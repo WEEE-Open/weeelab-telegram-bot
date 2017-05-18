@@ -7,7 +7,7 @@ Python script to create a Telegram bot.
 The goal of this script is to obtain lab info and simplify life.
 
 ## COMMAND SYNTAX
-/[COMMAND]
+`/start` the bot and type a `/command`.  
 
 Available commands:  
   `lab`  : Show the number of people in lab.  
