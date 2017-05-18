@@ -75,6 +75,7 @@ def main():
             #print last_update['message']
 
             if last_chat_username in lst:
+                print "ok"
                 #greet_bot.send_message(last_chat_id, 'Ciao {}'.format(last_chat_name))
                 if last_chat_text == "/lab" or last_chat_text == "/lab@weeelab_bot":
                     count = 0
