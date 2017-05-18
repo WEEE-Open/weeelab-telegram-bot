@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+# coding:utf-8
+
+'''
+WEEELAB_BOT - Telegram bot.
+Author: God
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+import requests
+import owncloud  
+from datetime import datetime
+
+class BotHandler:
+
+    def __init__(self, token):
+        self.token = token
+        self.api_url = "https://api.telegram.org/bot{}/".format(token)
+
+    def get_updates(self, offset=None, timeout=30):
+        method = 'getUpdates'
+        params = {'timeout': timeout, 'offset': offset}
+        resp = requests.get(self.api_url + method, params)
+        result_json = resp.json()['result']
+        return result_json
+
+    def send_message(self, chat_id, text):
+        params = {'chat_id': chat_id, 'text': text}
+        method = 'sendMessage'
+        resp = requests.post(self.api_url + method, params)
+        return resp
+
+    def get_last_update(self):
+        get_result = self.get_updates()
+
+        if len(get_result) > 0:
+            print len(get_result)
+            last_update = get_result[-1]
+            return last_update
+        else:
+            #print len(get_result)
+            #last_update = get_result[len(get_result)]
+
+            return -1
+
+greet_bot = BotHandler(TOKEN)
+lst = USERLIST
+def main():
+    oc = owncloud.Client('https://cloud.weeeopen.eu/')
+    oc.login(USERNAME, USER_PASS)
+    new_offset = None
+    while True:
+        greet_bot.get_updates(new_offset)
+        last_update = greet_bot.get_last_update()
+        if last_update != -1:
+            last_update_id = last_update['update_id']
+            new_offset = last_update_id + 1
+            last_chat_text = last_update['message']['text']
+            last_chat_id = last_update['message']['chat']['id']
+           #last_chat_name = last_update['message']['chat']['first_name']
+            print last_update['message']
+            last_chat_username= last_update['message']['from']['username']
+            #print last_update['message']
+
+            if last_chat_username in lst:
+                #greet_bot.send_message(last_chat_id, 'Ciao {}'.format(last_chat_name))
+                if last_chat_text == "/lab" or last_chat_text == "/lab@weeelab_bot":
+                    count = 0
+                    riga = ''
+                    file = oc.get_file_contents('weeeopen/Welab/log.txt')
+                    #currDay = datetime.now().strftime("%d/%m/%Y")
+                    #print file
+                
+                    for line in file:
+                        if line != '>':
+                            riga = riga + line
+                        if ("INLAB" in riga):
+                            count += 1
+                            print count
+                            riga = ''
+                    if count == 0:
+                        #print "Nessuno in laboratorio"
+                        greet_bot.send_message(last_chat_id, 'Nessuno in laboratorio')
+                    elif count == 1:
+                        #print "Una persona in lab"
+                        greet_bot.send_message(last_chat_id, 'Una persona in laboratorio')
+                    else:
+                        #print "{c} persone in lab".format(c=count)
+                        greet_bot.send_message(last_chat_id, '{c} persone in lab'.format(c=count))    
+            
+                if last_chat_text == "/log" or last_chat_text == "/log@weeelab_bot":
+                    file = oc.get_file_contents('weeeopen/Welab/log.txt')
+                    greet_bot.send_message(last_chat_id, '{}'.format(file))   
+                
+
+if __name__ == '__main__':  
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit()  
