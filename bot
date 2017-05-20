@@ -160,7 +160,7 @@ def main():
                         for char in file:
                             if char != '\n':
                                 line += char
-                            elif ("INLAB" in line and name == nameExtr(line[47:line.rfind(">")]):
+                            elif ("INLAB" in line and name == nameExtr(line[47:line.rfind(">")])):
                                 found_u= True
                                 (m, s) = line[39:line.rfind("]")].split(':')
                                 d = datetime.timedelta(minutes=int(m), seconds=int(s))
