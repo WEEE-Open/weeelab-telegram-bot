@@ -187,7 +187,7 @@ def main():
                             (h, m) = line[39:line.rfind("]")].split(':')
                             d = datetime.timedelta(hours=int(h), minutes=int(m))
                             if (name in user_name):
-                                user_hour[name]+=d
+                                user_hours[name]+=d
                             else:
                                 user_name.append(name)
                                 user_hours[name]=d
