@@ -108,7 +108,7 @@ def main():
                     file = oc.get_file_contents(OC_PATH)
                     n_line= 0
                     n=0
-                    if (len(command)>1 and command[2].isdigit():
+                    if (len(command)>1 and command[2].isdigit()):
                         n=command[2]
                     else
                         n=5
