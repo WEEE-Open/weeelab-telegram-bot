@@ -197,6 +197,7 @@ def main():
                                 user_hours[name]=d
                                 line = ''
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1))
+                    print sorted_hours
                     top=sorted_hours.reverse()
                     print top
                     greet_bot.send_message(last_chat_id, 'Top User List!\n')
