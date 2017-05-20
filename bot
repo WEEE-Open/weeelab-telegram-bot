@@ -209,8 +209,8 @@ def main():
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
                         if count <= number_list:
-                            print "count: " + count
-                            print "number_list: " + number_list
+                            print "count: " + str(count)
+                            print "number_list: " + str(number_list)
                             greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
                     
 
