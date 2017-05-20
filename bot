@@ -177,6 +177,13 @@ def main():
                             greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))
                             
                 if command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                    number_list = 10
+                    if len(command) == 1:
+                        number_list = 10
+                    elif command[1].isdigit():
+                        number_list = command[1]
+                    elif command[1] == "all":
+                        number_list = 50
                     file = oc.get_file_contents(OC_PATH)
                     count = 0
                     user_name=[]
@@ -202,7 +209,8 @@ def main():
                     for element in sorted_hours:
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
-                        greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
+                        if count < number_list:
+                            greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
                     
 
 if __name__ == '__main__':
