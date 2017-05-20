@@ -174,6 +174,27 @@ def main():
                         else:
                             (hours, minutes, seconds) = str(sum).split(':')
                             greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))
+                            
+                if command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                    file = oc.get_file_contents(OC_PATH)
+                    user_name=[]
+                    user_hours={}
+                    for char in file:
+                        if char != '\n':
+                            line += char
+                        else:
+                            name == line[47:line.rfind(">")]
+                            (h, m) = line[39:line.rfind("]")].split(':')
+                            d = datetime.timedelta(hours=int(h), minutes=int(m))
+                            if (name in user_name)
+                                user_hour[name]+=d
+                            else
+                                user_name.append(name)
+                                user_hours[name]=d
+                                line = ''
+                    sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1))
+                    print sorted_hours
+                    
 
 if __name__ == '__main__':
     try:
