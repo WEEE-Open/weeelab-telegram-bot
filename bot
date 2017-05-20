@@ -187,8 +187,9 @@ def main():
                     print number_list
                     file = oc.get_file_contents(OC_PATH)
                     count = 0
-                    user_name=[]
-                    user_hours={}
+                    user_name = []
+                    user_hours = {}
+                    top_list = 'Top User List!\n'
                     for char in file:
                         if char != '\n':
                             line += char
@@ -204,13 +205,14 @@ def main():
                                 user_hours[name]=d
                                 line = ''
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)
-                    greet_bot.send_message(last_chat_id, 'Top User List!\n')
+                    #greet_bot.send_message(last_chat_id, 'Top User List!\n')
                     for element in sorted_hours:
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
                         if count <= number_list:
-                            greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
-                    
+                            top_list = top_list + '{}) {}    HH:MM = {}:{}\n'.format(count, nameExtr(element[0]), hours, minutes)
+                            #greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
+                    greet_bot.send_message(last_chat_id, '{}'.format(top_list))
 
 if __name__ == '__main__':
     try:
