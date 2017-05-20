@@ -118,9 +118,9 @@ def main():
                                 line += char
                             elif ("INLAB" in line):
                                 found=1
-                                user= nameExtr(line[47:line.rfind(">")])
+                                user = nameExtr(line[47:line.rfind(">")])
                                 if(len(command) > 2 and command[2] == "girls"):
-                                    if user in GIRLS:
+                                    if line[47:line.rfind(">")] in GIRLS:
                                         found_g = 1
                                         greet_bot.send_message(last_chat_id, '{}'.format(user))
                                 else:
