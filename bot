@@ -172,7 +172,8 @@ def main():
                         if found_u == False:
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
-                            greet_bot.send_message(last_chat_id, 'Stat for the user {} HH:MM = {}:{}'.format(nameExtr(name), str(sum.hours), str(sum.minutes)))
+                            (hours, minutes, seconds) = sum.split(':')
+                            greet_bot.send_message(last_chat_id, 'Stat for the user {} HH:MM = {}:{}'.format(nameExtr(name), str(hours), str(minutes)))
 
 if __name__ == '__main__':
     try:
