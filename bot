@@ -129,7 +129,8 @@ def main():
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
                     data=oc.file_info(OC_PATH).get_last_modified()
-                    greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))
+                    log = ('Last modified time of log file\n{}\n'.format(data))
+                    #greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))
                     n_line= 0
                     n_print=0
                     if (len(command)>1 and command[1].isdigit()):
@@ -140,9 +141,10 @@ def main():
                         if n_line < n_print :
                             line += char
                             if char == '\n':
-                                greet_bot.send_message(last_chat_id, '{}\n'.format(line))
+                                log = log + '{}\n'.format(line)
                                 line = ''
                                 n_line += 1
+                    greet_bot.send_message(last_chat_id, '{}'.format(log))
                 
                 if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":
                     data=oc.file_info(OC_PATH).get_last_modified()
