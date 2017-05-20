@@ -28,6 +28,8 @@ OC_URL = os.environ.get('OC_URL')
 OC_USER = os.environ.get('OC_USER')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
 USER_LIST_NAME = os.environ.get('USER_LIST_NAME')
+USERS= os.environ.get('USERS')
+GIRLS= os.environ.get('GIRLS')
 
 class BotHandler:
     def __init__(self, token):
@@ -89,34 +91,52 @@ def main():
                 # Show how many students are in lab right now
                 if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
-                    for char in file:
-                        if char != '\n':
-                            line += char
-                        elif ("INLAB" in line):
-                            count += 1
-                            print count
-                            line = ''
-                    if count == 0:
-                        greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
-                    elif count == 1:
-                        greet_bot.send_message(last_chat_id, 'There is one student in lab right now.')
-                    else:
-                        greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count))
+                    found = 0
+                    found_g = 0
+                    if (len(command)=1):
+                        for char in file:
+                            if char != '\n':
+                                line += char
+                            elif ("INLAB" in line):
+                                count += 1
+                                print count
+                                line = ''
+                        if count == 0:
+                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
+                        elif count == 1:
+                            greet_bot.send_message(last_chat_id, 'There is one student in lab right now.')
+                        else:
+                            greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count))
+                    elif (command[2]=="who"):
+                        for char in file:
+                            if char != '\n':
+                                line += char
+                            elif ("INLAB" in line):
+                                found=1
+                                user= nameExtr(line[47:line.rfind(">")])
+                                if(len(command) > 2 and command[3] == "girls")
+                                    if user in GIRLS:
+                                        found_g = 1
+                                        greet_bot.send_message(last_chat_id, '{}'.format(user))
+                                else:
+                                greet_bot.send_message(last_chat_id, '{}'.format(user))
+                                line = ''
+                        if found == 0:
+                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
+                        elif (found_g == 0 and command[3] == "girls"):
+                            greet_bot.send_message(last_chat_id, 'No girls in lab right now.')
 
                 # Show log file
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
                     n_line= 0
-                    n=0
+                    n_print=0
                     if (len(command)>1 and command[1].isdigit()):
-                        n=int(command[1])
-                        print command
-                        print command[1]
-                        print n
+                        n_print=int(command[1])
                     else:
-                        n=5
+                        n_print=5
                     for char in file:
-                        if n_line < n :
+                        if n_line < n_print :
                             line += char
                             if char == '\n':
                                 greet_bot.send_message(last_chat_id, '{}\n'.format(line))
