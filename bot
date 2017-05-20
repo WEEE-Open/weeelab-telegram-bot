@@ -189,6 +189,7 @@ def main():
                             d = datetime.timedelta(hours=int(h), minutes=int(m))
                             if (name in user_name):
                                 user_hours[name]+=d
+                                line = ''
                             else:
                                 user_name.append(name)
                                 user_hours[name]=d
