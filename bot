@@ -110,6 +110,9 @@ def main():
                     n=0
                     if (len(command)>1 and command[1].isdigit()):
                         n=command[1]
+                        print command
+                        print command[1]
+                        print n
                     else:
                         n=5
                     for char in file:
