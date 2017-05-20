@@ -147,7 +147,11 @@ def main():
                             if char == '\n':
                                 greet_bot.send_message(last_chat_id, '{}\n'.format(line))
                                 line = ''
-                                n_line += 1                                
+                                n_line += 1
+                if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":
+                    data=oc.get_last_modified(OC_PATH)
+                    greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}'.format(data))
+                                
 
 
 if __name__ == '__main__':
