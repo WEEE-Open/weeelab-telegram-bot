@@ -173,7 +173,7 @@ def main():
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
                             (hours, minutes, seconds) = str(sum).split(':')
-                            greet_bot.send_message(last_chat_id, 'Stat for the user {}\n HH:MM = {}:{}'.format(nameExtr(name), hours, minutes))
+                            greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))
 
 if __name__ == '__main__':
     try:
