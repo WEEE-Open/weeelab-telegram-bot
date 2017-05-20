@@ -181,9 +181,12 @@ def main():
                     if len(command) == 1:
                         number_list = 10
                     elif command[1].isdigit():
+                        print command[1]
                         number_list = command[1]
+                        print number_list
                     elif command[1] == "all":
                         number_list = 50
+                    print number_list
                     file = oc.get_file_contents(OC_PATH)
                     count = 0
                     user_name=[]
@@ -193,7 +196,6 @@ def main():
                             line += char
                         else:
                             name = line[47:line.rfind(">")]
-                            print line[39:line.rfind("]")]
                             (h, m) = line[39:line.rfind("]")].split(':')
                             d = datetime.timedelta(hours=int(h), minutes=int(m))
                             if (name in user_name):
@@ -204,12 +206,11 @@ def main():
                                 user_hours[name]=d
                                 line = ''
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)
-                    print sorted_hours
                     greet_bot.send_message(last_chat_id, 'Top User List!\n')
                     for element in sorted_hours:
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
-                        if count < number_list:
+                        if count <= number_list:
                             greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
                     
 
