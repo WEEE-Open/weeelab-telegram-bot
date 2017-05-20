@@ -75,6 +75,7 @@ def main():
             last_update_id = last_update['update_id']
             new_offset = last_update_id + 1
             last_chat_text = last_update['message']['text']
+            command = last_chat_text.split()
             last_chat_id = last_update['message']['chat']['id']
             # last_chat_name = last_update['message']['chat']['first_name']
             print last_update['message']
@@ -86,7 +87,7 @@ def main():
 
                 ''' ADD COMMANDS HERE '''
                 # Show how many students are in lab right now
-                if last_chat_text == "/inlab" or last_chat_text == "/inlab@weeelab_bot":
+                if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
                     for char in file:
                         if char != '\n':
@@ -103,13 +104,21 @@ def main():
                         greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count))
 
                 # Show log file
-                if last_chat_text == "/log" or last_chat_text == "/log@weeelab_bot":
+                if command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
+                    n_line= 0
+                    n=0
+                    if (len(command)>1 and command[2].isdigit():
+                        n=command[2]
+                    else
+                        n=5
                     for char in file:
-                        line += char
-                        if char == '\n':
-                            greet_bot.send_message(last_chat_id, '{}\n'.format(line))
-                            line = ''
+                        if n_line < n :
+                            line += char
+                            if char == '\n':
+                                greet_bot.send_message(last_chat_id, '{}\n'.format(line))
+                                line = ''
+                                n_line += 1                                
 
 
 if __name__ == '__main__':
