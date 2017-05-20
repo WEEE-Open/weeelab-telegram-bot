@@ -119,8 +119,8 @@ def main():
                                         found_g = 1
                                         greet_bot.send_message(last_chat_id, '{}'.format(user))
                                 else:
-                                greet_bot.send_message(last_chat_id, '{}'.format(user))
-                                line = ''
+                                    greet_bot.send_message(last_chat_id, '{}'.format(user))
+                                    line = ''
                         if found == 0:
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
                         elif (found_g == 0 and command[3] == "girls"):
