@@ -118,8 +118,8 @@ def main():
                             elif ("INLAB" in line):
                                 found= True
                                 user = nameExtr(line[47:line.rfind(">")])
-                                    greet_bot.send_message(last_chat_id, '{}'.format(user))
-                                    line = ''
+                                greet_bot.send_message(last_chat_id, '{}'.format(user))
+                                line = ''
                         if (found == False):
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
 
