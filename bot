@@ -200,10 +200,10 @@ def main():
                     top=sorted_hours.reverse()
                     print top
                     greet_bot.send_message(last_chat_id, 'Top User List!\n')
-                    for element in top:
-                        count += 1
-                        (hours, minutes, seconds) = str(element[1]).split(':')
-                        greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
+                    #for element in top:
+                    #    count += 1
+                    #    (hours, minutes, seconds) = str(element[1]).split(':')
+                    #    greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
                     
 
 if __name__ == '__main__':
