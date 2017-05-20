@@ -58,6 +58,11 @@ class BotHandler:
         else:
             return -1
 
+def nameExtr(username):
+    firstName = username.split('.')[0].capitalize()
+    lastName = username.split('.')[1].capitalize()
+    return firstName + " " + lastName
+
 
 greet_bot = BotHandler(TOKEN_BOT)
 lst_username = USER_LIST_NAME
