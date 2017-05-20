@@ -153,10 +153,12 @@ def main():
                     m=0
                     s=0
                     sum = datetime.timedelta()
+                    print "stat"
+                    print command
                     if (len(command) == 1):
                         greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
                     elif (len(command)>2):
-                        print command
+                        
                         name = command[1]
                         for char in file:
                             if char != '\n':
