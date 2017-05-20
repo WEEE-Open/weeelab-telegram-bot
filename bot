@@ -149,7 +149,7 @@ def main():
                     
                 if command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
-                    found_u = True
+                    found_u = False
                     m=0
                     s=0
                     sum = datetime.timedelta()
@@ -160,14 +160,14 @@ def main():
                         for char in file:
                             if char != '\n':
                                 line += char
-                            elif ("INLAB" in line and name == nameExtr(line[47:line.rfind(">")])):
+                            elif (name == nameExtr(line[47:line.rfind(">")])):
                                 found_u= True
                                 (m, s) = line[39:line.rfind("]")].split(':')
                                 d = datetime.timedelta(minutes=int(m), seconds=int(s))
                                 sum += d
                                 line = ''
                         if found_u == False:
-                            greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? name.surname')
+                            greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
                             greet_bot.send_message(last_chat_id, 'Stat for the user {} \n'.format(name))
                             greet_bot.send_message(last_chat_id, 'HH:MM = {}'.format(str(sum)))
