@@ -96,8 +96,7 @@ def main():
                 # Show how many students are in lab right now
                 if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
-                    found = 0
-                    found_g = 0
+                    found = False
                     if (len(command) == 1):
                         for char in file:
                             if char != '\n':
@@ -117,19 +116,11 @@ def main():
                             if char != '\n':
                                 line += char
                             elif ("INLAB" in line):
-                                found=1
+                                found= True
                                 user = nameExtr(line[47:line.rfind(">")])
-                                if(len(command) > 2 and command[2] == "girls"):
-                                    if line[47:line.rfind(">")] in GIRLS:
-                                        found_g = 1
-                                        greet_bot.send_message(last_chat_id, '{}'.format(user))
-                                else:
                                     greet_bot.send_message(last_chat_id, '{}'.format(user))
                                     line = ''
-                        if (len(command) > 2 and command[2] == "girls"):
-                            if (found_g == 0):
-                                greet_bot.send_message(last_chat_id, 'No girls in lab right now.')
-                        elif (found == 0):
+                        if (found == False):
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
 
                 # Show log file
@@ -149,7 +140,7 @@ def main():
                                 line = ''
                                 n_line += 1
                 if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":
-                    data=oc.file_info.get_last_modified(OC_PATH)
+                    data=FileInfo.get_last_modified(OC_PATH)
                     greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}'.format(data))
                                 
 
