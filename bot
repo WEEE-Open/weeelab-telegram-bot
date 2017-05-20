@@ -181,9 +181,7 @@ def main():
                     if len(command) == 1:
                         number_list = 10
                     elif command[1].isdigit():
-                        print command[1]
                         number_list = command[1]
-                        print number_list
                     elif command[1] == "all":
                         number_list = 50
                     print number_list
@@ -211,6 +209,8 @@ def main():
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
                         if count <= number_list:
+                            print count
+                            print number_list
                             greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
                     
 
