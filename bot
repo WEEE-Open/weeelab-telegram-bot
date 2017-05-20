@@ -110,7 +110,7 @@ def main():
                     n=0
                     if (len(command)>1 and command[2].isdigit()):
                         n=command[2]
-                    else
+                    else:
                         n=5
                     for char in file:
                         if n_line < n :
