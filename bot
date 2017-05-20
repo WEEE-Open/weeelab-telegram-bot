@@ -156,13 +156,13 @@ def main():
                     if (len(command) == 1):
                         greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
                     elif (len(command)>1):
-                        name = nameExtr(command[1])
+                        name = command[1]
                         print name
                         for char in file:
                             if char != '\n':
                                 line += char
-                            elif (name == nameExtr(line[47:line.rfind(">")])):
-                                found_u= True
+                            elif (name == line[47:line.rfind(">")]):
+                                found_u = True
                                 (h, m) = line[39:line.rfind("]")].split(':')
                                 d = datetime.timedelta(hours=int(h), minutes=int(m))
                                 sum += d
@@ -172,8 +172,7 @@ def main():
                         if found_u == False:
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
-                            greet_bot.send_message(last_chat_id, 'Stat for the user {}'.format(name))
-                            greet_bot.send_message(last_chat_id, 'HH:MM = {}'.format(str(sum)))
+                            greet_bot.send_message(last_chat_id, 'Stat for the user {} HH:MM = {}:{}'.format(nameExtr(name), str(sum.hours), str(sum.minutes)))
 
 if __name__ == '__main__':
     try:
