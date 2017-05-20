@@ -121,7 +121,7 @@ def main():
                                 else:
                                     greet_bot.send_message(last_chat_id, '{}'.format(user))
                                     line = ''
-                            if (len(command) > 2 and command[2] == "girls"):
+                            if (len(command) > 2 and command[2] == "girls")
                                 if (found_g == 0):
                                     greet_bot.send_message(last_chat_id, 'No girls in lab right now.')
                             elif (found == 0):
