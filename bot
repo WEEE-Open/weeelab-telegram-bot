@@ -156,11 +156,12 @@ def main():
                     if (len(command) == 1):
                         greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
                     elif (len(command)>1):
-                        name = nameExtr(command[1])
+                        name = command[1]
+                        print name
                         for char in file:
                             if char != '\n':
                                 line += char
-                            elif (name == nameExtr(line[47:line.rfind(">")])):
+                            elif (name == line[47:line.rfind(">")]):
                                 found_u= True
                                 (m, s) = line[39:line.rfind("]")].split(':')
                                 d = datetime.timedelta(minutes=int(m), seconds=int(s))
