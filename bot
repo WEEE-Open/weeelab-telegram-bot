@@ -196,7 +196,7 @@ def main():
                                 user_hours[name]=d
                                 line = ''
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1))
-                    print sorted_hours
+                    print dict(sorted_hours.reverse)
                     
 
 if __name__ == '__main__':
