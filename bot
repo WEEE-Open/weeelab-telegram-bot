@@ -20,6 +20,7 @@ NOTE: The print commands are only for debug.
 import os
 import requests
 import owncloud
+import datetime
 from sys import argv
 
 OC_PATH = os.environ.get('OC_PATH')
@@ -145,8 +146,31 @@ def main():
                 if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":
                     data=oc.file_info(OC_PATH).get_last_modified()
                     greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}'.format(data))
-                                
-
+                    
+                if command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
+                    file = oc.get_file_contents(OC_PATH)
+                    found_u = True
+                    m=0
+                    s=0
+                    sum = datetime.timedelta()
+                    if (len(command) == 1):
+                        greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
+                    elif (len(command)>2):
+                        name = command[1]
+                        for char in file:
+                            if char != '\n':
+                                line += char
+                            elif ("INLAB" in line and name == nameExtr(line[47:line.rfind(">")]):
+                                found_u= True
+                                (m, s) = line[39:line.rfind("]")].split(':')
+                                d = datetime.timedelta(minutes=int(m), seconds=int(s))
+                                sum += d
+                                line = ''
+                        if found_u == False:
+                            greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? name.surname')
+                        else:
+                            greet_bot.send_message(last_chat_id, 'Stat for the user {} \n'.format(name))
+                            greet_bot.send_message(last_chat_id, 'HH:MM = {}'.format(str(sum)))
 
 if __name__ == '__main__':
     try:
