@@ -199,7 +199,7 @@ def main():
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)
                     print sorted_hours
                     greet_bot.send_message(last_chat_id, 'Top User List!\n')
-                    for element in top:
+                    for element in sorted_hours:
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
                         greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
