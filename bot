@@ -121,10 +121,11 @@ def main():
                                 else:
                                     greet_bot.send_message(last_chat_id, '{}'.format(user))
                                     line = ''
-                        if found == 0:
-                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
-                        elif (found_g == 0 and command[2] == "girls"):
-                            greet_bot.send_message(last_chat_id, 'No girls in lab right now.')
+                            if (len(command) > 2 and command[2] == "girls")
+                                if (found_g == 0):
+                                    greet_bot.send_message(last_chat_id, 'No girls in lab right now.')
+                            elif (found == 0):
+                                greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
 
                 # Show log file
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":
