@@ -93,7 +93,7 @@ def main():
                     file = oc.get_file_contents(OC_PATH)
                     found = 0
                     found_g = 0
-                    if (len(command)=1):
+                    if (len(command) == 1):
                         for char in file:
                             if char != '\n':
                                 line += char
