@@ -129,7 +129,7 @@ def main():
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
                     data=oc.file_info(OC_PATH).get_last_modified()
-                    log = ('Last modified time of log file: {}\n'.format(data))
+                    log = ('Last modified time of log file: {}\n \n'.format(data))
                     #greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))
                     n_line= 0
                     n_print=0
