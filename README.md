@@ -4,12 +4,12 @@
 
 WEEE Open Telegram bot.
 
-The goal of this bot is to obtain information of who's currently in 
-the lab, who has done what, compute some stats and in general simplify 
-life. And avoid more paper sign sheets.
+The goal of this bot is to obtain information of who's currently in  
+the lab, who has done what, compute some stats and in general simplify  
+life. And avoid more paper sign sheets.  
 
-All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log 
-file, which is fetched from an OwnCloud shared folder.
+All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log  
+file, which is fetched from an OwnCloud shared folder.  
 
 ## Installation
 
