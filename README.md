@@ -34,7 +34,7 @@ run:
 
 Available commands:  
     `inlab` : Show the number of people in lab.  
-    `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
+    `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)\n
         -   `number`   : Insert a number and show the `number` of lines of `OC_PATH` file.
     `stat`  :  Show the hours in lab of the user (option needed)
         -   `name.surname`  : Show the hours for this user.
