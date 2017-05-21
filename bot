@@ -91,11 +91,12 @@ def main():
             print last_update['message']
             last_user_username = last_update['message']['from']['username']
             last_user_id = last_update['message']['from']['id']
-            if (complete_name in USER_BOT):
+            user_bot = user_bot(USER_BOT)
+            if (complete_name in user_bot):
                 print "ok"
             else:
-                USER_BOT[complete_name] = last_user_id
-            os.environ['USER_BOT'] = USER_BOT
+                user_bot[complete_name] = last_user_id
+            os.environ['USER_BOT'] = user_bot
 
             if last_user_username in lst_username:
                 print "ok" 
