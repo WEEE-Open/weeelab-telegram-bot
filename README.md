@@ -33,10 +33,11 @@ Available commands:
 
 * `inlab` : Show the number of people in lab.
 * `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
-  * number   : Show the N most recent lines of `OC_PATH` file.
-* `stat name.surname`  :  Show hours spent in lab by this user
+  * `number`   : Show the N most recent lines of `OC_PATH` file.
+  * `all`      : Show all the lines of OC_PATH file.
+* `stat name.surname`  :  Show hours spent in lab by this user.
 * `top`   :  Show a list of the top users in lab (defaul top 10)
-  * number     : Show the top N elements
+  * number     : Show the top N elements.
   * `all`      : Show list with all users.
 * `sync`  :  Show last edit date and time of the `OC_PATH` file.
 
