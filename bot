@@ -88,7 +88,7 @@ def main():
             command = last_chat_text.split()
             last_chat_id = last_update['message']['chat']['id']
             last_chat_name = last_update['message']['from']['first_name']
-            last_chat_surname = last_update['message']['from']['last_name']
+            last_chat_surname = last_update['message']['chat']['last_name']
             complete_name = last_chat_name + ' ' + last_chat_surname
             print last_update['message']
             last_user_username = last_update['message']['from']['username']
