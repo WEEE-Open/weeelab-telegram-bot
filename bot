@@ -30,6 +30,7 @@ OC_URL = os.environ.get('OC_URL')
 OC_USER = os.environ.get('OC_USER')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
 USER_LIST_NAME = os.environ.get('USER_LIST_NAME')
+USER_BOT = os.environ.get('USER_BOT')
 
 class BotHandler:
     def __init__(self, token):
@@ -84,10 +85,17 @@ def main():
             last_chat_text = last_update['message']['text']
             command = last_chat_text.split()
             last_chat_id = last_update['message']['chat']['id']
-            # last_chat_name = last_update['message']['chat']['first_name']
+            last_chat_name = last_update['message']['from']['first_name']
+            last_chat_surname = last_update['message']['from']['last_name']
+            complete_name = last_chat_name + ' ' + last_chat_surname
             print last_update['message']
             last_user_username = last_update['message']['from']['username']
-            #last_user_id = last_update['message']['from']['id']
+            last_user_id = last_update['message']['from']['id']
+            if (complete_name in USER_BOT):
+                print "ok"
+            else:
+                USER_BOT[complete_name] = last_user_id
+            os.environ['USER_BOT'] = USER_BOT
 
             if last_user_username in lst_username:
                 print "ok" 
@@ -202,7 +210,7 @@ def main():
                                 line = ''
                             else:
                                 user_name.append(name)
-                                user_hours[name]=d
+                                user_hours[name] = d
                                 line = ''
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)
                     #greet_bot.send_message(last_chat_id, 'Top User List!\n')
