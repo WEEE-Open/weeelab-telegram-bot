@@ -92,8 +92,8 @@ def main():
                 last_chat_name = last_update['message']['from']['first_name']
                 last_user_username = last_update['message']['from']['username']
                 complete_name = last_chat_name 
-                last_chat_surname = last_update['message']['from']['last_name']
-                complete_name = complete_name + ' ' + last_chat_surname
+                #last_chat_surname = last_update['message']['from']['last_name']
+                #complete_name = complete_name + ' ' + last_chat_surname
                 print last_update['message']
                 #print USER_BOT
                 
