@@ -31,7 +31,7 @@ OC_URL = os.environ.get('OC_URL')
 OC_USER = os.environ.get('OC_USER')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
 USER_LIST_NAME = os.environ.get('USER_LIST_NAME')
-#USER_BOT = os.environ.get('USER_BOT')
+USER_BOT_PATH = os.environ.get('USER_BOT_PATH')
 
 class BotHandler:
     def __init__(self, token):
@@ -82,7 +82,7 @@ def main():
         count = 0
         if last_update != -1:
             try:
-                user_bot = {}
+                user_bot_str = ''
                 last_update_id = last_update['update_id']
                 new_offset = last_update_id + 1
                 last_chat_text = last_update['message']['text']
@@ -90,16 +90,17 @@ def main():
                 last_chat_id = last_update['message']['chat']['id']
                 last_chat_name = last_update['message']['from']['first_name']
                 #last_chat_surname = last_update['message']['from']['last_name']
-                #complete_name = last_chat_name #+ ' ' + last_chat_surname
+                complete_name = last_chat_name #+ ' ' + last_chat_surname
                 print last_update['message']
                 last_user_username = last_update['message']['from']['username']
                 last_user_id = last_update['message']['from']['id']
                 #print USER_BOT
-                #user_bot = ast.literal_eval(USER_BOT)
-                #if (complete_name in user_bot):
-                #    print "ok"
-                #else:
-                #    user_bot[complete_name] = last_user_id
+                user_bot = oc.get_file_contents(USER_BOT_PATH)
+                if (complete_name in user_bot):
+                    print "ok"
+                else:
+                    user_bot_str = '\'' + complete_name + '\'' + ': ' + '\'' + last_user_id + '\'' + ','
+                oc.put_file_contents(USER_BOT_PATH, user_bot_str)
                 #os.environ['USER_BOT'] = str(user_bot)
             except KeyError:
                 last_user_username = 'error'
