@@ -21,27 +21,29 @@ requirements.txt` to install dependencies.
 
 `bot` is the main program, and it requires some environment variables to 
 run:
-* `OC_PATH`: TODO (format?)
-* `OC_URL`: TODO (which URL? Where do I find it?)
+* `OC_PATH`: path of the file to read in owncloud (/folder/file.txt)
+* `OC_URL`: url of the owncloud server
 * `OC_USER`: OwnCloud username
 * `OC_PWD`: OwnCloud password
 * `TOKEN_BOT`: Telegram token for the bot API
-* `USER_LIST_NAME`: TODO (list format: comma-separated, space-separated, 
-are spaces allowed?)
-* `USERS`: TODO (what?)
+* `USER_LIST_NAME`: Python list of the user allowed to use the bot
+
 
 ## Command syntax
-`/start` the bot and type a command.  
+`/start` the bot and type `/[COMMAND] [OPTION]`.  
 
 Available commands:  
-  `lab`  : Show the number of people in lab.  
-  `log`  : Show the complete log (only for admin user).  
-  `inlab`:   
-  `stat` :  
-  `top`  :  
-  `sync` :  
+    `inlab` : Show the number of people in lab.  
+    `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
+        -   `number`   : Insert a number and show the `number` of lines of `OC_PATH` file.
+    `stat`  :  Show the hours in lab of the user (option needed)
+        -   `name.surname`  : Show the hours for this user.
+    `top`   :  Show a list of the top users in lab (defaul top 10)
+        -   `number`   : Insert a number and show the list with `number` element;
+        -   `all`      : Show the list of all the users.
+    `sync`  :  Show the info about last edit of the `OC_PATH` file.
 
 ## TODO
 
-- [ ] Implement a function to compute stats for a user
-- [ ] Finish documenting commands
+- [X] Implement a function to compute stats for a user
+- [X] Finish documenting commands
