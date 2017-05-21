@@ -92,7 +92,7 @@ def main():
             print last_update['message']
             last_user_username = last_update['message']['from']['username']
             last_user_id = last_update['message']['from']['id']
-            user_bot = user_bot(USER_BOT)
+            user_bot = dict(USER_BOT)
             if (complete_name in user_bot):
                 print "ok"
             else:
