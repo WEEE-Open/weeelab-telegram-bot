@@ -8,8 +8,7 @@ The goal of this bot is to obtain information about who is currently in the lab,
 who has done what, compute some stats and, in general, simplify the life of our members...  
 And to avoid waste of paper as well.  
 
-All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log  
-file, which is fetched from an OwnCloud shared folder.  
+All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log file, which is fetched from an OwnCloud shared folder.  
 
 ## Installation
 
