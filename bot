@@ -81,25 +81,28 @@ def main():
         line = ''
         count = 0
         if last_update != -1:
-            user_bot = {}
-            last_update_id = last_update['update_id']
-            new_offset = last_update_id + 1
-            last_chat_text = last_update['message']['text']
-            command = last_chat_text.split()
-            last_chat_id = last_update['message']['chat']['id']
-            last_chat_name = last_update['message']['from']['first_name']
-            #last_chat_surname = last_update['message']['from']['last_name']
-            #complete_name = last_chat_name #+ ' ' + last_chat_surname
-            print last_update['message']
-            last_user_username = last_update['message']['from']['username']
-            last_user_id = last_update['message']['from']['id']
-            #print USER_BOT
-            #user_bot = ast.literal_eval(USER_BOT)
-            #if (complete_name in user_bot):
-            #    print "ok"
-            #else:
-            #    user_bot[complete_name] = last_user_id
-            #os.environ['USER_BOT'] = str(user_bot)
+            try:
+                user_bot = {}
+                last_update_id = last_update['update_id']
+                new_offset = last_update_id + 1
+                last_chat_text = last_update['message']['text']
+                command = last_chat_text.split()
+                last_chat_id = last_update['message']['chat']['id']
+                last_chat_name = last_update['message']['from']['first_name']
+                #last_chat_surname = last_update['message']['from']['last_name']
+                #complete_name = last_chat_name #+ ' ' + last_chat_surname
+                print last_update['message']
+                last_user_username = last_update['message']['from']['username']
+                last_user_id = last_update['message']['from']['id']
+                #print USER_BOT
+                #user_bot = ast.literal_eval(USER_BOT)
+                #if (complete_name in user_bot):
+                #    print "ok"
+                #else:
+                #    user_bot[complete_name] = last_user_id
+                #os.environ['USER_BOT'] = str(user_bot)
+            except KeyError:
+                last_user_username = 'error'
 
             if last_user_username in lst_username:
                 print "ok" 
