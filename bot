@@ -149,6 +149,8 @@ def main():
                     n_print=0
                     if (len(command)>1 and command[1].isdigit()):
                         n_print=int(command[1])
+                    elif (len(command)>1 and command[1] == "all"):
+                        n_print=1000
                     else:
                         n_print=5
                     for char in file:
