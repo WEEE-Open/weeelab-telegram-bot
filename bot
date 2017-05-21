@@ -95,12 +95,13 @@ def main():
             last_user_id = last_update['message']['from']['id']
             print USER_BOT
             user_bot = ast.literal_eval(USER_BOT)
-            print type(user_bot)
             if (complete_name in user_bot):
                 print "ok"
             else:
                 user_bot[complete_name] = last_user_id
             os.environ['USER_BOT'] = str(user_bot)
+            print user_bot
+            print USER_BOT
 
             if last_user_username in lst_username:
                 print "ok" 
