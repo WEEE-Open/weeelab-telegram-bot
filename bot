@@ -80,6 +80,7 @@ def main():
         last_update = greet_bot.get_last_update()
         line = ''
         count = 0
+        found_username = False
         if last_update != -1:
             try:
                 user_bot_str = ''
@@ -91,15 +92,18 @@ def main():
                 last_user_id = last_update['message']['from']['id']
                 last_chat_name = last_update['message']['from']['first_name']
                 last_user_username = last_update['message']['from']['username']
+                found_username = True
                 complete_name = last_chat_name 
-                #last_chat_surname = last_update['message']['from']['last_name']
-                #complete_name = complete_name + ' ' + last_chat_surname
+                last_chat_surname = last_update['message']['from']['last_name']
+                complete_name = complete_name + ' ' + last_chat_surname
                 print last_update['message']
                 #print USER_BOT
                 
             except KeyError:
-                last_user_username = 'error'
+                if (found_username == False):
+                    last_user_username = 'error'
                 print "ERROR!"
+                continue
 
             if last_user_username in lst_username:
                 print "ok" 
