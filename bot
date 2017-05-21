@@ -103,6 +103,7 @@ def main():
                 #os.environ['USER_BOT'] = str(user_bot)
             except KeyError:
                 last_user_username = 'error'
+                print "ERROR!"
 
             if last_user_username in lst_username:
                 print "ok" 
