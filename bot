@@ -103,9 +103,9 @@ def main():
                 if (found_username == False):
                     last_user_username = 'error'
                 print "ERROR!"
-                goto check
+                goto .check
             
-            label: check
+            label: .check
             if last_user_username in lst_username:
                 print "ok" 
 
