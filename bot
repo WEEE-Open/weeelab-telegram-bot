@@ -105,7 +105,7 @@ def main():
                 print "ERROR!"
                 goto .check
             
-            label: .check
+            label .check
             if last_user_username in lst_username:
                 print "ok" 
 
