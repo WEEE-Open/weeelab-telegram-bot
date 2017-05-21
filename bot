@@ -24,7 +24,6 @@ import datetime
 import operator
 import ast
 from sys import argv
-from goto import goto, comefrom, label
 
 OC_PATH = os.environ.get('OC_PATH')
 OC_PWD = os.environ.get('OC_PWD')
@@ -95,8 +94,8 @@ def main():
                 last_user_username = last_update['message']['from']['username']
                 found_username = True
                 complete_name = last_chat_name 
-                last_chat_surname = last_update['message']['from']['last_name']
-                complete_name = complete_name + ' ' + last_chat_surname
+                #last_chat_surname = last_update['message']['from']['last_name']
+                #complete_name = complete_name + ' ' + last_chat_surname
                 print last_update['message']
                 #print USER_BOT
                 
@@ -104,9 +103,7 @@ def main():
                 if (found_username == False):
                     last_user_username = 'error'
                 print "ERROR!"
-                goto .check
             
-            label .check
             if last_user_username in lst_username:
                 print "ok" 
 
