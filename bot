@@ -30,8 +30,6 @@ OC_URL = os.environ.get('OC_URL')
 OC_USER = os.environ.get('OC_USER')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
 USER_LIST_NAME = os.environ.get('USER_LIST_NAME')
-USERS= os.environ.get('USERS')
-GIRLS= os.environ.get('GIRLS')
 
 class BotHandler:
     def __init__(self, token):
