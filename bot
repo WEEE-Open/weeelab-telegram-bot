@@ -100,7 +100,7 @@ def main():
                 print "ok"
             else:
                 user_bot[complete_name] = last_user_id
-            os.environ['USER_BOT'] = user_bot
+            os.environ['USER_BOT'] = str(user_bot)
 
             if last_user_username in lst_username:
                 print "ok" 
