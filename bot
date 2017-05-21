@@ -80,6 +80,7 @@ def main():
         line = ''
         count = 0
         if last_update != -1:
+            user_bot = {}
             last_update_id = last_update['update_id']
             new_offset = last_update_id + 1
             last_chat_text = last_update['message']['text']
