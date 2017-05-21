@@ -21,8 +21,8 @@ requirements.txt` to install dependencies.
 
 `bot` is the main program, and it requires some environment variables to 
 run:
-* `OC_PATH`: PATH of the file to read in owncloud (/folder/file.txt)
-* `OC_URL`: URL of the owncloud server
+* `OC_PATH`: path of the file to read in owncloud (/folder/file.txt)
+* `OC_URL`: url of the owncloud server
 * `OC_USER`: OwnCloud username
 * `OC_PWD`: OwnCloud password
 * `TOKEN_BOT`: Telegram token for the bot API
@@ -34,7 +34,7 @@ run:
 
 Available commands:  
     `inlab` : Show the number of people in lab.  
-    `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)\n
+    `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
         -   `number`   : Insert a number and show the `number` of lines of `OC_PATH` file.
     `stat`  :  Show the hours in lab of the user (option needed)
         -   `name.surname`  : Show the hours for this user.
