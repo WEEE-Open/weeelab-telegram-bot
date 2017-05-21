@@ -32,16 +32,16 @@ run:
 ## Command syntax
 `/start` the bot and type `/[COMMAND] [OPTION]`.  
 
-Available commands:  
-    `inlab` : Show the number of people in lab.  
-    `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
-        -   `number`   : Insert a number and show the `number` of lines of `OC_PATH` file.
-    `stat`  :  Show the hours in lab of the user (option needed)
-        -   `name.surname`  : Show the hours for this user.
-    `top`   :  Show a list of the top users in lab (defaul top 10)
-        -   `number`   : Insert a number and show the list with `number` element;
-        -   `all`      : Show the list of all the users.
-    `sync`  :  Show the info about last edit of the `OC_PATH` file.
+Available commands:
+
+* `inlab` : Show the number of people in lab.
+* `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
+  * number   : Show the N most recent lines of `OC_PATH` file.
+* `stat name.surname`  :  Show hours spent in lab by this user
+* `top`   :  Show a list of the top users in lab (defaul top 10)
+  * number     : Show the top N elements
+  * `all`      : Show list with all users.
+* `sync`  :  Show last edit date and time of the `OC_PATH` file.
 
 ## TODO
 
