@@ -232,7 +232,7 @@ def main():
                 print "ok"
             else:
                 user_bot_str = user_bot + '\'' + complete_name + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '
-            oc.put_file_contents(USER_BOT_PATH, user_bot_str)
+                oc.put_file_contents(USER_BOT_PATH, user_bot_str)
             #os.environ['USER_BOT'] = str(user_bot)
 
 if __name__ == '__main__':
