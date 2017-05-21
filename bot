@@ -99,7 +99,7 @@ def main():
                 if (complete_name in user_bot):
                     print "ok"
                 else:
-                    user_bot_str = '\'' + complete_name + '\'' + ': ' + '\'' + last_user_id + '\'' + ','
+                    user_bot_str = '\'' + complete_name + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ','
                 oc.put_file_contents(USER_BOT_PATH, user_bot_str)
                 #os.environ['USER_BOT'] = str(user_bot)
             except KeyError:
