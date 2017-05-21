@@ -46,4 +46,4 @@ Available commands:
 ## TODO
 
 - [X] Implement a function to compute stats for a user
-- [ ] Finish documenting commands
+- [X] Finish documenting commands
