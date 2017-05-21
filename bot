@@ -22,6 +22,7 @@ import requests
 import owncloud
 import datetime
 import operator
+import ast
 from sys import argv
 
 OC_PATH = os.environ.get('OC_PATH')
@@ -93,7 +94,8 @@ def main():
             last_user_username = last_update['message']['from']['username']
             last_user_id = last_update['message']['from']['id']
             print USER_BOT
-            user_bot = USER_BOT.copy()
+            user_bot = ast.literal_eval(USER_BOT)
+            print type(user_bot)
             if (complete_name in user_bot):
                 print "ok"
             else:
