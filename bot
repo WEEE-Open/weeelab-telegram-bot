@@ -235,7 +235,7 @@ def main():
             if (str(last_user_id) in user_bot):
                 print "ok"
             else:
-                user_bot_str = user_bot + '\'' + complete_name + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '
+                user_bot_str = user_bot.encode('utf-8') + '\'' + complete_name.encode('utf-8') + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '
                 oc.put_file_contents(USER_BOT_PATH, user_bot_str.encode('utf-8'))
             #os.environ['USER_BOT'] = user_bot.encode('utf-8')
 
