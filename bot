@@ -165,9 +165,9 @@ def main():
                     greet_bot.send_message(last_chat_id, '{}'.format(log))
                 
                 if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":
-                    it_eu = timezone('Europe/Rome')
-                    data = oc.file_info(OC_PATH).get_last_modified()
-                    data = it_eu.localize(data)
+                    #it_eu = timezone('Europe/Rome')
+                    data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=1)
+                    #data = it_eu.localize(data)
                     print data
                     greet_bot.send_message(last_chat_id, 'Last update of log file:\n{}'.format(data))
                     
