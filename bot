@@ -176,7 +176,7 @@ def main():
                     if (len(command) == 1):
                         greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
                     elif (len(command)>1):
-                        name = command[1].encode('utf-8')
+                        name = str(command[1])
                         print name
                         for char in file:
                             if char != '\n':
@@ -195,8 +195,6 @@ def main():
                                 print name 
                                 print str(line[47:line.rfind(">")])
                                 print line[47:line.rfind(">")
-                                var = (name == str(line[47:line.rfind(">")]))
-                                print var
                         if found_u == False:
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
