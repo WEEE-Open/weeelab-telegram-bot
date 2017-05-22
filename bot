@@ -192,9 +192,6 @@ def main():
                                     sum += d
                                     line = ''
                             else:
-                                print name 
-                                print str(line[47:line.rfind(">")])
-                                print line[47:line.rfind(">")]
                                 line = ''
                         if found_u == False:
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
