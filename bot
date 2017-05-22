@@ -191,6 +191,11 @@ def main():
                                     d = datetime.timedelta(hours=int(h), minutes=int(m))
                                     sum += d
                                     line = ''
+                            else:
+                                print name 
+                                print str(line[47:line.rfind(">")])
+                                print line[47:line.rfind(">")
+                                print name == str(line[47:line.rfind(">")])
                         if found_u == False:
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
