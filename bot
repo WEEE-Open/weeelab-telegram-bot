@@ -237,7 +237,7 @@ def main():
             else:
                 user_bot_str = user_bot + '\'' + complete_name + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '
                 oc.put_file_contents(USER_BOT_PATH, str(user_bot_str))
-            #os.environ['USER_BOT'] = str(user_bot)
+            #os.environ['USER_BOT'] = user_bot.encode('utf-8')
 
 if __name__ == '__main__':
     try:
