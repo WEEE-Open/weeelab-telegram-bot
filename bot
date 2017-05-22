@@ -176,12 +176,12 @@ def main():
                     if (len(command) == 1):
                         greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
                     elif (len(command)>1):
-                        name = command[1]
+                        name = command[1].encode('utf-8')
                         print name
                         for char in file:
                             if char != '\n':
                                 line += char
-                            elif (name == line[47:line.rfind(">")]):
+                            elif (name == line[47:line.rfind(">")].encode('utf-8')):
                                 if ("INLAB" in line):
                                     line = ''
                                 else:
@@ -217,7 +217,7 @@ def main():
                             if ("INLAB" in line):
                                 line = ''
                             else:
-                                name = line[47:line.rfind(">")]
+                                name = line[47:line.rfind(">")].encode('utf-8')
                                 (h, m) = line[39:line.rfind("]")].split(':')
                                 d = datetime.timedelta(hours=int(h), minutes=int(m))
                                 if (name in user_name):
