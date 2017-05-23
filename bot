@@ -39,11 +39,6 @@ USER_LIST_NAME = os.environ.get('USER_LIST_NAME')   #Python list of the user all
 #USER_LIST_ID = os.environ.get('USER_LIST_ID')       #Python list of the users' id allowed to use the bot
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH')     #path of the file to store bot users in owncloud (/folder/file.txt)
 
-#set variable used in main function 
-greet_bot = BotHandler(TOKEN_BOT)       #create the bot object
-lst_username = USER_LIST_NAME           #store the user allowed in a variable
-#lst_id = USER_LIST_ID                  #store the users' id allowed in a variable
-
 #class with function used by the bot
 class BotHandler:
     '''init function to set bot token and reference url'''
@@ -83,6 +78,11 @@ def nameExtr(username):
     firstName = username.split('.')[0].capitalize() #Extract the name and capitalize it
     lastName = username.split('.')[1].capitalize()  #Extract the surname and capitalize it
     return firstName + " " + lastName   #Return a string of type "Name Surname"
+
+#set variable used in main function 
+greet_bot = BotHandler(TOKEN_BOT)       #create the bot object
+lst_username = USER_LIST_NAME           #store the user allowed in a variable
+#lst_id = USER_LIST_ID                  #store the users' id allowed in a variable
 
 '''main function of the bot'''
 def main():
