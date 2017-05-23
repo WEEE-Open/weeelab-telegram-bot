@@ -79,7 +79,7 @@ def nameExtr(username):
     lastName = username.split('.')[1].capitalize()  #Extract the surname and capitalize it
     return firstName + " " + lastName   #Return a string of type "Name Surname"
 
-#set variable used in main function 
+#set variable used in main function
 greet_bot = BotHandler(TOKEN_BOT)       #create the bot object
 lst_username = USER_LIST_NAME           #store the user allowed in a variable
 #lst_id = USER_LIST_ID                  #store the users' id allowed in a variable
@@ -100,25 +100,25 @@ def main():
             try:                                    #try to read all the values in the block, if a field is not found, raise an exception
                 user_bot_str = ''                                                   #inizialize variable of string type
                 last_update_id = last_update['update_id']                           #store the id of the bot taken from the mesasge
-                new_offset = last_update_id + 1                                     #store the update id of the bot 
+                new_offset = last_update_id + 1                                     #store the update id of the bot
                 last_chat_text = last_update['message']['text']                     #store all the message in a variable
                 command = last_chat_text.split()                                    #store all the words in the message in an array (split by space)
-                last_chat_id = last_update['message']['chat']['id']                 #store the id of the chat between user and bot read from the message in a variable 
-                last_user_id = last_update['message']['from']['id']                 #store the id of the user read from the message in a variable 
-                last_chat_name = last_update['message']['from']['first_name']       #store the name of the user read from the message in a variable 
-                last_user_username = last_update['message']['from']['username']     #store the username of the user read from the message in a variable 
+                last_chat_id = last_update['message']['chat']['id']                 #store the id of the chat between user and bot read from the message in a variable
+                last_user_id = last_update['message']['from']['id']                 #store the id of the user read from the message in a variable
+                last_chat_name = last_update['message']['from']['first_name']       #store the name of the user read from the message in a variable
+                last_user_username = last_update['message']['from']['username']     #store the username of the user read from the message in a variable
                 found_username = True                                               #DEBUG
-                complete_name = last_chat_name                                      #store the name of the user in a variable 
+                complete_name = last_chat_name                                      #store the name of the user in a variable
                 #last_chat_surname = last_update['message']['from']['last_name']    #DEBUG
                 #complete_name = complete_name + ' ' + last_chat_surname            #DEBUG
                 print last_update['message']                                        #DEBUG
                 #print USER_BOT                                                     #DEBUG
-                
-            except KeyError:                                                        #catch the exception if raised 
-                if (found_username == False):                                       #DEBUG
+
+            except KeyError:                                                        #catch the exception if raised
+                if not found_username:                                       #DEBUG
                     last_user_username = 'error'                                    #DEBUG
                 print "ERROR!"                                                      #DEBUG
-            
+
             if last_user_username in lst_username:                                  #check if the user is allowed to use the bot
                 print "ok"                                                          #DEBUG
 
@@ -130,32 +130,32 @@ def main():
                 if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":    #Check if the message is the command /inlab
                     file = oc.get_file_contents(OC_PATH)                            #read the content of the log file, char by char, stored in owncloud server
                     found = False                                                   #create a control variable used to check if someone is in lab
-                    if (len(command) == 1):                                         #Check if the command has option "who" or not 
+                    if (len(command) == 1):                                         #Check if the command has option "who" or not
                         for char in file:                                           #read the file char by char
                             if char != '\n':                                        #Check if a complete line is read or not
                                 line += char                                        #add the character to a string to form the line
                             elif ("INLAB" in line):                                 #if the line is read check if contains INLAB string
                                 count += 1                                          #update the counter of the people in lab
                                 print count                                         #DEBUG
-                                line = ''                                           #Clean the line 
+                                line = ''                                           #Clean the line
                         if count == 0:                                              #Check if there aren't people in lab
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     #Send a message to the user that makes the request /inlab
                         elif count == 1:                                            #Check if there is a person in lab
                             greet_bot.send_message(last_chat_id, 'There is one student in lab right now.') #Send a message to the user that makes the request /inlab
-                        else:                                                       
+                        else:
                             greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count)) #Send a message to the user that makes the request /inlab
                     elif (command[1]=="who"):                                       #Check if the command has option "who" or not 
                         for char in file:                                           #read the file char by char
                             if char != '\n':                                        #Check if a complete line is read or not
                                 line += char                                        #add the character to a string to form the line
                             elif ("INLAB" in line):                                 #if the line is read check if contains INLAB string
-                                found= True                                         #set that a person is in lab
+                                found = True                                        #set that a person is in lab
                                 user = nameExtr(line[47:line.rfind(">")])           #extract the name of the persone
                                 greet_bot.send_message(last_chat_id, '{}'.format(user))     #send the name of the person in lab to the user that makes the request
                                 line = ''                                           #Clean the line
                             else:
                                 line = ''                                           #Clean the line
-                        if (found == False):                                        #check if a person is in lab
+                        if not found:                                        #check if a person is in lab
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     #Send a message to the user that makes the request
 
                 # Show log file
@@ -193,7 +193,7 @@ def main():
                     data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)       #store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
                     #data = it_eu.localize(data)                                                #DEBUG
                     print data                                                                  #DEBUG
-                    greet_bot.send_message(last_chat_id, 'Last update of log file:\n{}'.format(data))      #Send a message with the data to the user that makes the request 
+                    greet_bot.send_message(last_chat_id, 'Latest log update:\n{}'.format(data))      #Send a message with the data to the user that makes the request 
                 
                 # Show the stat of the user
                 ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
@@ -205,7 +205,7 @@ def main():
                     m = 0                                                               #initialize minute variable, type int
                     sum = datetime.timedelta(hours=int(0), minutes=int(0))              #initialize hours sum variable, type datetime
                     if (len(command) == 1):                                             #Check if the command has option or not 
-                        greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')   #write an error message to the user
+                        greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname to view the stats')   #write an error message to the user
                     elif (len(command)>1):                                              #Check if the command has option or not
                         name = str(command[1])                                          #store the option in a variable 
                         print name                                                      #DEBUG
@@ -225,7 +225,7 @@ def main():
                             else:
                                 line = ''                                               #Clean the line
                         if found_u == False:                                            #check if name.surname is found
-                            greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')      #Write an advise message 
+                            greet_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly? (name.surname)')      #Write an advise message 
                         else:
                             (hours, minutes, seconds) = str(sum).split(':')         #extract from the sum the hours and minutes
                             greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))      #write the stat of the user
