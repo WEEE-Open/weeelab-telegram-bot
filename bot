@@ -166,7 +166,7 @@ def main():
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":        #Check if the message is the command /log
                     file = oc.get_file_contents(OC_PATH)                            #read the content of the log file, char by char, stored in owncloud server
                     data=oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     #store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
-                    log = ('Last update of log file: {}\n \n'.format(data))         #write in the log variabile the data
+                    log = ('Latest log update: {}\n \n'.format(data))         #write in the log variabile the data
                     #greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))      #DEBUG
                     n_line = 0                                                      #inizialize variable of int type, number of line printed
                     n_print = 0                                                     #inizialize variable of int type, number of line to print
@@ -184,7 +184,7 @@ def main():
                                 line = ''                                           #Clean the line
                                 n_line += 1                                         #update the number of line printed 
                     greet_bot.send_message(last_chat_id, '{}'.format(log))          #Send a message with the log to the user that makes the request
-                
+
                 # Show data update log
                 ''' Command "/sync", Show last edit date and time of the OC_PATH file.
                 '''
