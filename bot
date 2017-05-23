@@ -23,9 +23,9 @@ import owncloud
 import datetime
 from datetime import timedelta
 import operator
-import ast
-from sys import argv
-from pytz import timezone
+# import ast
+# from sys import argv
+# from pytz import timezone
 
 OC_PATH = os.environ.get('OC_PATH')
 OC_PWD = os.environ.get('OC_PWD')
@@ -95,19 +95,19 @@ def main():
                 last_chat_name = last_update['message']['from']['first_name']
                 last_user_username = last_update['message']['from']['username']
                 found_username = True
-                complete_name = last_chat_name 
-                #last_chat_surname = last_update['message']['from']['last_name']
-                #complete_name = complete_name + ' ' + last_chat_surname
+                complete_name = last_chat_name
+                # last_chat_surname = last_update['message']['from']['last_name']
+                # complete_name = complete_name + ' ' + last_chat_surname
                 print last_update['message']
-                #print USER_BOT
-                
+                # print USER_BOT
+
             except KeyError:
-                if (found_username == False):
+                if not found_username:
                     last_user_username = 'error'
                 print "ERROR!"
-            
+
             if last_user_username in lst_username:
-                print "ok" 
+                print "ok"
 
                 ''' ADD COMMANDS HERE '''
                 # Show how many students are in lab right now
@@ -128,59 +128,58 @@ def main():
                             greet_bot.send_message(last_chat_id, 'There is one student in lab right now.')
                         else:
                             greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count))
-                    elif (command[1]=="who"):
+                    elif (command[1] == "who"):
                         for char in file:
                             if char != '\n':
                                 line += char
                             elif ("INLAB" in line):
-                                found= True
+                                found = True
                                 user = nameExtr(line[47:line.rfind(">")])
                                 greet_bot.send_message(last_chat_id, '{}'.format(user))
                                 line = ''
                             else:
                                 line = ''
-                        if (found == False):
+                        if not found:
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
 
                 # Show log file
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
-                    data=oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)
+                    data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)
                     log = ('Last update of log file: {}\n \n'.format(data))
-                    #greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))
-                    n_line= 0
-                    n_print=0
-                    if (len(command)>1 and command[1].isdigit()):
-                        n_print=int(command[1])
-                    elif (len(command)>1 and command[1] == "all"):
-                        n_print=1000
+                    # greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))
+                    n_line = 0
+                    n_print = 0
+                    if (len(command) > 1 and command[1].isdigit()):
+                        n_print = int(command[1])
+                    elif (len(command) > 1 and command[1] == "all"):
+                        n_print = 1000
                     else:
-                        n_print=5
+                        n_print = 5
                     for char in file:
-                        if n_line < n_print :
+                        if n_line < n_print:
                             line += char
                             if char == '\n':
                                 log = log + '{}\n'.format(line)
                                 line = ''
                                 n_line += 1
                     greet_bot.send_message(last_chat_id, '{}'.format(log))
-                
+
                 if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":
-                    #it_eu = timezone('Europe/Rome')
+                    # it_eu = timezone('Europe/Rome')
                     data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)
-                    #data = it_eu.localize(data)
+                    # data = it_eu.localize(data)
                     print data
                     greet_bot.send_message(last_chat_id, 'Last update of log file:\n{}'.format(data))
-                    
+
                 if command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
                     file = oc.get_file_contents(OC_PATH)
                     found_u = False
-                    m=0
-                    s=0
+                    m = 0
                     sum = datetime.timedelta(hours=int(0), minutes=int(0))
                     if (len(command) == 1):
                         greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname for the stat')
-                    elif (len(command)>1):
+                    elif (len(command) > 1):
                         name = str(command[1])
                         print name
                         for char in file:
@@ -198,12 +197,12 @@ def main():
                                     line = ''
                             else:
                                 line = ''
-                        if found_u == False:
+                        if not found_u:
                             greet_bot.send_message(last_chat_id, 'No stat for the user. Have you insert it correctly? (name.surname)')
                         else:
                             (hours, minutes, seconds) = str(sum).split(':')
                             greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))
-                            
+
                 if command[0] == "/top" or command[0] == "/top@weeelab_bot":
                     number_list = 10
                     if len(command) == 1:
@@ -229,29 +228,29 @@ def main():
                                 (h, m) = line[39:line.rfind("]")].split(':')
                                 d = datetime.timedelta(hours=int(h), minutes=int(m))
                                 if (name in user_name):
-                                    user_hours[name]+=d
+                                    user_hours[name] += d
                                     line = ''
                                 else:
                                     user_name.append(name)
                                     user_hours[name] = d
                                     line = ''
                     sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)
-                    #greet_bot.send_message(last_chat_id, 'Top User List!\n')
+                    # greet_bot.send_message(last_chat_id, 'Top User List!\n')
                     for element in sorted_hours:
                         count += 1
                         (hours, minutes, seconds) = str(element[1]).split(':')
                         if count <= number_list:
                             top_list = top_list + '{}) {}    HH:MM = {}:{}\n'.format(count, nameExtr(element[0]), hours, minutes)
-                            #greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
+                            # greet_bot.send_message(last_chat_id, '{}) {}    HH:MM = {}:{}'.format(count, nameExtr(element[0]), hours, minutes))
                     greet_bot.send_message(last_chat_id, '{}'.format(top_list))
-            
+
             user_bot = oc.get_file_contents(USER_BOT_PATH)
             if (str(last_user_id) in user_bot):
                 print "ok"
             else:
                 user_bot_str = user_bot.decode('utf-8') + '\'' + complete_name.encode('utf-8') + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '
                 oc.put_file_contents(USER_BOT_PATH, user_bot_str.encode('utf-8'))
-            #os.environ['USER_BOT'] = user_bot.encode('utf-8')
+            # os.environ['USER_BOT'] = user_bot.encode('utf-8')
 
 if __name__ == '__main__':
     try:
