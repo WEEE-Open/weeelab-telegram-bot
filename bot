@@ -16,275 +16,275 @@ Author: God
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 NOTE: The print commands are only for debug.
 '''
-#system library needed to read the environment variables
+# system library needed to read the environment variables
 import os
 from sys import argv
-#library to make requests to telegram server 
+# library to make requests to telegram server
 import requests
-#library to make requests to owncloud server, more details on https://github.com/owncloud/pyocclient
+# library to make requests to owncloud server, more details on https://github.com/owncloud/pyocclient
 import owncloud
-#library to handle time 
+# library to handle time
 import datetime
 from datetime import timedelta
-#library to handle dictionary
+# library to handle dictionary
 import operator
 
-#get environment variables 
-OC_PATH = os.environ.get('OC_PATH')         #path of the file to read in owncloud (/folder/file.txt)
-OC_PWD = os.environ.get('OC_PWD')           #OwnCloud password
-OC_URL = os.environ.get('OC_URL')           #url of the owncloud server
-OC_USER = os.environ.get('OC_USER')         #OwnCloud username
-TOKEN_BOT = os.environ.get('TOKEN_BOT')     #Telegram token for the bot API
-USER_LIST_NAME = os.environ.get('USER_LIST_NAME')   #Python list of the user allowed to use the bot
-#USER_LIST_ID = os.environ.get('USER_LIST_ID')       #Python list of the users' id allowed to use the bot
-USER_BOT_PATH = os.environ.get('USER_BOT_PATH')     #path of the file to store bot users in owncloud (/folder/file.txt)
+# get environment variables
+OC_PATH = os.environ.get('OC_PATH')         # path of the file to read in owncloud (/folder/file.txt)
+OC_PWD = os.environ.get('OC_PWD')           # OwnCloud password
+OC_URL = os.environ.get('OC_URL')           # url of the owncloud server
+OC_USER = os.environ.get('OC_USER')         # OwnCloud username
+TOKEN_BOT = os.environ.get('TOKEN_BOT')     # Telegram token for the bot API
+USER_LIST_NAME = os.environ.get('USER_LIST_NAME')   # Python list of the user allowed to use the bot
+# USER_LIST_ID = os.environ.get('USER_LIST_ID')       # Python list of the users' id allowed to use the bot
+USER_BOT_PATH = os.environ.get('USER_BOT_PATH')     # path of the file to store bot users in owncloud (/folder/file.txt)
 
-#class with function used by the bot
+# class with function used by the bot
 class BotHandler:
     '''init function to set bot token and reference url'''
     def __init__(self, token):
-        self.token = token      #set token
-        self.api_url = "https://api.telegram.org/bot{}/".format(token)  #set bot url from the token
-    
+        self.token = token      # set token
+        self.api_url = "https://api.telegram.org/bot{}/".format(token)  # set bot url from the token
+
     '''function to get the last message send by the user to the bot
     for more info about this method refeer to https://core.telegram.org/bots/api#getting-updates'''
     def get_updates(self, offset=None, timeout=30):
-        method = 'getUpdates'       #set type of method used refering to Telegram API
-        params = {'timeout': timeout, 'offset': offset}     #set parameter like timeout in seconds for long polling and no offset related to updates
-        resp = requests.get(self.api_url + method, params) #make the request to the bot with the previous method and parameters, get type because we request a message
-        result_json = resp.json()['result'] #store the json response from the telegram server
-        return result_json  #return a variable of type json as response of the bot 
-    
+        method = 'getUpdates'       # set type of method used refering to Telegram API
+        params = {'timeout': timeout, 'offset': offset}     # set parameter like timeout in seconds for long polling and no offset related to updates
+        resp = requests.get(self.api_url + method, params) # make the request to the bot with the previous method and parameters, get type because we request a message
+        result_json = resp.json()['result'] # store the json response from the telegram server
+        return result_json  # return a variable of type json as response of the bot
+
     '''function to send messages to the user of the bot
-    for more info about this method refeer to https://core.telegram.org/bots/api#sendmessage'''    
+    for more info about this method refeer to https://core.telegram.org/bots/api#sendmessage'''
     def send_message(self, chat_id, text):
-        params = {'chat_id': chat_id, 'text': text}     #set parameter like the unique identifier of the chat between user and bot and the message to send
-        method = 'sendMessage'          #set the method used refering to Telegram API
-        resp = requests.post(self.api_url + method, params)     #make the request to the bot with the previous method and parameters, post type because we send a message
-        return resp #return a variable of type json as response of the bot 
-    
+        params = {'chat_id': chat_id, 'text': text}     # set parameter like the unique identifier of the chat between user and bot and the message to send
+        method = 'sendMessage'          # set the method used refering to Telegram API
+        resp = requests.post(self.api_url + method, params)     # make the request to the bot with the previous method and parameters, post type because we send a message
+        return resp # return a variable of type json as response of the bot
+
     '''function to get last message if there is'''
     def get_last_update(self):
-        get_result = self.get_updates()     #recall the function to get updates
-        if len(get_result) > 0:             #check if there are new messages
-            last_update = get_result[-1]    #takes the last update from the result of the function
-            return last_update              #return the last message in json format
+        get_result = self.get_updates()     # recall the function to get updates
+        if len(get_result) > 0:             # check if there are new messages
+            last_update = get_result[-1]    # takes the last update from the result of the function
+            return last_update              # return the last message in json format
         else:
-            return -1                       #in case of error return an error code used in the main function
+            return -1                       # in case of error return an error code used in the main function
 
 '''function created by Ste (teschio) complete code at https://github.com/WEEE-Open/weeelab
 extract the name and surname from a string of type name.surname to obtain Name Surname'''
 def nameExtr(username):
-    firstName = username.split('.')[0].capitalize() #Extract the name and capitalize it
-    lastName = username.split('.')[1].capitalize()  #Extract the surname and capitalize it
-    return firstName + " " + lastName   #Return a string of type "Name Surname"
+    firstName = username.split('.')[0].capitalize() # Extract the name and capitalize it
+    lastName = username.split('.')[1].capitalize()  # Extract the surname and capitalize it
+    return firstName + " " + lastName   # Return a string of type "Name Surname"
 
-#set variable used in main function
-greet_bot = BotHandler(TOKEN_BOT)       #create the bot object
-lst_username = USER_LIST_NAME           #store the user allowed in a variable
-#lst_id = USER_LIST_ID                  #store the users' id allowed in a variable
+# set variable used in main function
+greet_bot = BotHandler(TOKEN_BOT)        # create the bot object
+lst_username = USER_LIST_NAME            # store the user allowed in a variable
+# lst_id = USER_LIST_ID                  # store the users' id allowed in a variable
 
 '''main function of the bot'''
 def main():
-    oc = owncloud.Client(OC_URL)        #create an object of type Client to connect to the cloud url
-    oc.login(OC_USER, OC_PWD)           #connect to the cloud using authorize username and password
-    new_offset = None                   #set at beginning an offest None for the get_updates function
+    oc = owncloud.Client(OC_URL)        # create an object of type Client to connect to the cloud url
+    oc.login(OC_USER, OC_PWD)           # connect to the cloud using authorize username and password
+    new_offset = None                   # set at beginning an offest None for the get_updates function
 
-    while True:                         #infinite loop
-        greet_bot.get_updates(new_offset)           #call the function to check if there are new messages
-        last_update = greet_bot.get_last_update()   #takes the last message from the server
-        line = ''                                   #inizialize variable of string type
-        count = 0                                   #inizialize variable of int type
-        found_username = False                      #inizialize variable of boolean type
-        if last_update != -1:                       #if there is an error to read the last message from the server skip the message
-            try:                                    #try to read all the values in the block, if a field is not found, raise an exception
-                user_bot_str = ''                                                   #inizialize variable of string type
-                last_update_id = last_update['update_id']                           #store the id of the bot taken from the mesasge
-                new_offset = last_update_id + 1                                     #store the update id of the bot
-                last_chat_text = last_update['message']['text']                     #store all the message in a variable
-                command = last_chat_text.split()                                    #store all the words in the message in an array (split by space)
-                last_chat_id = last_update['message']['chat']['id']                 #store the id of the chat between user and bot read from the message in a variable
-                last_user_id = last_update['message']['from']['id']                 #store the id of the user read from the message in a variable
-                last_chat_name = last_update['message']['from']['first_name']       #store the name of the user read from the message in a variable
-                last_user_username = last_update['message']['from']['username']     #store the username of the user read from the message in a variable
-                found_username = True                                               #DEBUG
-                complete_name = last_chat_name                                      #store the name of the user in a variable
-                #last_chat_surname = last_update['message']['from']['last_name']    #DEBUG
-                #complete_name = complete_name + ' ' + last_chat_surname            #DEBUG
-                print last_update['message']                                        #DEBUG
-                #print USER_BOT                                                     #DEBUG
+    while True:                         # infinite loop
+        greet_bot.get_updates(new_offset)           # call the function to check if there are new messages
+        last_update = greet_bot.get_last_update()   # takes the last message from the server
+        line = ''                                   # inizialize variable of string type
+        count = 0                                   # inizialize variable of int type
+        found_username = False                      # inizialize variable of boolean type
+        if last_update != -1:                       # if there is an error to read the last message from the server skip the message
+            try:                                    # try to read all the values in the block, if a field is not found, raise an exception
+                user_bot_str = ''                                                   # inizialize variable of string type
+                last_update_id = last_update['update_id']                           # store the id of the bot taken from the mesasge
+                new_offset = last_update_id + 1                                     # store the update id of the bot
+                last_chat_text = last_update['message']['text']                     # store all the message in a variable
+                command = last_chat_text.split()                                    # store all the words in the message in an array (split by space)
+                last_chat_id = last_update['message']['chat']['id']                 # store the id of the chat between user and bot read from the message in a variable
+                last_user_id = last_update['message']['from']['id']                 # store the id of the user read from the message in a variable
+                last_chat_name = last_update['message']['from']['first_name']       # store the name of the user read from the message in a variable
+                last_user_username = last_update['message']['from']['username']     # store the username of the user read from the message in a variable
+                found_username = True                                               # DEBUG
+                complete_name = last_chat_name                                      # store the name of the user in a variable
+                # last_chat_surname = last_update['message']['from']['last_name']    # DEBUG
+                # complete_name = complete_name + ' ' + last_chat_surname            # DEBUG
+                print last_update['message']                                        # DEBUG
+                # print USER_BOT                                                     # DEBUG
 
-            except KeyError:                                                        #catch the exception if raised
-                if not found_username:                                       #DEBUG
-                    last_user_username = 'error'                                    #DEBUG
-                print "ERROR!"                                                      #DEBUG
+            except KeyError:                                                        # catch the exception if raised
+                if not found_username:                                       # DEBUG
+                    last_user_username = 'error'                                    # DEBUG
+                print "ERROR!"                                                      # DEBUG
 
-            if last_user_username in lst_username:                                  #check if the user is allowed to use the bot
-                print "ok"                                                          #DEBUG
+            if last_user_username in lst_username:                                  # check if the user is allowed to use the bot
+                print "ok"                                                          # DEBUG
 
                 ''' ADD COMMANDS HERE '''
                 # Show how many students are in lab right now
                 ''' Command "/inlab", Show the number of people in lab.
                     Command "/inlab who", Show the name of the people in lab.
                 '''
-                if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":    #Check if the message is the command /inlab
-                    file = oc.get_file_contents(OC_PATH)                            #read the content of the log file, char by char, stored in owncloud server
-                    found = False                                                   #create a control variable used to check if someone is in lab
-                    if (len(command) == 1):                                         #Check if the command has option "who" or not
-                        for char in file:                                           #read the file char by char
-                            if char != '\n':                                        #Check if a complete line is read or not
-                                line += char                                        #add the character to a string to form the line
-                            elif ("INLAB" in line):                                 #if the line is read check if contains INLAB string
-                                count += 1                                          #update the counter of the people in lab
-                                print count                                         #DEBUG
-                                line = ''                                           #Clean the line
-                        if count == 0:                                              #Check if there aren't people in lab
-                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     #Send a message to the user that makes the request /inlab
-                        elif count == 1:                                            #Check if there is a person in lab
-                            greet_bot.send_message(last_chat_id, 'There is one student in lab right now.') #Send a message to the user that makes the request /inlab
+                if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":    # Check if the message is the command /inlab
+                    file = oc.get_file_contents(OC_PATH)                            # read the content of the log file, char by char, stored in owncloud server
+                    found = False                                                   # create a control variable used to check if someone is in lab
+                    if (len(command) == 1):                                         # Check if the command has option "who" or not
+                        for char in file:                                           # read the file char by char
+                            if char != '\n':                                        # Check if a complete line is read or not
+                                line += char                                        # add the character to a string to form the line
+                            elif ("INLAB" in line):                                 # if the line is read check if contains INLAB string
+                                count += 1                                          # update the counter of the people in lab
+                                print count                                         # DEBUG
+                                line = ''                                           # Clean the line
+                        if count == 0:                                              # Check if there aren't people in lab
+                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     # Send a message to the user that makes the request /inlab
+                        elif count == 1:                                            # Check if there is a person in lab
+                            greet_bot.send_message(last_chat_id, 'There is one student in lab right now.') # Send a message to the user that makes the request /inlab
                         else:
-                            greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count)) #Send a message to the user that makes the request /inlab
-                    elif (command[1]=="who"):                                       #Check if the command has option "who" or not 
-                        for char in file:                                           #read the file char by char
-                            if char != '\n':                                        #Check if a complete line is read or not
-                                line += char                                        #add the character to a string to form the line
-                            elif ("INLAB" in line):                                 #if the line is read check if contains INLAB string
-                                found = True                                        #set that a person is in lab
-                                user = nameExtr(line[47:line.rfind(">")])           #extract the name of the persone
-                                greet_bot.send_message(last_chat_id, '{}'.format(user))     #send the name of the person in lab to the user that makes the request
-                                line = ''                                           #Clean the line
+                            greet_bot.send_message(last_chat_id, 'There are {c} students in lab right now.'.format(c=count)) # Send a message to the user that makes the request /inlab
+                    elif (command[1] == "who"):                                       # Check if the command has option "who" or not
+                        for char in file:                                           # read the file char by char
+                            if char != '\n':                                        # Check if a complete line is read or not
+                                line += char                                        # add the character to a string to form the line
+                            elif ("INLAB" in line):                                 # if the line is read check if contains INLAB string
+                                found = True                                        # set that a person is in lab
+                                user = nameExtr(line[47:line.rfind(">")])           # extract the name of the persone
+                                greet_bot.send_message(last_chat_id, '{}'.format(user))     # send the name of the person in lab to the user that makes the request
+                                line = ''                                           # Clean the line
                             else:
-                                line = ''                                           #Clean the line
-                        if not found:                                        #check if a person is in lab
-                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     #Send a message to the user that makes the request
+                                line = ''                                           # Clean the line
+                        if not found:                                        # check if a person is in lab
+                            greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     # Send a message to the user that makes the request
 
                 # Show log file
                 ''' Command "/log", Show the complete OC_PATH file (only for admin user, by default only 5 lines.
                     Command "/log number", Show the N most recent lines of OC_PATH file.
                     Command "/log all", Show all the lines of OC_PATH file.
                 '''
-                if command[0] == "/log" or command[0] == "/log@weeelab_bot":        #Check if the message is the command /log
-                    file = oc.get_file_contents(OC_PATH)                            #read the content of the log file, char by char, stored in owncloud server
-                    data=oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     #store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
-                    log = ('Latest log update: {}\n \n'.format(data))         #write in the log variabile the data
-                    #greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))      #DEBUG
-                    n_line = 0                                                      #inizialize variable of int type, number of line printed
-                    n_print = 0                                                     #inizialize variable of int type, number of line to print
-                    if (len(command)>1 and command[1].isdigit()):                   #check if the command is "/log number"
-                        n_print=int(command[1])                                     #set the number of line to print
-                    elif (len(command)>1 and command[1] == "all"):                  #check if the command is "/log all"
-                        n_print=1000                                                #set the number of line to print
+                if command[0] == "/log" or command[0] == "/log@weeelab_bot":        # Check if the message is the command /log
+                    file = oc.get_file_contents(OC_PATH)                            # read the content of the log file, char by char, stored in owncloud server
+                    data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
+                    log = ('Latest log update: {}\n \n'.format(data))         # write in the log variabile the data
+                    # greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))      #DEBUG
+                    n_line = 0                                                      # inizialize variable of int type, number of line printed
+                    n_print = 0                                                     # inizialize variable of int type, number of line to print
+                    if (len(command) > 1 and command[1].isdigit()):                   # check if the command is "/log number"
+                        n_print = int(command[1])                                     # set the number of line to print
+                    elif (len(command) > 1 and command[1] == "all"):                  # check if the command is "/log all"
+                        n_print = 1000                                              # set the number of line to print
                     else:
-                        n_print=5                                                   #set the number of line to print, default
-                    for char in file:                                               #read the file char by char
-                        if n_line < n_print :                                       #Check if all the line requested are printed
-                            line += char                                            #add the character to a string to form the line
-                            if char == '\n':                                        #Check if a complete line is read or not
-                                log = log + '{}\n'.format(line)                     #store the new line in the log variable
-                                line = ''                                           #Clean the line
-                                n_line += 1                                         #update the number of line printed 
-                    greet_bot.send_message(last_chat_id, '{}'.format(log))          #Send a message with the log to the user that makes the request
+                        n_print = 5                                                 # set the number of line to print, default
+                    for char in file:                                               # read the file char by char
+                        if n_line < n_print:                                        # Check if all the line requested are printed
+                            line += char                                            # add the character to a string to form the line
+                            if char == '\n':                                        # Check if a complete line is read or not
+                                log = log + '{}\n'.format(line)                     # store the new line in the log variable
+                                line = ''                                           # Clean the line
+                                n_line += 1                                         # update the number of line printed
+                    greet_bot.send_message(last_chat_id, '{}'.format(log))          # Send a message with the log to the user that makes the request
 
                 # Show data update log
                 ''' Command "/sync", Show last edit date and time of the OC_PATH file.
                 '''
-                if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":                  #Check if the message is the command /sync
-                    #it_eu = timezone('Europe/Rome')                                            #DEBUG
-                    data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)       #store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
-                    #data = it_eu.localize(data)                                                #DEBUG
-                    print data                                                                  #DEBUG
-                    greet_bot.send_message(last_chat_id, 'Latest log update:\n{}'.format(data))      #Send a message with the data to the user that makes the request 
-                
+                if command[0] == "/sync" or command[0] == "/sync@weeelab_bot":                  # Check if the message is the command /sync
+                    # it_eu = timezone('Europe/Rome')                                            # DEBUG
+                    data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)       # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
+                    # data = it_eu.localize(data)                                                # DEBUG
+                    print data                                                                  # DEBUG
+                    greet_bot.send_message(last_chat_id, 'Latest log update:\n{}'.format(data)) # Send a message with the data to the user that makes the request
+
                 # Show the stat of the user
                 ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
                 '''
-                if command[0] == "/stat" or command[0] == "/stat@weeelab_bot":          #Check if the message is the command /stat
-                    file = oc.get_file_contents(OC_PATH)                                #read the content of the log file, char by char, stored in owncloud server
-                    found_u = False                                                     #create a control variable used to check if name.surname is found
-                    h = 0                                                               #initialize hour variable, type int
-                    m = 0                                                               #initialize minute variable, type int
-                    sum = datetime.timedelta(hours=int(0), minutes=int(0))              #initialize hours sum variable, type datetime
-                    if (len(command) == 1):                                             #Check if the command has option or not 
-                        greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname to view the stats')   #write an error message to the user
-                    elif (len(command)>1):                                              #Check if the command has option or not
-                        name = str(command[1])                                          #store the option in a variable 
-                        print name                                                      #DEBUG
-                        for char in file:                                               #read the file char by char
-                            if char != '\n':                                            #Check if a complete line is read or not
-                                line += char                                            #add the character to a string to form the line
-                            elif (name == str(line[47:line.rfind(">")])):               #check if the name.surname is in the string of the line extracted from char 47 to the first >
-                                print "enter"                                           #DEBUG
-                                if ("INLAB" in line):                                   #check if the line contains INLAB string and skip the line
-                                    line = ''                                           #Clean the line
+                if command[0] == "/stat" or command[0] == "/stat@weeelab_bot":          # Check if the message is the command /stat
+                    file = oc.get_file_contents(OC_PATH)                                # read the content of the log file, char by char, stored in owncloud server
+                    found_u = False                                                     # create a control variable used to check if name.surname is found
+                    h = 0                                                               # initialize hour variable, type int
+                    m = 0                                                               # initialize minute variable, type int
+                    sum = datetime.timedelta(hours=int(0), minutes=int(0))              # initialize hours sum variable, type datetime
+                    if (len(command) == 1):                                             # Check if the command has option or not
+                        greet_bot.send_message(last_chat_id, 'Achtung! Insert name.surname to view the stats')   # write an error message to the user
+                    elif (len(command) > 1):                                              # Check if the command has option or not
+                        name = str(command[1])                                          # store the option in a variable
+                        print name                                                      # DEBUG
+                        for char in file:                                               # read the file char by char
+                            if char != '\n':                                            # Check if a complete line is read or not
+                                line += char                                            # add the character to a string to form the line
+                            elif (name == str(line[47:line.rfind(">")])):               # check if the name.surname is in the string of the line extracted from char 47 to the first >
+                                print "enter"                                           # DEBUG
+                                if ("INLAB" in line):                                   # check if the line contains INLAB string and skip the line
+                                    line = ''                                           # Clean the line
                                 else:
-                                    found_u = True                                      #set that stats are found
-                                    (h, m) = line[39:line.rfind("]")].split(':')        #extrack the hours and minute from char 39 until ], splitted by :
-                                    d = datetime.timedelta(hours=int(h), minutes=int(m))    #convert hours and minutes in datetime type
-                                    sum += d                                            #sum to the previous hours
-                                    line = ''                                           #Clean the line
+                                    found_u = True                                      # set that stats are found
+                                    (h, m) = line[39:line.rfind("]")].split(':')        # extrack the hours and minute from char 39 until ], splitted by :
+                                    d = datetime.timedelta(hours=int(h), minutes=int(m))    # convert hours and minutes in datetime type
+                                    sum += d                                            # sum to the previous hours
+                                    line = ''                                           # Clean the line
                             else:
-                                line = ''                                               #Clean the line
-                        if found_u == False:                                            #check if name.surname is found
-                            greet_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly? (name.surname)')      #Write an advise message 
+                                line = ''                                               # Clean the line
+                        if not found_u:                                            # check if name.surname is found
+                            greet_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly? (name.surname)')      # Write an advise message
                         else:
-                            (hours, minutes, seconds) = str(sum).split(':')         #extract from the sum the hours and minutes
-                            greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))      #write the stat of the user
-                 
+                            (hours, minutes, seconds) = str(sum).split(':')         # extract from the sum the hours and minutes
+                            greet_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(name), hours, minutes))      # write the stat of the user
+
                 # Show the top list of the users
                 ''' Command "/top", Show a list of the top users in lab (defaul top 10).
                     Command "/top number", Show the top N elements.
                     Command "/top all", Show list with all users.
                 '''
-                if command[0] == "/top" or command[0] == "/top@weeelab_bot":            #Check if the message is the command /top
-                    number_list = 0                                                     #Inizialize the number of users to pring
-                    if len(command) == 1:                                               #Check if the command has option or not 
-                        number_list = 10                                                #set the default number of user to print
-                    elif command[1].isdigit():                                          #Check if the option is a number
-                        number_list = int(command[1])                                   #set the number of user to print with the option
-                    elif command[1] == "all":                                           #Check if the option is "all"
-                        number_list = 50                                                #set the number of user to print to a "huge" number
-                    print number_list                                                   #DEBUG
-                    file = oc.get_file_contents(OC_PATH)                                #read the content of the log file, char by char, stored in owncloud server
-                    count = 0                                                           #reinizialize variable of int type
-                    user_name = []                                                      #inizialize variable of string type
-                    user_hours = {}                                                     #inizialize variable of dict type
-                    top_list = 'Top User List!\n'                                       #create variable of string type
-                    for char in file:                                                   #read the file char by char
-                        if char != '\n':                                                #Check if a complete line is read or not
-                            line += char                                                #add the character to a string to form the line
+                if command[0] == "/top" or command[0] == "/top@weeelab_bot":            # Check if the message is the command /top
+                    number_list = 0                                                     # Inizialize the number of users to pring
+                    if len(command) == 1:                                               # Check if the command has option or not
+                        number_list = 10                                                # set the default number of user to print
+                    elif command[1].isdigit():                                          # Check if the option is a number
+                        number_list = int(command[1])                                   # set the number of user to print with the option
+                    elif command[1] == "all":                                           # Check if the option is "all"
+                        number_list = 50                                                # set the number of user to print to a "huge" number
+                    print number_list                                                   # DEBUG
+                    file = oc.get_file_contents(OC_PATH)                                # read the content of the log file, char by char, stored in owncloud server
+                    count = 0                                                           # reinizialize variable of int type
+                    user_name = []                                                      # inizialize variable of string type
+                    user_hours = {}                                                     # inizialize variable of dict type
+                    top_list = 'Top User List!\n'                                       # create variable of string type
+                    for char in file:                                                   # read the file char by char
+                        if char != '\n':                                                # Check if a complete line is read or not
+                            line += char                                                # add the character to a string to form the line
                         else:
-                            if ("INLAB" in line):                                       #check if the line contains INLAB string and skip the line
-                                line = ''                                               #Clean the line
+                            if ("INLAB" in line):                                       # check if the line contains INLAB string and skip the line
+                                line = ''                                               # Clean the line
                             else:
-                                name = line[47:line.rfind(">")].encode('utf-8')         #extracte the name in the line from char 47 to the first >, and encode as utf-8
-                                (h, m) = line[39:line.rfind("]")].split(':')            #extrack the hours and minute from char 39 until ], splitted by :
-                                d = datetime.timedelta(hours=int(h), minutes=int(m))    #convert hours and minutes in datetime type
-                                if (name in user_name):                                 #check if user was already found
-                                    user_hours[name]+=d                                 #add to the key with the same name the value d
-                                    line = ''                                           #Clean the line
+                                name = line[47:line.rfind(">")].encode('utf-8')         # extracte the name in the line from char 47 to the first >, and encode as utf-8
+                                (h, m) = line[39:line.rfind("]")].split(':')            # extrack the hours and minute from char 39 until ], splitted by :
+                                d = datetime.timedelta(hours=int(h), minutes=int(m))    # convert hours and minutes in datetime type
+                                if (name in user_name):                                 # check if user was already found
+                                    user_hours[name] += d                               # add to the key with the same name the value d
+                                    line = ''                                           # Clean the line
                                 else:
-                                    user_name.append(name)                              #create a new key with the name 
-                                    user_hours[name] = d                                #add the hours to the key
-                                    line = ''                                           #Clean the line
-                    sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)     #sort the dict by value in descendet order
-                    for element in sorted_hours:                                        #print the elemented sorted
-                        count += 1                                                      #update the counter of user printed
-                        (hours, minutes, seconds) = str(element[1]).split(':')          #extract the hours and minutes from dict, splitted by :
-                        if count <= number_list:                                        #check if the list is completed
-                            top_list = top_list + '{}) {}    HH:MM = {}:{}\n'.format(count, nameExtr(element[0]), hours, minutes)   #add the user to the top list
-                    greet_bot.send_message(last_chat_id, '{}'.format(top_list))         #send the top list to the user that makes the request
+                                    user_name.append(name)                              # create a new key with the name
+                                    user_hours[name] = d                                # add the hours to the key
+                                    line = ''                                           # Clean the line
+                    sorted_hours = sorted(user_hours.items(), key=operator.itemgetter(1), reverse=True)     # sort the dict by value in descendet order
+                    for element in sorted_hours:                                        # print the elemented sorted
+                        count += 1                                                      # update the counter of user printed
+                        (hours, minutes, seconds) = str(element[1]).split(':')          # extract the hours and minutes from dict, splitted by :
+                        if count <= number_list:                                        # check if the list is completed
+                            top_list = top_list + '{}) {}    HH:MM = {}:{}\n'.format(count, nameExtr(element[0]), hours, minutes)   # add the user to the top list
+                    greet_bot.send_message(last_chat_id, '{}'.format(top_list))         # send the top list to the user that makes the request
             else:
-                greet_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized.')    #Send an error message to the user, not allowed to use the bot
-                
-            user_bot = oc.get_file_contents(USER_BOT_PATH)                          #read the content of the user file stored in owncloud server
-            if (str(last_user_id) in user_bot):     #Check if the user is already recorded 
-                print "ok"                          #DEBUG
-            else:
-                user_bot_str = user_bot.decode('utf-8') + '\'' + complete_name.encode('utf-8') + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '   #Store a new user name and id in a file on owncloud server, encoding in utf.8
-                oc.put_file_contents(USER_BOT_PATH, user_bot_str.encode('utf-8'))   #write on the file the new data 
-            #os.environ['USER_BOT'] = user_bot.encode('utf-8')                      #DEBUG
+                greet_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized.')    # Send an error message to the user, not allowed to use the bot
 
-#call the main() until a keyboard interrupt is called
+            user_bot = oc.get_file_contents(USER_BOT_PATH)                          # read the content of the user file stored in owncloud server
+            if (str(last_user_id) in user_bot):     # Check if the user is already recorded
+                print "ok"                          # DEBUG
+            else:
+                user_bot_str = user_bot.decode('utf-8') + '\'' + complete_name.encode('utf-8') + '\'' + ': ' + '\'' + str(last_user_id) + '\'' + ', '   # Store a new user name and id in a file on owncloud server, encoding in utf.8
+                oc.put_file_contents(USER_BOT_PATH, user_bot_str.encode('utf-8'))    # write on the file the new data
+            # os.environ['USER_BOT'] = user_bot.encode('utf-8')                      # DEBUG
+
+# call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
     try:
         main()
