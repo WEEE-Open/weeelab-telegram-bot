@@ -159,23 +159,21 @@ def main():
                             greet_bot.send_message(last_chat_id, 'Nobody is in lab right now.')     # Send a message to the user that makes the request
 
                 # Show log file
-                ''' Command "/log", Show the complete OC_PATH file (only for admin user, by default only 5 lines.
-                    Command "/log number", Show the N most recent lines of OC_PATH file.
-                    Command "/log all", Show all the lines of OC_PATH file.
+                ''' Command "/log", Show the complete OC_PATH file (only for admin user, by default only 5 lines)
+                    Command "/log [number]", Show the [number] most recent lines of OC_PATH file
+                    Command "/log all", Show all lines of OC_PATH file.
                 '''
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":        # Check if the message is the command /log
                     file = oc.get_file_contents(OC_PATH)                            # read the content of the log file, char by char, stored in owncloud server
                     data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
                     log = ('Latest log update: {}\n \n'.format(data))         # write in the log variabile the data
                     # greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))      #DEBUG
-                    n_line = 0                                                      # inizialize variable of int type, number of line printed
-                    n_print = 0                                                     # inizialize variable of int type, number of line to print
-                    if (len(command) > 1 and command[1].isdigit()):                   # check if the command is "/log number"
-                        n_print = int(command[1])                                     # set the number of line to print
-                    elif (len(command) > 1 and command[1] == "all"):                  # check if the command is "/log all"
+                    n_line = 0                                                      # init var, number of lines sent
+                    n_print = 5                                                     # init var, default line number to send
+                    if (len(command) > 1 and command[1].isdigit()):                 # check if the command is "/log [number]"
+                        n_print = int(command[1])                                   # set [number] of line to print
+                    elif (len(command) > 1 and command[1] == "all"):                # check if the command is "/log all"
                         n_print = 1000                                              # set the number of line to print
-                    else:
-                        n_print = 5                                                 # set the number of line to print, default
                     for char in file:                                               # read the file char by char
                         if n_line < n_print:                                        # Check if all the line requested are printed
                             line += char                                            # add the character to a string to form the line
