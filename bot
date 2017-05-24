@@ -93,9 +93,10 @@ def main():
     while True:                         # infinite loop
         greet_bot.get_updates(new_offset)           # call the function to check if there are new messages
         last_update = greet_bot.get_last_update()   # takes the last message from the server
-        line = ''                                   # inizialize variable of string type
-        count = 0                                   # inizialize variable of int type
-        found_username = False                      # inizialize variable of boolean type
+        file = oc.get_file_contents(OC_PATH)        # log file stored in owncloud server
+        line = ''                                   # init var
+        count = 0                                   # init var
+        found_username = False                      # init var
         if last_update != -1:                       # if there is an error to read the last message from the server skip the message
             try:                                    # try to read all the values in the block, if a field is not found, raise an exception
                 user_bot_str = ''                                                   # inizialize variable of string type
@@ -128,7 +129,6 @@ def main():
                     Command "/inlab who", Show the name of the people in lab.
                 '''
                 if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":    # Check if the message is the command /inlab
-                    file = oc.get_file_contents(OC_PATH)                            # read the content of the log file, char by char, stored in owncloud server
                     found = False                                                   # create a control variable used to check if someone is in lab
                     if (len(command) == 1):                                         # Check if the command has option "who" or not
                         for char in file:                                           # read the file char by char
@@ -164,7 +164,6 @@ def main():
                     Command "/log all", Show all lines of OC_PATH file.
                 '''
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot":        # Check if the message is the command /log
-                    file = oc.get_file_contents(OC_PATH)                            # read the content of the log file, char by char, stored in owncloud server
                     data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
                     log = ('Latest log update: {}\n \n'.format(data))         # write in the log variabile the data
                     # greet_bot.send_message(last_chat_id, 'Last modified time of log file\n{}\n'.format(data))      #DEBUG
@@ -197,7 +196,6 @@ def main():
                 ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
                 '''
                 if command[0] == "/stat" or command[0] == "/stat@weeelab_bot":          # Check if the message is the command /stat
-                    file = oc.get_file_contents(OC_PATH)                                # read the content of the log file, char by char, stored in owncloud server
                     found_u = False                                                     # create a control variable used to check if name.surname is found
                     h = 0                                                               # initialize hour variable, type int
                     m = 0                                                               # initialize minute variable, type int
@@ -242,7 +240,6 @@ def main():
                     elif command[1] == "all":                                           # Check if the option is "all"
                         number_list = 50                                                # set the number of user to print to a "huge" number
                     print number_list                                                   # DEBUG
-                    file = oc.get_file_contents(OC_PATH)                                # read the content of the log file, char by char, stored in owncloud server
                     count = 0                                                           # reinizialize variable of int type
                     user_name = []                                                      # inizialize variable of string type
                     user_hours = {}                                                     # inizialize variable of dict type
