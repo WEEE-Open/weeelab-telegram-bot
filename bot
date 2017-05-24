@@ -243,7 +243,7 @@ def main():
                     count = 0                                                           # reinizialize variable of int type
                     user_name = []                                                      # inizialize variable of string type
                     user_hours = {}                                                     # inizialize variable of dict type
-                    top_list = 'Top User List!\n'                                       # create variable of string type
+                    top_list = 'Top User List! [hh:mm]\n'                                       # create variable of string type
                     for char in file:                                                   # read the file char by char
                         if char != '\n':                                                # Check if a complete line is read or not
                             line += char                                                # add the character to a string to form the line
@@ -266,7 +266,7 @@ def main():
                         count += 1                                                      # update the counter of user printed
                         (hours, minutes, seconds) = str(element[1]).split(':')          # extract the hours and minutes from dict, splitted by :
                         if count <= number_list:                                        # check if the list is completed
-                            top_list = top_list + '{}) {}    HH:MM = {}:{}\n'.format(count, nameExtr(element[0]), hours, minutes)   # add the user to the top list
+                            top_list = top_list + '{}) [{}:{}] {}\n'.format(count, hours, minutes, nameExtr(element[0]))   # add the user to the top list
                     greet_bot.send_message(last_chat_id, '{}'.format(top_list))         # send the top list to the user that makes the request
             else:
                 greet_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized.')    # Send an error message to the user, not allowed to use the bot
