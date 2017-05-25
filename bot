@@ -60,9 +60,9 @@ class BotHandler:
 
     '''function to send messages to the user of the bot
     for more info about this method refeer to https://core.telegram.org/bots/api#sendmessage'''
-    def send_message(self, chat_id, text):
+    def send_message(self, chat_id, text, parse_mode='Markdown'):
         # set parameter like the unique identifier of the chat between user and bot and the message to send
-        params = {'chat_id': chat_id, 'text': text}     
+        params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}     
         method = 'sendMessage'  # set the method used refering to Telegram API
         # make the request to the bot with the previous method and parameters, post type because we send a message
         resp = requests.post(self.api_url + method, params)
