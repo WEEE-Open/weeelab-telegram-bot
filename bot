@@ -99,6 +99,8 @@ def main():
         '''Variables for /inlab command'''
         people_inlab = 0
         found_user_inlab = False
+        '''Variables for /log command'''
+        lines_to_print = 5  # default line number to send
         '''Variables for /stat command'''
         user_hours = 0  # initialize hour variable, type int
         user_minutes = 0 # initialize minute variable, type int
@@ -162,7 +164,6 @@ def main():
                 '''
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
                     log_print = ('Latest log update: {}\n \n'.format(log_update_data)) # write in the log variabile the data
-                    lines_to_print = 5  # default line number to send
                     if (len(command) > 1 and command[1].isdigit()): # check if the command is "/log [number]"
                         lines_to_print = int(command[1])
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
@@ -199,9 +200,9 @@ def main():
                             weee_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly? (name.surname)')      
                         else:
                             total_second = hours_sum.total_seconds()
-                            total_hours = total_second // 3600
-                            total_minutes = (total_second % 3600) // 60
-                            weee_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {}:{}'.format(nameExtr(user_name), total_hours, total_minutes))
+                            total_hours = int(total_second // 3600)
+                            total_minutes = int((total_second % 3600) // 60)
+                            weee_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {:02d}:{:02d}'.format(nameExtr(user_name), total_hours, total_minutes))
                             # write the stat of the user
 
                 # Show the top list of the users
@@ -236,8 +237,24 @@ def main():
                             # add the user to the top list
                             top_list_print = top_list_print + '{}) [{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                     weee_bot.send_message(last_chat_id, '{}'.format(top_list_print)) # send the top list to the user that makes the request
+                # Show help
+                ''' Command "/help", Show an help.
+                '''
+                if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
+                    help_message = "/start the bot and type /[COMMAND] [OPTION].\
+                    Available commands:\n \
+                    inlab : Show the number of people in lab. \n \
+                    log : Show the complete OC_PATH file (only for admin user, by default only 5 lines) \n \
+                    \t [number] : Show the [number] most recent lines of OC_PATH file. \n \
+                    \t all : Show all lines of OC_PATH file. \n \
+                    stat name.surname : Show hours spent in lab by this user. \n \
+                    top : Show a list of top users in lab (defaul top 10) \n \
+                    \t [number] : Show the top [number] elements. \n \
+                    \t all : Show list with all users. \n \
+                    sync : Show last edit date and time of the OC_PATH file."
+                    weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized.')    # Send an error message to the user, not allowed to use the bot
+                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized.')
 
             user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
