@@ -117,8 +117,7 @@ def main():
             try: 
                 log_file = oc.get_file_contents(OC_PATH) # log file stored in owncloud server
                 log_lines = log_file.splitlines()
-                #lines_inlab = [i for i, lines in enumerate(log_lines) if 'INLAB' in lines]
-                lines_inlab = (i for i, lines in enumerate(log_lines) if 'INLAB' in lines)
+                lines_inlab = [i for i, lines in enumerate(log_lines) if 'INLAB' in lines]
                 # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
                 log_update_data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     
                 last_update_id = last_update['update_id'] # store the id of the bot taken from the mesasge
@@ -151,12 +150,6 @@ def main():
                             weee_bot.send_message(last_chat_id, 'There are {} students in lab right now.'.format(people_inlab)) 
                     elif (command[1] == "who"): # Check if the command has option "who" or not
                         for index in lines_inlab:
-                            index += 1
-                            found_user_inlab = True
-                            print index
-                            print lines_inlab
-                            print "log_file: " + log_lines[index]
-                            print log_lines[index][47:log_lines[index].rfind(">")]
                             user_inlab = nameExtr(log_lines[index][47:log_lines[index].rfind(">")]) # extract the name of the person
                             weee_bot.send_message(last_chat_id, '{}'.format(user_inlab)) 
                         if not found_user_inlab: 
