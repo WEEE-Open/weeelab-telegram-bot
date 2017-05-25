@@ -150,6 +150,7 @@ def main():
                             weee_bot.send_message(last_chat_id, 'There are {} students in lab right now.'.format(people_inlab)) 
                     elif (command[1] == "who"): # Check if the command has option "who" or not
                         for index in lines_inlab:
+                            found_user_inlab = True
                             user_inlab = nameExtr(log_lines[index][47:log_lines[index].rfind(">")]) # extract the name of the person
                             weee_bot.send_message(last_chat_id, '{}'.format(user_inlab)) 
                         if not found_user_inlab: 
