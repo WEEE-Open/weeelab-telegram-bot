@@ -151,6 +151,7 @@ def main():
                             weee_bot.send_message(last_chat_id, 'There are {} students in lab right now.'.format(people_inlab)) 
                     elif (command[1] == "who"): # Check if the command has option "who" or not
                         for index in lines_inlab:
+                            index += 1
                             found_user_inlab = True
                             print index
                             print lines_inlab
