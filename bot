@@ -18,6 +18,7 @@ NOTE: The print commands are only for debug.
 '''
 # system library needed to read the environment variables
 import os
+
 # library to make requests to telegram server
 import requests
 # library to make requests to owncloud server, more details on https://github.com/owncloud/pyocclient
@@ -25,7 +26,8 @@ import owncloud
 # library to handle time
 import datetime
 from datetime import timedelta
-
+# library to handle dictionary
+import operator
 
 # get environment variables
 OC_URL = os.environ.get('OC_URL') # url of the owncloud server
