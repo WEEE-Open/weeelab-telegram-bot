@@ -52,7 +52,8 @@ class BotHandler:
         method = 'getUpdates'       # set type of method used refering to Telegram API
         params = {'timeout': timeout, 'offset': offset}     # set parameter like timeout in seconds for long polling and no offset related to updates
         resp = requests.get(self.api_url + method, params) # make the request to the bot with the previous method and parameters, get type because we request a message
-        result_json = resp.json()['result'] # store the json response from the telegram server
+        # store the json response from the telegram server
+        result_json = resp.json()['result'] 
         return result_json  # return a variable of type json as response of the bot
 
     '''function to send messages to the user of the bot
@@ -99,6 +100,7 @@ def main():
         found_username = False                      # init var
         if last_update != -1:                       # if there is an error to read the last message from the server skip the message
             try:                                    # try to read all the values in the block, if a field is not found, raise an exception
+                print type(file)
                 user_bot_str = ''                                                   # inizialize variable of string type
                 last_update_id = last_update['update_id']                           # store the id of the bot taken from the mesasge
                 new_offset = last_update_id + 1                                     # store the update id of the bot
