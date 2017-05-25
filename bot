@@ -109,6 +109,7 @@ def main():
         users_name = []
         users_hours = {}
         top_list_print = 'Top User List!\n'
+        position = 1
         number_top_list = 10  # Inizialize the number of users to print for command /top
 
         if last_update != -1: 
@@ -129,7 +130,6 @@ def main():
 
             except KeyError: # catch the exception if raised
                 print "ERROR!" # DEBUG
-                pass
 
             if (last_user_username in USER_LIST_NAME) or (last_user_id in USER_LIST_ID): # check if the user is allowed to use the bot  
                 ''' ADD COMMANDS HERE '''
@@ -227,11 +227,12 @@ def main():
                     # sort the dict by value in descendet order 
                     sorted_top_list = sorted(users_hours.items(), key=operator.itemgetter(1), reverse=True) 
                     for rival in sorted_top_list: # print the elements sorted
-                        for position in range(1,number_top_list): # update the counter of user printed
+                        position += 1                                                      # update the counter of user printed
+                        if position  <= number_top_list:                                        # check if the list is completed
                             # extract the hours and minutes from dict, splitted by :
                             total_second = rival[1].total_seconds()
-                            total_hours = total_second // 3600
-                            total_minutes = (total_second % 3600) // 60
+                            total_hours = int(total_second // 3600)
+                            total_minutes = int((total_second % 3600) // 60)
                             # add the user to the top list
                             top_list_print = top_list_print + '{}) [{}:{}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                     weee_bot.send_message(last_chat_id, '{}'.format(top_list_print)) # send the top list to the user that makes the request
