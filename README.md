@@ -40,6 +40,7 @@ Available commands:
   * `[number]`     : Show the top `[number]` elements.
   * `all`      : Show list with all users.
 * `sync`  :  Show last edit date and time of the `OC_PATH` file.
+* `help`  :  Show all the commands and a short explanations.
 
 ## TODO
 
