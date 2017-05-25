@@ -155,9 +155,9 @@ def main():
                             found_user_inlab = True
                             print index
                             print lines_inlab
-                            print "log_file: " + log_file[index]
-                            print log_file[index][47:log_file[index].rfind(">")]
-                            user_inlab = nameExtr(log_file[index][47:log_file[index].rfind(">")]) # extract the name of the person
+                            print "log_file: " + log_lines[index]
+                            print log_lines[index][47:log_lines[index].rfind(">")]
+                            user_inlab = nameExtr(log_lines[index][47:log_lines[index].rfind(">")]) # extract the name of the person
                             weee_bot.send_message(last_chat_id, '{}'.format(user_inlab)) 
                         if not found_user_inlab: 
                             weee_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
