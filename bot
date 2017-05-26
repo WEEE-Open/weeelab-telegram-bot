@@ -99,9 +99,10 @@ def main():
         people_inlab = 0
         found_user_inlab = False
         '''Variables for /log command'''
-        lines_to_print = 5  # default line number to send
+        lines_to_print = 5 # default lines number to send
+        lines_message = 0 # number of lines of the message
         '''Variables for /stat command'''
-        user_hours = 0  # initialize hour variable, type int
+        user_hours = 0 # initialize hour variable, type int
         user_minutes = 0 # initialize minute variable, type int
         total_hours = 0 
         total_minutes = 0
