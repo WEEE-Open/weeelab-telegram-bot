@@ -186,7 +186,7 @@ For a list of the commands allowed send /help.')
                         log_print = log_print + '{}\n'.format(log_lines[lines_printed])
                         lines_message += 1
                         if lines_message > 25:
-                            weee_bot.send_message(last_chat_id, '{}'.format(log_print),None)
+                            weee_bot.send_message(last_chat_id, '{}'.format(log_print))
                             lines_message = 0
                             log_print = ''
                     weee_bot.send_message(last_chat_id, '{}'.format(log_print))
