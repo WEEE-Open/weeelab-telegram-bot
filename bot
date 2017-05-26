@@ -132,8 +132,18 @@ def main():
             except KeyError: # catch the exception if raised
                 print "ERROR!" # DEBUG
 
-            if (last_user_username in USER_LIST_NAME) or (last_user_id in USER_LIST_ID): # check if the user is allowed to use the bot  
+            if (last_user_username in USER_LIST_NAME) or (last_user_id in USER_LIST_ID): # check if the user is allowed to use the bot            
                 ''' ADD COMMANDS HERE '''
+                # Short introduction
+                ''' Command "/start", Start info
+                '''
+                if command[0] == "/start" or command[0] == "/start@weeelab_bot": # Check if the message is the command /start
+                    weee_bot.send_message(last_chat_id, 'WEEE-Open Telegram bot.\n \
+The goal of this bot is to obtain information about who is currently in the lab, \
+who has done what, compute some stats and, in general, simplify the life of our members \
+And to avoid waste of paper as well. \n \
+All data is read from a weeelab log file, which is fetched from an OwnCloud shared folder. \n \
+For a list of the command allowed send /help.')
                 # Show how many students are in lab right now
                 ''' Command "/inlab", Show the number of people in lab.
                     Command "/inlab who", Show the name of the people in lab.
@@ -255,7 +265,7 @@ sync : Show last edit date and time of the OC_PATH file.\n \
 help : Show all the commands and a short explanations."
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized.')
+                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized. \n After authorization /start the bot.')
 
             user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
