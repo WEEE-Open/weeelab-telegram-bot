@@ -254,7 +254,7 @@ For a list of the commands allowed send /help.')
                             total_hours = int(total_second // 3600)
                             total_minutes = int((total_second % 3600) // 60)
                             # add the user to the top list
-                            top_list_print = top_list_print + '{}) [{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                            top_list_print = top_list_print + '{}) \[{:02d}:{:02d}\] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                     weee_bot.send_message(last_chat_id, '{}'.format(top_list_print)) # send the top list to the user that makes the request
                 # Show help
                 ''' Command "/help", Show an help.
