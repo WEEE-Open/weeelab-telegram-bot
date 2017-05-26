@@ -96,6 +96,7 @@ def main():
         weee_bot.get_updates(new_offset) # call the function to check if there are new messages
         last_update = weee_bot.get_last_update() # takes the last message from the server
         '''Variables for /inlab command'''
+        user_inlab_list = ''
         people_inlab = 0
         found_user_inlab = False
         '''Variables for /log command'''
@@ -163,9 +164,11 @@ For a list of the commands allowed send /help.')
                         for index in lines_inlab:
                             found_user_inlab = True
                             user_inlab = nameExtr(log_lines[index][47:log_lines[index].rfind(">")]) # extract the name of the person
-                            weee_bot.send_message(last_chat_id, '{}'.format(user_inlab)) 
+                            user_inlab_list = user_inlab_list + '\n' + user_inlab 
                         if not found_user_inlab: 
                             weee_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
+                        else:
+                            weee_bot.send_message(last_chat_id, '{}'.format(user_inlab_list))
 
                 # Show log file
                 ''' Command "/log", Show the complete OC_PATH file (only for admin user, by default only 5 lines)
