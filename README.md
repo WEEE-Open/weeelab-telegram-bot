@@ -24,6 +24,7 @@ run:
 * `OC_PWD`: OwnCloud password
 * `TOKEN_BOT`: Telegram token for the bot API
 * `USER_LIST_NAME`: Python list of the user allowed to use the bot
+* `USER_LIST_ID`: Python list of the users' id allowed to use the bot
 
 
 ## Command syntax
@@ -31,7 +32,8 @@ run:
 
 Available commands:
 
-* `inlab` : Show the number of people in lab.
+* `inlab` : Show the number of people in lab
+  * `who`      : Show the name of the people in lab.
 * `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
   * `[number]`   : Show the `[number]` most recent lines of `OC_PATH` file.
   * `all`      : Show all lines of OC_PATH file.
