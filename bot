@@ -268,7 +268,7 @@ For a list of the commands allowed send /help.')
 - *top* : Show a list of top users in lab (defaul top 10) \n\
     + _[number]_ : Show the top _[number]_ elements. \n\
     + _all_ : Show list with all users. \n\
-- *sync* : Show last edit date and time of the OC_PATH file.\n\
+- *sync* : Show last edit date and time of the OC-PATH file.\n\
 - *help* : Show all the commands and a short explanations."
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
