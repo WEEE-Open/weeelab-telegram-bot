@@ -142,8 +142,8 @@ def main():
 The goal of this bot is to obtain information about who is currently in the lab, \
 who has done what, compute some stats and, in general, simplify the life of our members \
 and to avoid waste of paper as well. \n\
-All data is read from a weeelab log file, which is fetched from an OwnCloud shared folder. \n \
-For a list of the command allowed send /help.')
+All data is read from a weeelab log file, which is fetched from an OwnCloud shared folder. \n\
+For a list of the commands allowed send /help.')
                 # Show how many students are in lab right now
                 ''' Command "/inlab", Show the number of people in lab.
                     Command "/inlab who", Show the name of the people in lab.
@@ -251,7 +251,7 @@ For a list of the command allowed send /help.')
                 ''' Command "/help", Show an help.
                 '''
                 if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
-                    help_message = "/start the bot and type '''/[COMMAND] [OPTION]'''. \n \
+                    help_message = "/start the bot and type /[COMMAND] [OPTION]. \n \
                 *Available commands*:\n \n \
 * inlab : Show the number of people in lab. \n \
 * log : Show the complete OC_PATH file (only for admin user, by default only 5 lines) \n \
