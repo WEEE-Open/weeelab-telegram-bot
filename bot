@@ -251,9 +251,18 @@ For a list of the commands allowed send /help.')
                 ''' Command "/help", Show an help.
                 '''
                 if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
-                    help_message = "/start the bot and type /[COMMAND] [OPTION]. \n\
+                    help_message = "/start the bot and type '''/[COMMAND] [OPTION]'''. \n\
                 *Available commands*:\n\
 - inlab : Show the number of people in lab. \n\
+- log : Show the complete OC_PATH file (only for admin user, by default only 5 lines) \n\
+    + [number] : Show the [number] most recent lines of OC_PATH file. \n\
+    + all : Show all lines of OC_PATH file. \n\
+- stat name.surname : Show hours spent in lab by this user. \n\
+- top : Show a list of top users in lab (defaul top 10) \n\
+    + [number] : Show the top [number] elements. \n\
+    + all : Show list with all users. \n\
+- sync : Show last edit date and time of the OC_PATH file.\n\
+- help : Show all the commands and a short explanations.
 "
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
