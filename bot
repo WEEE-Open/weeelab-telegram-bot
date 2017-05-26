@@ -260,7 +260,9 @@ For a list of the commands allowed send /help.')
                     help_message = "/start the bot and type /[COMMAND] [OPTION]. \n\
                     *Available commands*:\n\
 - *inlab* : Show the number of people in lab. \n\
-"
+    + _who_ : print the name of the people in lab \n\
+- *log* : Show the complete OC-PATH file (only for admin user, by default only 5 lines) \n\
+."
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
                 weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized. \n After authorization /start the bot.')
