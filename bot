@@ -182,7 +182,7 @@ For a list of the commands allowed send /help.')
                         lines_to_print = int(command[1])
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
                         lines_to_print = int(len(log_lines))
-                    for lines_printed in range(1,lines_to_print):
+                    for lines_printed in range(0,lines_to_print):
                         log_print = log_print + '{}\n'.format(log_lines[lines_printed])
                         lines_message += 1
                         if lines_message > 25:
