@@ -253,7 +253,7 @@ For a list of the commands allowed send /help.')
                 if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
                     help_message = "/start the bot and type /[COMMAND] [OPTION]. \n\
                 *Available commands*:\n\
-+ inlab : Show the number of people in lab. \n\
+- inlab : Show the number of people in lab. \n\
 "
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
