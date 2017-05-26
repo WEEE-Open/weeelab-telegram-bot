@@ -261,7 +261,7 @@ For a list of the commands allowed send /help.')
                 '''
                 if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
                     help_message = "/start the bot and type /*COMMAND* _OPTION_. \n\
-                    *Available commands and _options_*:\n\
+                    *Available commands and options*:\n\
 - *inlab* : Show the number of people in lab. \n\
     + _who_ : print the name of the people in lab \n\
 - *log* : Show the complete OC-PATH file (only for admin user, by default only 5 lines) \n\
