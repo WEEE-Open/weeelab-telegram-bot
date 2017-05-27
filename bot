@@ -59,9 +59,12 @@ class BotHandler:
 
     '''function to send messages to the user of the bot
     for more info about this method refeer to https://core.telegram.org/bots/api#sendmessage'''
-    def send_message(self, chat_id, text, parse_mode='Markdown'):
+    def send_message(self, chat_id, text, parse_mode='Markdown', mode = False ):
         # set parameter like the unique identifier of the chat between user and bot and the message to send
-        params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}     
+        if mode == False:
+            params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}  
+        else:
+            params = {'chat_id': chat_id, 'text': text}  
         method = 'sendMessage'  # set the method used refering to Telegram API
         # make the request to the bot with the previous method and parameters, post type because we send a message
         resp = requests.post(self.api_url + method, params)
@@ -186,10 +189,10 @@ For a list of the commands allowed send /help.')
                         log_print = log_print + '{}\n'.format(log_lines[lines_printed])
                         lines_message += 1
                         if lines_message > 25:
-                            weee_bot.send_message(last_chat_id, '{}'.format(log_print))
+                            weee_bot.send_message(last_chat_id, '{}'.format(log_print),None,True)
                             lines_message = 0
                             log_print = ''
-                    weee_bot.send_message(last_chat_id, '{}'.format(log_print))
+                    weee_bot.send_message(last_chat_id, '{}'.format(log_print),None,True)
 
                 # Show data update log
                 ''' Command "/sync", Show last edit date and time of the OC_PATH file.
