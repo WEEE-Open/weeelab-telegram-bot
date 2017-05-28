@@ -263,19 +263,19 @@ For a list of the commands allowed send /help.')
                 ''' Command "/help", Show an help.
                 '''
                 if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
-                    help_message = "/start the bot and type /*COMMAND* _OPTION_. \n\
-                    *Available commands and options*:\n\
-- *inlab* : Show the number of people in lab. \n\
-    + _who_ : print the name of the people in lab \n\
-- *log* : Show the complete OC-PATH file (only for admin user, by default only 5 lines) \n\
-    + _number_ : Show the _number_ most recent lines of OC-PATH file. \n\
-    + _all_ : Show all lines of OC-PATH file. \n\
-- *stat* _name.surname_ : Show hours spent in lab by this user. \n\
-- *top* : Show a list of top users in lab (defaul top 10) \n\
-    + _number_ : Show the top _number_ elements. \n\
-    + _all_ : Show list with all users. \n\
-- *sync* : Show last edit date and time of the OC-PATH file.\n\
-- *help* : Show all the commands and a short explanations."
+                    help_message = "Available commands and options:\n\
+\n*For all team*\n\
+/sync - Show last edit date and time of the login file\n\
+/inlab - Show the number of people in lab\n\
+    + _who_ - print the name of the people in lab\n\
+\n*only for admin user*\n\
+/log - Show last 5 login\n\
+    + _number_ - Show last _number_ login\n\
+    + _all_ - Show all login\n\
+/stat _name.surname_ - Show hours spent in lab by this user\n\
+/top - Show a list of top 10 users in lab\n\
+    + _number_ - Show the top _number_ elements\n\
+    + _all_ - Show list with all users\n\"
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
                 weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized. \n After authorization /start the bot.')
