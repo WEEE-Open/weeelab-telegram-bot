@@ -275,7 +275,7 @@ For a list of the commands allowed send /help.')
 /stat _name.surname_ - Show hours spent in lab by this user\n\
 /top - Show a list of top 10 users in lab\n\
     + _number_ - Show the top _number_ elements\n\
-    + _all_ - Show list with all users\n\"
+    + _all_ - Show list with all users\n"
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
                 weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact WeeeOpen team to be authorized. \n After authorization /start the bot.')
