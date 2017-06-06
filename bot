@@ -110,6 +110,7 @@ def main():
         '''Variables for /log command'''
         lines_to_print = 5 # default lines number to send
         lines_message = 0 # number of lines of the message
+        log_data = ''
         '''Variables for /stat command'''
         user_hours = 0 # initialize hour variable, type int
         user_minutes = 0 # initialize minute variable, type int
@@ -187,9 +188,15 @@ For a list of the commands allowed send /help.')
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
                         lines_to_print = 25
                     for lines_printed in range(0,lines_to_print):
-                        log_line_to_print=log_lines[lines_printed][0:11] + log_lines[lines_printed][17:30] +'] ' + log_lines[lines_printed][45:47] + '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">"):len(log_lines[lines_printed])]
-                        log_print = log_print + '{}\n'.format(log_line_to_print)
-                        lines_message += 1
+                        if log_data == log_lines[lines_printed][0:11]:
+                            log_line_to_print = '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")-1] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                            log_print = log_print + '{}\n'.format(log_line_to_print)
+                            lines_message += 1
+                         else:
+                            log_data = log_lines[lines_printed][0:11] +']\n'
+                            log_line_to_print = '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")-1] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                            log_print = log_print + '{}\n'.format(log_line_to_print)
+                            lines_message += 1
                         if lines_message > 25:
                             log_print = log_print.replace('[', '\[')
                             weee_bot.send_message(last_chat_id, '{}'.format(log_print))
