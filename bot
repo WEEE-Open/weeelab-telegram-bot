@@ -185,7 +185,7 @@ For a list of the commands allowed send /help.')
                     log_print = ('Latest log update: *{}*\n \n'.format(log_update_data)) # write in the log variabile the data
                     lines_to_print = len(log_lines)
                     if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
-                        lines_to_print = int(command[1]
+                        lines_to_print = int(command[1])
                     for lines_printed in range(0,lines_to_print):
                         if not ("INLAB" in log_lines[lines_printed]):
                             if log_data == log_lines[lines_printed][1:11]:
