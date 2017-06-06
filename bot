@@ -184,7 +184,6 @@ For a list of the commands allowed send /help.')
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
                     log_print = ('Latest log update: *{}*\n \n'.format(log_update_data)) # write in the log variabile the data
                     lines_to_print = len(log_lines)
-                    print lines_to_print
                     if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
                         lines_to_print = int(command[1])
                     for lines_printed in range(0,lines_to_print):
@@ -194,19 +193,19 @@ For a list of the commands allowed send /help.')
                                 log_print = log_print + '{}\n'.format(log_line_to_print)
                                 lines_message += 1
                             else:
-                                if (len(command) == 1):
-                                    lines_printed = 200
+                                if (len(command) == 1 and lines_message > 0):
+                                    lines_printed = len(log_lines)
                                 else:
                                     log_data = log_lines[lines_printed][1:11]
                                     log_line_to_print = '*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
                                     log_print = log_print + '{}\n'.format(log_line_to_print)
                                     lines_message += 1
-                                if lines_message > 25:
-                                    log_print = log_print.replace('[', '\[')
-                                    log_print = log_print.replace('::', ':')
-                                    weee_bot.send_message(last_chat_id, '{}'.format(log_print))
-                                    lines_message = 0
-                                    log_print = ''
+                                    if lines_message > 25:
+                                        log_print = log_print.replace('[', '\[')
+                                        log_print = log_print.replace('::', ':')
+                                        weee_bot.send_message(last_chat_id, '{}'.format(log_print))
+                                        lines_message = 0
+                                        log_print = ''
                     log_print = log_print.replace('[', '\[')
                     log_print = log_print.replace('::', ':')
                     weee_bot.send_message(last_chat_id, '{}'.format(log_print))
