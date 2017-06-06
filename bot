@@ -211,7 +211,7 @@ For a list of the commands allowed send /help.')
                     if len(command)==1:
                         print last_user_id
                         print USER_DICT
-                        user_name = USER_DICT[last_user_id]
+                        user_name = USER_DICT[str(last_user_id)]
                         allowed = True
                     if ((len(command) != 1) and (str(last_user_id) in USER_LIST_ADMIN_ID)):  # Check if the command has option or not
                         user_name = str(command[1]) # store the option in a variable
