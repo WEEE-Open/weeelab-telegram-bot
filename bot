@@ -194,7 +194,6 @@ For a list of the commands allowed send /help.')
                             lines_message = 0
                             log_print = ''
                     log_print = log_print.replace('[', '\[')
-                    log_print = log_print.replace(']', '\]')
                     weee_bot.send_message(last_chat_id, '{}'.format(log_print))
 
                 # Show data update log
