@@ -197,7 +197,7 @@ For a list of the commands allowed send /help.')
                                     lines_printed = len(log_lines)
                                 else:
                                     log_data = log_lines[lines_printed][1:11]
-                                    log_line_to_print = '*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                                    log_line_to_print = '\n*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
                                     log_print = log_print + '{}\n'.format(log_line_to_print)
                                     lines_message += 1
                                     if lines_message > 25:
