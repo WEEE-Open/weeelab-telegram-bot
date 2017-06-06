@@ -194,7 +194,7 @@ For a list of the commands allowed send /help.')
                                 log_print = log_print + '{}\n'.format(log_line_to_print)
                                 lines_message += 1
                             else:
-                                if not (len(command) > 1 and command[1] == "all"):
+                                if (len(command) == 1):
                                     lines_printed = 200
                                 else:
                                     log_data = log_lines[lines_printed][1:11]
