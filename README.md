@@ -40,9 +40,7 @@ Available commands:
   * `[number]`   : Show the `[number]` most recent lines of `OC_PATH` file.
   * `all`      : Show all lines of OC_PATH file.
 * `stat`   :  Show hours spent in lab by the user.
-* `top`   :  Show a list of top users in lab (only for admin, default top 10)
-  * `[number]`     : Show the top `[number]` elements.
-  * `all`      : Show list with all users.
+* `top`   :  Show a list of top users in lab (only for admin, default top 50)
 * `sync`  :  Show last edit date and time of the `OC_PATH` file.
 * `help`  :  Show all the commands and a short explanations.
 
