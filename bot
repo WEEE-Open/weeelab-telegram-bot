@@ -210,11 +210,10 @@ For a list of the commands allowed send /help.')
                     found_user = False # create a control variable used to check if name.surname is found
                     allowed = False
                     if len(command)==1:
-                        print type(last_user_id)
-                        print type(USER_DICT)
                         user_name = USER_DICT[str(last_user_id)]
+                        print user_name
                         allowed = True
-                    if ((len(command) != 1) and (str(last_user_id) in USER_LIST_ADMIN_ID)):  # Check if the command has option or not
+                    elif ((len(command) != 1) and (str(last_user_id) in USER_LIST_ADMIN_ID)):  # Check if the command has option or not
                         user_name = str(command[1]) # store the option in a variable
                         allowed = True
                     else:
