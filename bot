@@ -182,7 +182,6 @@ For a list of the commands allowed send /help.')
                 '''
                 #Api limit message too long
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
-                    
                     lines_to_print = len(log_lines)
                     if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
                         lines_to_print = int(command[1])
@@ -203,13 +202,12 @@ For a list of the commands allowed send /help.')
                                     if lines_message > 25:
                                         log_print = log_print.replace('[', '\[')
                                         log_print = log_print.replace('::', ':')
-                                        log_print = log_print + ('\nLatest log update: *{}*\n'.format(log_update_data)) # write in the log variabile the data
-                                        weee_bot.send_message(last_chat_id, '{}'.format(log_print))
+                                        weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
                                         lines_message = 0
                                         log_print = ''
                     log_print = log_print.replace('[', '\[')
                     log_print = log_print.replace('::', ':')
-                    weee_bot.send_message(last_chat_id, '{}'.format(log_print))
+                    weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
 
                 # Show data update log
                 ''' Command "/sync", Show last edit date and time of the OC_PATH file.
