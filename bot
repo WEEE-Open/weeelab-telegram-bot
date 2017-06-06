@@ -38,6 +38,7 @@ USER_LIST_NAME = os.environ.get('USER_LIST_NAME') # Python list of the user allo
 USER_LIST_ID = os.environ.get('USER_LIST_ID') # Python list of the users' id allowed to use the bot
 USER_LIST_PRO = os.environ.get('USER_LIST_PRO') # Python list of the pro users' id allowed to use the bot
 USER_LIST_ADMIN_ID = os.environ.get('USER_LIST_ADMIN_ID') # Python list of the Admin users' id allowed to use the bot
+USER_DICT = os.environ.get('USER_DICT') # Python dict of the users allowed to use the bot
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH') # path of the file to store bot users in owncloud (/folder/file.txt)
 
 # class with function used by the bot
@@ -184,12 +185,11 @@ For a list of the commands allowed send /help.')
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
                         lines_to_print = 25
                     for lines_printed in range(0,lines_to_print):
-                        log_line_to_print=log_lines[lines_printed][0:37] + log_lines[lines_printed][45:46] + '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">"):len(log_lines[lines_printed])]
+                        log_line_to_print=log_lines[lines_printed][0:37] + log_lines[lines_printed][45:47] + '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">"):len(log_lines[lines_printed])]
                         log_print = log_print + '{}\n'.format(log_line_to_print)
                         lines_message += 1
                         if lines_message > 25:
                             log_print = log_print.replace('[', '\[')
-                            log_print = log_print.replace(']', '\]')
                             weee_bot.send_message(last_chat_id, '{}'.format(log_print))
                             lines_message = 0
                             log_print = ''
@@ -208,10 +208,16 @@ For a list of the commands allowed send /help.')
                 '''
                 if command[0] == "/stat" or command[0] == "/stat@weeelab_bot": # Check if the message is the command /stat
                     found_user = False # create a control variable used to check if name.surname is found
-                    if (len(command) == 1):  # Check if the command has option or not
-                        weee_bot.send_message(last_chat_id, 'Achtung! Insert name.surname to view the stats')
-                    else:
+                    allowed = False
+                    if len(command)==1;
+                        user_name = USER_DICT[last_user_id]
+                        allowed = True
+                    if ((len(command) != 1) and (str(last_user_id) in USER_LIST_ADMIN_ID)):  # Check if the command has option or not
                         user_name = str(command[1]) # store the option in a variable
+                        allowed = True
+                    else:
+                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to see stat of other users! \nOnly admin can!')
+                    if allowed:
                         for lines in log_lines:
                             if not ("INLAB" in lines) and (user_name == lines[47:lines.rfind(">")]):
                                 found_user = True
@@ -234,36 +240,39 @@ For a list of the commands allowed send /help.')
                     Command "/top number", Show the top N elements.
                     Command "/top all", Show list with all users.
                 '''
-                if (command[0] == "/top" or command[0] == "/top@weeelab_bot") and (str(last_user_id) in USER_LIST_ADMIN_ID): # Check if the message is the command /top
-                    if len(command) > 1 and command[1].isdigit(): # Check if the option is a number
-                        number_top_list = int(command[1]) # set the number of user to print with the option
-                    elif len(command) > 1 and command[1] == "all": # Check if the option is "all"
-                        number_top_list = 50  # set the number of user to print to a "huge" number
-                    for lines in log_lines:
-                        if not ("INLAB" in lines):
-                            name = lines[47:lines.rfind(">")].encode('utf-8') 
-                            (user_hours, user_minutes) = lines[39:lines.rfind("]")].split(':')
-                            partial_hours = datetime.timedelta(hours=int(user_hours), minutes=int(user_minutes)) 
-                            if (name in users_name): # check if user was already found
-                                users_hours[name] += partial_hours # add to the key with the same name the value partial_hours
-                            else:
-                                users_name.append(name) # create a new key with the name
-                                users_hours[name] = partial_hours # add the hours to the key
-                    # sort the dict by value in descendet order 
-                    sorted_top_list = sorted(users_hours.items(), key=operator.itemgetter(1), reverse=True) 
-                    for rival in sorted_top_list: # print the elements sorted
-                        position += 1 # update the counter of position on top list
-                        if position  <= number_top_list: # check if the list is completed
-                            # extract the hours and minutes from dict, splitted by :
-                            total_second = rival[1].total_seconds()
-                            total_hours = int(total_second // 3600)
-                            total_minutes = int((total_second % 3600) // 60)
-                            # add the user to the top list
-                            if rival[0] in USER_LIST_PRO:
-                                top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
-                            else:
-                                top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
-                    weee_bot.send_message(last_chat_id, 'Latest log update:\n{} \n{}'.format(log_update_data, top_list_print)) # send the top list to the user that makes the request
+                if command[0] == "/top" or command[0] == "/top@weeelab_bot": # Check if the message is the command /top
+                    if str(last_user_id) in USER_LIST_ADMIN_ID:
+                        if len(command) > 1 and command[1].isdigit(): # Check if the option is a number
+                            number_top_list = int(command[1]) # set the number of user to print with the option
+                        elif len(command) > 1 and command[1] == "all": # Check if the option is "all"
+                            number_top_list = 50  # set the number of user to print to a "huge" number
+                        for lines in log_lines:
+                            if not ("INLAB" in lines):
+                                name = lines[47:lines.rfind(">")].encode('utf-8') 
+                                (user_hours, user_minutes) = lines[39:lines.rfind("]")].split(':')
+                                partial_hours = datetime.timedelta(hours=int(user_hours), minutes=int(user_minutes)) 
+                                if (name in users_name): # check if user was already found
+                                    users_hours[name] += partial_hours # add to the key with the same name the value partial_hours
+                                else:
+                                    users_name.append(name) # create a new key with the name
+                                    users_hours[name] = partial_hours # add the hours to the key
+                        # sort the dict by value in descendet order 
+                        sorted_top_list = sorted(users_hours.items(), key=operator.itemgetter(1), reverse=True) 
+                        for rival in sorted_top_list: # print the elements sorted
+                            position += 1 # update the counter of position on top list
+                            if position  <= number_top_list: # check if the list is completed
+                                # extract the hours and minutes from dict, splitted by :
+                                total_second = rival[1].total_seconds()
+                                total_hours = int(total_second // 3600)
+                                total_minutes = int((total_second % 3600) // 60)
+                                # add the user to the top list
+                                if rival[0] in USER_LIST_PRO:
+                                    top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                                else:
+                                    top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                        weee_bot.send_message(last_chat_id, 'Latest log update:\n{} \n{}'.format(log_update_data, top_list_print)) # send the top list to the user that makes the request
+                    else: 
+                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admin can use!')
                 # Show help
                 ''' Command "/help", Show an help.
                 '''
@@ -283,8 +292,7 @@ For a list of the commands allowed send /help.')
     + _all_ - Show list with all users\n"
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \n Please contact [WeeeOpen](http://weeeopen.polito.it/) team to be authorized. \n After authorization /start the bot.')
-
+                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact [WeeeOpen FB]( https://www.facebook.com/weeeopenpolito/ ) team to be authorized or visit the site [WeeeOpen]( http://weeeopen.polito.it/ ) for more info. \nAfter authorization /start the bot.')
             user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
                 pass
