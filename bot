@@ -182,7 +182,7 @@ For a list of the commands allowed send /help.')
                 '''
                 #Api limit message too long
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
-                    log_print = ('Latest log update: *{}*\n \n'.format(log_update_data)) # write in the log variabile the data
+                    log_print = ('Latest log update: *{}*\n'.format(log_update_data)) # write in the log variabile the data
                     lines_to_print = len(log_lines)
                     if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
                         lines_to_print = int(command[1])
