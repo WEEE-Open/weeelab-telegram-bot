@@ -284,7 +284,7 @@ For a list of the commands allowed send /help.')
                                     top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                                 else:
                                     top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
-                        weee_bot.send_message(last_chat_id, 'Latest log update:\n*{}* \n{}'.format(log_update_data, top_list_print)) # send the top list to the user that makes the request
+                        weee_bot.send_message(last_chat_id, 'Latest log update:\n*{}* {}'.format(log_update_data, top_list_print)) # send the top list to the user that makes the request
                     else: 
                         weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admin can use!')
                 # Show help
