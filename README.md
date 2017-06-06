@@ -39,7 +39,7 @@ Available commands:
 * `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
   * `[number]`   : Show the `[number]` most recent lines of `OC_PATH` file.
   * `all`      : Show all lines of OC_PATH file.
-* `stat   :  Show hours spent in lab by the user.
+* `stat`   :  Show hours spent in lab by the user.
 * `top`   :  Show a list of top users in lab (only for admin, default top 10)
   * `[number]`     : Show the top `[number]` elements.
   * `all`      : Show list with all users.
