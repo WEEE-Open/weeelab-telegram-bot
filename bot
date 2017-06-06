@@ -186,7 +186,7 @@ For a list of the commands allowed send /help.')
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
                         lines_to_print = 25
                     for lines_printed in range(0,lines_to_print):
-                        log_line_to_print=log_lines[lines_printed][0:37] + log_lines[lines_printed][45:47] + '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">"):len(log_lines[lines_printed])]
+                        log_line_to_print=log_lines[lines_printed][0:11] + log_lines[lines_printed][17:30] +'] ' + log_lines[lines_printed][45:47] + '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">"):len(log_lines[lines_printed])]
                         log_print = log_print + '{}\n'.format(log_line_to_print)
                         lines_message += 1
                         if lines_message > 25:
@@ -293,7 +293,7 @@ For a list of the commands allowed send /help.')
     + _all_ - Show list with all users\n"
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact [WeeeOpen FB](https://www.facebook.com/weeeopenpolito/) team to be authorized or visit the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
+                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact us [mail] (weeeopen@polito.it), visit our [WeeeOpen FB page](https://www.facebook.com/weeeopenpolito/) and the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
             user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
                 pass
