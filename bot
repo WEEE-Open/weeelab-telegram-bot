@@ -186,8 +186,6 @@ For a list of the commands allowed send /help.')
                     lines_to_print = len(log_lines)
                     if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
                         lines_to_print = int(command[1]
-                    elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
-                        lines_to_print = len(log_lines)
                     for lines_printed in range(0,lines_to_print):
                         if not ("INLAB" in log_lines[lines_printed]):
                             if log_data == log_lines[lines_printed][1:11]:
