@@ -184,9 +184,8 @@ For a list of the commands allowed send /help.')
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
                     log_print = ('Latest log update: *{}*\n \n'.format(log_update_data)) # write in the log variabile the data
                     lines_to_print = len(log_lines)
-                    if (len(command) > 1 and command[1].isdigit()): # check if the command is "/log [number]"
-                        if lines_to_print > int(command[1]):
-                            lines_to_print = int(command[1]
+                    if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
+                        lines_to_print = int(command[1]
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
                         lines_to_print = len(log_lines)
                     for lines_printed in range(0,lines_to_print):
