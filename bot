@@ -27,6 +27,7 @@ import datetime
 from datetime import timedelta
 # library to handle dictionary
 import operator
+import ast
 
 # get environment variables
 OC_URL = os.environ.get('OC_URL') # url of the owncloud server
@@ -38,7 +39,7 @@ USER_LIST_NAME = os.environ.get('USER_LIST_NAME') # Python list of the user allo
 USER_LIST_ID = os.environ.get('USER_LIST_ID') # Python list of the users' id allowed to use the bot
 USER_LIST_PRO = os.environ.get('USER_LIST_PRO') # Python list of the pro users' id allowed to use the bot
 USER_LIST_ADMIN_ID = os.environ.get('USER_LIST_ADMIN_ID') # Python list of the Admin users' id allowed to use the bot
-USER_DICT = os.environ.get('USER_DICT') # Python dict of the users allowed to use the bot
+USER_DICT = ast.literal_eval(os.environ.get('USER_DICT')) # Python dict of the users allowed to use the bot
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH') # path of the file to store bot users in owncloud (/folder/file.txt)
 
 # class with function used by the bot
