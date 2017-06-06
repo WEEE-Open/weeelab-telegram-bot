@@ -281,12 +281,12 @@ For a list of the commands allowed send /help.')
                     help_message = "Available commands and options:\n\
 \n*For all team*\n\
 /sync - Show last edit date and time of the login file\n\
-/inlab - Show the number of people in lab\n\
-    + _who_ - print the name of the people in lab\n\
-\n*only for admin user*\n\
+/inlab - Show the people in lab\n\
 /log - Show last 5 login\n\
     + _number_ - Show last _number_ login\n\
     + _all_ - Show all login\n\
+/stat - Show hours spent in lab by the user\n\
+\n*only for admin user*\n\
 /stat _name.surname_ - Show hours spent in lab by this user\n\
 /top - Show a list of top 10 users in lab\n\
     + _number_ - Show the top _number_ elements\n\
