@@ -108,7 +108,7 @@ def main():
         people_inlab = 0
         found_user_inlab = False
         '''Variables for /log command'''
-        lines_to_print = 5 # default lines number to send
+        lines_to_print = 200 # default lines number to send
         lines_message = 0 # number of lines of the message
         log_data = ''
         '''Variables for /stat command'''
@@ -186,23 +186,27 @@ For a list of the commands allowed send /help.')
                     if (len(command) > 1 and command[1].isdigit()): # check if the command is "/log [number]"
                         lines_to_print = int(command[1])
                     elif (len(command) > 1 and command[1] == "all"): # check if the command is "/log all"
-                        lines_to_print = 25
+                        lines_to_print = 200
                     for lines_printed in range(0,lines_to_print):
-                        if log_data == log_lines[lines_printed][1:11]:
-                            log_line_to_print = '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")-1] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
-                            log_print = log_print + '{}\n'.format(log_line_to_print)
-                            lines_message += 1
-                        else:
-                            log_data = log_lines[lines_printed][1:11]
-                            log_line_to_print = '*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")-1] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
-                            log_print = log_print + '{}\n'.format(log_line_to_print)
-                            lines_message += 1
-                        if lines_message > 25:
-                            log_print = log_print.replace('[', '\[')
-                            log_print = log_print.replace('::', ':')
-                            weee_bot.send_message(last_chat_id, '{}'.format(log_print))
-                            lines_message = 0
-                            log_print = ''
+                        if not ("INLAB" in log_lines[lines_printed]):
+                            if log_data == log_lines[lines_printed][1:11]:
+                                log_line_to_print = '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")-1] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                                log_print = log_print + '{}\n'.format(log_line_to_print)
+                                lines_message += 1
+                            else:
+                                if not (len(command) > 1 and command[1] == "all"):
+                                    lines_printed = 200
+                                else:
+                                    log_data = log_lines[lines_printed][1:11]
+                                    log_line_to_print = '*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                                    log_print = log_print + '{}\n'.format(log_line_to_print)
+                                    lines_message += 1
+                                if lines_message > 25:
+                                    log_print = log_print.replace('[', '\[')
+                                    log_print = log_print.replace('::', ':')
+                                    weee_bot.send_message(last_chat_id, '{}'.format(log_print))
+                                    lines_message = 0
+                                    log_print = ''
                     log_print = log_print.replace('[', '\[')
                     log_print = log_print.replace('::', ':')
                     weee_bot.send_message(last_chat_id, '{}'.format(log_print))
