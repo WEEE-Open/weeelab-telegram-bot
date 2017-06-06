@@ -293,7 +293,7 @@ For a list of the commands allowed send /help.')
     + _all_ - Show list with all users\n"
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact [WeeeOpen FB]( https://www.facebook.com/weeeopenpolito/ ) team to be authorized or visit the site [WeeeOpen]( http://weeeopen.polito.it/ ) for more info. \nAfter authorization /start the bot.')
+                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact [WeeeOpen FB](https://www.facebook.com/weeeopenpolito/) team to be authorized or visit the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
             user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
                 pass
