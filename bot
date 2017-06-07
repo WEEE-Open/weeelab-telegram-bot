@@ -203,7 +203,7 @@ For a list of the commands allowed send /help.')
                             if lines_message > 25:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
-                                weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
+                                weee_bot.send_message(last_chat_id, '{}\n'.format(log_print))
                                 lines_message = 0
                                 log_print = ''
                     log_print = log_print.replace('[', '\[')
