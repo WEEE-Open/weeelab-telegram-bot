@@ -111,6 +111,7 @@ def main():
         lines_to_print = 0 # default lines number to send
         lines_message = 0 # number of lines of the message
         log_data = ''
+        log_print = ''
         '''Variables for /stat command'''
         user_hours = 0 # initialize hour variable, type int
         user_minutes = 0 # initialize minute variable, type int
