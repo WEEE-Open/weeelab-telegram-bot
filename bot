@@ -244,7 +244,7 @@ For a list of the commands allowed send /help.')
                             # write the stat of the user
 
                 # Show the top list of the users
-				''' Command "/top", Show a list of the top users in lab (defaul top 50).
+                ''' Command "/top", Show a list of the top users in lab (defaul top 50).
                 '''
                 if command[0] == "/top" or command[0] == "/top@weeelab_bot": # Check if the message is the command /top
                     if str(last_user_id) in USER_LIST_ADMIN_ID:
