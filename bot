@@ -210,12 +210,6 @@ For a list of the commands allowed send /help.')
                     log_print = log_print.replace('::', ':')
                     weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
 
-				'''                # Show data update log
-                 Command "/sync", Show last edit date and time of the OC_PATH file.
-                
-                if command[0] == "/sync" or command[0] == "/sync@weeelab_bot": # Check if the message is the command /sync
-                    weee_bot.send_message(last_chat_id, 'Latest log update:\n{}'.format(log_update_data)) 
-				'''
                 # Show the stat of the user
                 ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
                 '''
