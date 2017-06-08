@@ -123,7 +123,7 @@ def main():
         users_hours = {}
         top_list_print = 'Top User List!\n'
         position = 0
-        number_top_list = 10  # Inizialize the number of users to print for command /top
+        number_top_list = 50  # Inizialize the number of users to print for command /top
 
         if last_update != -1: 
             try: 
@@ -250,16 +250,10 @@ For a list of the commands allowed send /help.')
                             # write the stat of the user
 
                 # Show the top list of the users
-                ''' Command "/top", Show a list of the top users in lab (defaul top 10).
-                    Command "/top number", Show the top N elements.
-                    Command "/top all", Show list with all users.
+                ''' Command "/top", Show a list of the top users in lab (defaul top 50).
                 '''
                 if command[0] == "/top" or command[0] == "/top@weeelab_bot": # Check if the message is the command /top
                     if str(last_user_id) in USER_LIST_ADMIN_ID:
-                        if len(command) > 1 and command[1].isdigit(): # Check if the option is a number
-                            number_top_list = int(command[1]) # set the number of user to print with the option
-                        elif len(command) > 1 and command[1] == "all": # Check if the option is "all"
-                            number_top_list = 50  # set the number of user to print to a "huge" number
                         for lines in log_lines:
                             if not ("INLAB" in lines):
                                 name = lines[47:lines.rfind(">")].encode('utf-8') 
