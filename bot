@@ -34,7 +34,7 @@ import json
 OC_URL = os.environ.get('OC_URL') # url of the owncloud server
 OC_USER = os.environ.get('OC_USER')  # OwnCloud username
 OC_PWD = os.environ.get('OC_PWD') # OwnCloud password
-LOG_PATH = os.environ.get('OC_PATH') # path of the log file to read in owncloud (/folder/file.txt)
+LOG_PATH = os.environ.get('LOG_PATH') # path of the log file to read in owncloud (/folder/file.txt)
 TOKEN_BOT = os.environ.get('TOKEN_BOT') # Telegram token for the bot API
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH') # path of the file to store bot users in owncloud (/folder/file.txt)
 USER_PATH = os.environ.get('USER_PATH') # path of the file with authorized users in owncloud (/folder/file.json)
@@ -125,12 +125,12 @@ def main():
             try: 
                 level = 0
                 complete_name = ''
-                log_file = oc.get_file_contents(OC_PATH) # log file stored in owncloud server
+                log_file = oc.get_file_contents(LOG_PATH) # log file stored in owncloud server
                 user_file = json.loads(oc.get_file_contents(USER_PATH)) # User data stored in owncloud server
                 log_lines = log_file.splitlines()
                 lines_inlab = [i for i, lines in enumerate(log_lines) if 'INLAB' in lines]
                 # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
-                log_update_data = oc.file_info(OC_PATH).get_last_modified() + timedelta(hours=2)     
+                log_update_data = oc.file_info(LOG_PATH).get_last_modified() + timedelta(hours=2)     
                 last_update_id = last_update['update_id'] # store the id of the bot taken from the mesasge
                 new_offset = last_update_id + 1 # store the update id of the bot
                 command  = last_update['message']['text'].split() # store all the words in the message in an array (split by space)
@@ -182,9 +182,9 @@ For a list of the commands allowed send /help.')
                         weee_bot.send_message(last_chat_id, 'There are {} students in lab right now:\n{}'.format(people_inlab, user_inlab_list)) 
 
                 # Show log file
-                ''' Command "/log", Show the complete OC_PATH file (only for admin user, by default only 5 lines)
-                    Command "/log [number]", Show the [number] most recent lines of OC_PATH file
-                    Command "/log all", Show all lines of OC_PATH file.
+                ''' Command "/log", Show the complete LOG_PATH file (only for admin user, by default only 5 lines)
+                    Command "/log [number]", Show the [number] most recent lines of LOG_PATH file
+                    Command "/log all", Show all lines of LOG_PATH file.
                 '''
                 #Api limit message too long
                 if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
