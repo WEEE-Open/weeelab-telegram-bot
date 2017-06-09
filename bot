@@ -152,7 +152,7 @@ def main():
                 # Short introduction
                 ''' Command "/start", Start info
                 '''
-                if command[0] == "/start" or command[0] == "/start@weeelab_bot": # Check if the message is the command /start
+                if command[0] == "/start" or command[0] == "/start@weeelabdev_bot": # Check if the message is the command /start
                     weee_bot.send_message(last_chat_id, '*WEEE-Open Telegram bot*.\n\
 The goal of this bot is to obtain information about who is currently in the lab, \
 who has done what, compute some stats and, in general, simplify the life of our members \
@@ -163,7 +163,7 @@ For a list of the commands allowed send /help.')
                 ''' Command "/inlab", Show the number of people in lab.
                     Command "/inlab who", Show the name of the people in lab.
                 '''
-                if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot": # Check if the message is the command /inlab
+                if command[0] == "/inlab" or command[0] == "/inlab@weeelabdev_bot": # Check if the message is the command /inlab
                     people_inlab=log_file.count("INLAB")
                     for index in lines_inlab:
                         user_inlab = log_lines[index][47:log_lines[index].rfind(">")] # extract the name of the person
@@ -187,7 +187,7 @@ For a list of the commands allowed send /help.')
                     Command "/log all", Show all lines of LOG_PATH file.
                 '''
                 #Api limit message too long
-                if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
+                if command[0] == "/log" or command[0] == "/log@weeelabdev_bot": # Check if the message is the command /log
                     lines_to_print = len(log_lines)
                     if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
                         lines_to_print = int(command[1])
@@ -218,7 +218,7 @@ For a list of the commands allowed send /help.')
                 # Show the stat of the user
                 ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
                 '''
-                if command[0] == "/stat" or command[0] == "/stat@weeelab_bot": # Check if the message is the command /stat
+                if command[0] == "/stat" or command[0] == "/stat@weeelabdev_bot": # Check if the message is the command /stat
                     found_user = False # create a control variable used to check if name.surname is found
                     allowed = False
                     if len(command)==1:
@@ -251,7 +251,7 @@ For a list of the commands allowed send /help.')
                 # Show the top list of the users
                 ''' Command "/top", Show a list of the top users in lab (defaul top 50).
                 '''
-                if command[0] == "/top" or command[0] == "/top@weeelab_bot": # Check if the message is the command /top
+                if command[0] == "/top" or command[0] == "/top@weeelabdev_bot": # Check if the message is the command /top
                     if level == 1:
                         for lines in log_lines:
                             if not ("INLAB" in lines):
@@ -286,7 +286,7 @@ For a list of the commands allowed send /help.')
                 # Show help
                 ''' Command "/help", Show an help.
                 '''
-                if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
+                if command[0] == "/help" or command[0] == "/help@weeelabdev_bot": # Check if the message is the command /help
                     help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
 /log - Show last 5 login\n\
