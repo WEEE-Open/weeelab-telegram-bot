@@ -148,7 +148,7 @@ def main():
             except KeyError: # catch the exception if raised
                 print "ERROR!" # DEBUG
 
-            if message_type == "private"
+            if message_type == "private":
                 if level != 0: # check if the user is allowed to use the bot 
                     ''' ADD COMMANDS HERE '''
                     # Short introduction
