@@ -279,6 +279,7 @@ For a list of the commands allowed send /help.')
                                     print user_complete_name
                                     if (rival[0]==user_complete_name and (user["level"]==1 or user["level"]==2)):
                                         top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                                        print top_list_print
                                     else:
                                         top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                         weee_bot.send_message(last_chat_id, '{}\nLatest log update: \n*{}*'.format(top_list_print, log_update_data)) # send the top list to the user that makes the request
