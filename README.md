@@ -18,17 +18,13 @@ For local installation, get `python2` and run `pip install -r requirements.txt` 
 
 `bot` is the main script, and it requires some environment variables to 
 run:
-* `OC_PATH`: path of the file to read in owncloud (/folder/file.txt)
-* `OC_URL`: url of the owncloud server
+* `OC_URL`: Url of the owncloud server
 * `OC_USER`: OwnCloud username
 * `OC_PWD`: OwnCloud password
 * `TOKEN_BOT`: Telegram token for the bot API
-* `USER_LIST_NAME`: Python list of the user allowed to use the bot
-* `USER_LIST_ID`: Python list of the users' id allowed to use the bot
-* `USER_LIST_ADMIN`: Python list of the admin users allowed to use the bot
-* `USER_LIST_PRO`: Python list of the pro users allowed to use the bot
-* `USER_DICT`: Python dict of users allowed to use the bot
-
+* `LOG_PATH`: Path of the file to read in owncloud (/folder/file.txt)
+* `USER_BOTH_PATH`: Path of the file to store bot users in owncloud (/folder/file.txt)
+* `USER_PATH`: Path of the file with authorized users in owncloud (/folder/file.json)
 
 ## Command syntax
 `/start` the bot and type `/[COMMAND] [OPTION]`.  
@@ -41,7 +37,6 @@ Available commands:
   * `all`      : Show all lines of OC_PATH file.
 * `stat`   :  Show hours spent in lab by the user.
 * `top`   :  Show a list of top users in lab (only for admin, default top 50)
-* `sync`  :  Show last edit date and time of the `OC_PATH` file.
 * `help`  :  Show all the commands and a short explanations.
 
 ## TODO
