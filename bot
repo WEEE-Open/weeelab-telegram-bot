@@ -139,7 +139,7 @@ def main():
                 last_user_name = last_update['message']['from']['first_name'] # store the name of the user read from the message in a variable
                 last_user_username = last_update['message']['from']['username'] # store the username of the user read from the message in a variable
                 for user in user_file["users"]:
-                    if user["telegramID"] == str(last_user_id)
+                    if user["telegramID"] == str(last_user_id):
                         level = user["level"]
                         complete_name = user["name"].lower() + '.' + user["surname"].lower()
                 print last_update['message'] # DEBUG
