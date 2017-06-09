@@ -27,21 +27,17 @@ import datetime
 from datetime import timedelta
 # library to handle dictionary
 import operator
-#library for evaluation of python line from string
-import ast
+#library for evaluation of json file
+import json
 
 # get environment variables
 OC_URL = os.environ.get('OC_URL') # url of the owncloud server
 OC_USER = os.environ.get('OC_USER')  # OwnCloud username
 OC_PWD = os.environ.get('OC_PWD') # OwnCloud password
-OC_PATH = os.environ.get('OC_PATH') # path of the file to read in owncloud (/folder/file.txt)
+LOG_PATH = os.environ.get('OC_PATH') # path of the log file to read in owncloud (/folder/file.txt)
 TOKEN_BOT = os.environ.get('TOKEN_BOT') # Telegram token for the bot API
-USER_LIST_NAME = os.environ.get('USER_LIST_NAME') # Python list of the user allowed to use the bot
-USER_LIST_ID = os.environ.get('USER_LIST_ID') # Python list of the users' id allowed to use the bot
-USER_LIST_PRO = os.environ.get('USER_LIST_PRO') # Python list of the pro users' id allowed to use the bot
-USER_LIST_ADMIN_ID = os.environ.get('USER_LIST_ADMIN_ID') # Python list of the Admin users' id allowed to use the bot
-USER_DICT = ast.literal_eval(os.environ.get('USER_DICT')) # Python dict of the users allowed to use the bot
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH') # path of the file to store bot users in owncloud (/folder/file.txt)
+USER_PATH = os.environ.get('USER_PATH') # path of the file with authorized users in owncloud (/folder/file.json)
 
 # class with function used by the bot
 class BotHandler:
@@ -127,7 +123,10 @@ def main():
 
         if last_update != -1: 
             try: 
+                level = 0
+                complete_name = ''
                 log_file = oc.get_file_contents(OC_PATH) # log file stored in owncloud server
+                user_file = json.loads(oc.get_file_contents(USER_PATH)) # User data stored in owncloud server
                 log_lines = log_file.splitlines()
                 lines_inlab = [i for i, lines in enumerate(log_lines) if 'INLAB' in lines]
                 # store the data of the last update of the log file, the data is in UTC so we add 2 for eu/it local time
@@ -139,12 +138,16 @@ def main():
                 last_user_id = last_update['message']['from']['id'] # store the id of the user read from the message in a variable
                 last_user_name = last_update['message']['from']['first_name'] # store the name of the user read from the message in a variable
                 last_user_username = last_update['message']['from']['username'] # store the username of the user read from the message in a variable
+                for user in user_file["users"]:
+                    if user["telegramID"] == str(last_user_id)
+                        level = user["level"]
+                        complete_name = user["name"].lower() + '.' + user["surname"].lower()
                 print last_update['message'] # DEBUG
 
             except KeyError: # catch the exception if raised
                 print "ERROR!" # DEBUG
 
-            if (last_user_username in USER_LIST_NAME) or (str(last_user_id) in USER_LIST_ID): # check if the user is allowed to use the bot            
+            if level != 0: # check if the user is allowed to use the bot            
                 ''' ADD COMMANDS HERE '''
                 # Short introduction
                 ''' Command "/start", Start info
@@ -164,10 +167,12 @@ For a list of the commands allowed send /help.')
                     people_inlab=log_file.count("INLAB")
                     for index in lines_inlab:
                         user_inlab = log_lines[index][47:log_lines[index].rfind(">")] # extract the name of the person
-                        if user_inlab in USER_LIST_PRO:
-                            user_inlab_list = user_inlab_list + '\n' + '- *' + nameExtr(user_inlab) + '*'
-                        else:
-                            user_inlab_list = user_inlab_list + '\n' + '- ' + nameExtr(user_inlab)
+                        for user in user_file["users"]:
+                            user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
+                            if (user_inlab == user_complete_name and (user["level"]==1 or user["level"]==2)):
+                                user_inlab_list = user_inlab_list + '\n' + '- *' + nameExtr(user_inlab) + '*'
+                            else:
+                                user_inlab_list = user_inlab_list + '\n' + '- ' + nameExtr(user_inlab)
                     if people_inlab == 0: # Check if there aren't people in lab
                         # Send a message to the user that makes the request /inlab
                         weee_bot.send_message(last_chat_id, 'Nobody is in lab right now.') 
@@ -217,10 +222,10 @@ For a list of the commands allowed send /help.')
                     found_user = False # create a control variable used to check if name.surname is found
                     allowed = False
                     if len(command)==1:
-                        user_name = USER_DICT[str(last_user_id)]
-                        print user_name
+                        user_name = complete_name
+                        #print user_name
                         allowed = True
-                    elif ((len(command) != 1) and (str(last_user_id) in USER_LIST_ADMIN_ID)):  # Check if the command has option or not
+                    elif ((len(command) != 1) and (level==1)):  # Check if the command has option or not
                         user_name = str(command[1]) # store the option in a variable
                         allowed = True
                     else:
@@ -247,7 +252,7 @@ For a list of the commands allowed send /help.')
                 ''' Command "/top", Show a list of the top users in lab (defaul top 50).
                 '''
                 if command[0] == "/top" or command[0] == "/top@weeelab_bot": # Check if the message is the command /top
-                    if str(last_user_id) in USER_LIST_ADMIN_ID:
+                    if level == 1:
                         for lines in log_lines:
                             if not ("INLAB" in lines):
                                 name = lines[47:lines.rfind(">")].encode('utf-8') 
@@ -268,10 +273,12 @@ For a list of the commands allowed send /help.')
                                 total_hours = int(total_second // 3600)
                                 total_minutes = int((total_second % 3600) // 60)
                                 # add the user to the top list
-                                if rival[0] in USER_LIST_PRO:
-                                    top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
-                                else:
-                                    top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                                for user in user_file["users"]:
+                                    user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
+                                    if (rival[0]==user_complete name and (user["level"]==1 or user["level"]==2)):
+                                        top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                                    else:
+                                        top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                         weee_bot.send_message(last_chat_id, '{}\nLatest log update: \n*{}*'.format(top_list_print, log_update_data)) # send the top list to the user that makes the request
                     else: 
                         weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admin can use!')
@@ -285,7 +292,7 @@ For a list of the commands allowed send /help.')
     + _number_ - Show last _number_ login\n\
     + _all_ - Show all login\n\
 /stat - Show hours spent in lab by the user\n"
-                    if (str(last_user_id) in USER_LIST_ADMIN_ID):
+                    if (level == 1):
                         help_message += "\n*only for admin user*\n\
 /stat _name.surname_ - Show hours spent in lab by this user\n\
 /top - Show a list of top users in lab\n"
