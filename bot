@@ -275,6 +275,8 @@ For a list of the commands allowed send /help.')
                                 # add the user to the top list
                                 for user in user_file["users"]:
                                     user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
+                                    print rival[0]
+                                    print user_complete_name
                                     if (rival[0]==user_complete_name and (user["level"]==1 or user["level"]==2)):
                                         top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                                     else:
