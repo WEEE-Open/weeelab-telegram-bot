@@ -138,6 +138,7 @@ def main():
                 last_user_id = last_update['message']['from']['id'] # store the id of the user read from the message in a variable
                 last_user_name = last_update['message']['from']['first_name'] # store the name of the user read from the message in a variable
                 last_user_username = last_update['message']['from']['username'] # store the username of the user read from the message in a variable
+                message_type = last_update['message']['chat']['type']
                 for user in user_file["users"]:
                     if user["telegramID"] == str(last_user_id):
                         level = user["level"]
@@ -147,160 +148,163 @@ def main():
             except KeyError: # catch the exception if raised
                 print "ERROR!" # DEBUG
 
-            if level != 0: # check if the user is allowed to use the bot            
-                ''' ADD COMMANDS HERE '''
-                # Short introduction
-                ''' Command "/start", Start info
-                '''
-                if command[0] == "/start" or command[0] == "/start@weeelabdev_bot": # Check if the message is the command /start
-                    weee_bot.send_message(last_chat_id, '*WEEE-Open Telegram bot*.\n\
+            if message_type == "private"
+                if level != 0: # check if the user is allowed to use the bot 
+                    ''' ADD COMMANDS HERE '''
+                    # Short introduction
+                    ''' Command "/start", Start info
+                    '''
+                    if command[0] == "/start" or command[0] == "/start@weeelab_bot": # Check if the message is the command /start
+                        weee_bot.send_message(last_chat_id, '*WEEE-Open Telegram bot*.\n\
 The goal of this bot is to obtain information about who is currently in the lab, \
 who has done what, compute some stats and, in general, simplify the life of our members \
 and to avoid waste of paper as well. \n\
 All data is read from a weeelab log file, which is fetched from an OwnCloud shared folder. \n\
 For a list of the commands allowed send /help.')
-                # Show how many students are in lab right now
-                ''' Command "/inlab", Show the number of people in lab.
-                    Command "/inlab who", Show the name of the people in lab.
-                '''
-                if command[0] == "/inlab" or command[0] == "/inlab@weeelabdev_bot": # Check if the message is the command /inlab
-                    people_inlab=log_file.count("INLAB")
-                    for index in lines_inlab:
-                        user_inlab = log_lines[index][47:log_lines[index].rfind(">")] # extract the name of the person
-                        for user in user_file["users"]:
-                            user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
-                            if (user_inlab == user_complete_name and (user["level"]==1 or user["level"]==2)):
-                                user_inlab_list = user_inlab_list + '\n' + '- *' + nameExtr(user_inlab) + '*'
-                            else:
-                                user_inlab_list = user_inlab_list + '\n' + '- ' + nameExtr(user_inlab)
-                    if people_inlab == 0: # Check if there aren't people in lab
-                        # Send a message to the user that makes the request /inlab
-                        weee_bot.send_message(last_chat_id, 'Nobody is in lab right now.') 
-                    elif people_inlab == 1:
-                        weee_bot.send_message(last_chat_id, 'There is one student in lab right now:\n{}'.format(user_inlab_list)) 
-                    else:
-                        weee_bot.send_message(last_chat_id, 'There are {} students in lab right now:\n{}'.format(people_inlab, user_inlab_list)) 
-
-                # Show log file
-                ''' Command "/log", Show the complete LOG_PATH file (only for admin user, by default only 5 lines)
-                    Command "/log [number]", Show the [number] most recent lines of LOG_PATH file
-                    Command "/log all", Show all lines of LOG_PATH file.
-                '''
-                #Api limit message too long
-                if command[0] == "/log" or command[0] == "/log@weeelabdev_bot": # Check if the message is the command /log
-                    lines_to_print = len(log_lines)
-                    if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
-                        lines_to_print = int(command[1])
-                    for lines_printed in range(0,lines_to_print):
-                        if not ("INLAB" in log_lines[lines_printed]):
-                            if log_data == log_lines[lines_printed][1:11]:
-                                log_line_to_print = '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
-                                log_print = log_print + '{}\n'.format(log_line_to_print)
-                                lines_message += 1
-                            else:
-                                if (len(command) == 1 and lines_message > 0):
-                                    lines_printed = len(log_lines)
+                    # Show how many students are in lab right now
+                    ''' Command "/inlab", Show the number of people in lab.
+                        Command "/inlab who", Show the name of the people in lab.
+                    '''
+                    if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot": # Check if the message is the command /inlab
+                        people_inlab=log_file.count("INLAB")
+                        for index in lines_inlab:
+                            user_inlab = log_lines[index][47:log_lines[index].rfind(">")] # extract the name of the person
+                            for user in user_file["users"]:
+                                user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
+                                if (user_inlab == user_complete_name and (user["level"]==1 or user["level"]==2)):
+                                    user_inlab_list = user_inlab_list + '\n' + '- *' + nameExtr(user_inlab) + '*'
                                 else:
-                                    log_data = log_lines[lines_printed][1:11]
-                                    log_line_to_print = '\n*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                                    user_inlab_list = user_inlab_list + '\n' + '- ' + nameExtr(user_inlab)
+                        if people_inlab == 0: # Check if there aren't people in lab
+                            # Send a message to the user that makes the request /inlab
+                            weee_bot.send_message(last_chat_id, 'Nobody is in lab right now.') 
+                        elif people_inlab == 1:
+                            weee_bot.send_message(last_chat_id, 'There is one student in lab right now:\n{}'.format(user_inlab_list)) 
+                        else:
+                            weee_bot.send_message(last_chat_id, 'There are {} students in lab right now:\n{}'.format(people_inlab, user_inlab_list)) 
+
+                    # Show log file
+                    ''' Command "/log", Show the complete LOG_PATH file (only for admin user, by default only 5 lines)
+                        Command "/log [number]", Show the [number] most recent lines of LOG_PATH file
+                        Command "/log all", Show all lines of LOG_PATH file.
+                    '''
+                    #Api limit message too long
+                    if command[0] == "/log" or command[0] == "/log@weeelab_bot": # Check if the message is the command /log
+                        lines_to_print = len(log_lines)
+                        if (len(command) > 1 and command[1].isdigit() and lines_to_print > int(command[1])): # check if the command is "/log [number]"
+                            lines_to_print = int(command[1])
+                        for lines_printed in range(0,lines_to_print):
+                            if not ("INLAB" in log_lines[lines_printed]):
+                                if log_data == log_lines[lines_printed][1:11]:
+                                    log_line_to_print = '_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
                                     log_print = log_print + '{}\n'.format(log_line_to_print)
                                     lines_message += 1
-                            if lines_message > 25:
-                                log_print = log_print.replace('[', '\[')
-                                log_print = log_print.replace('::', ':')
-                                weee_bot.send_message(last_chat_id, '{}\n'.format(log_print))
-                                lines_message = 0
-                                log_print = ''
-                    log_print = log_print.replace('[', '\[')
-                    log_print = log_print.replace('::', ':')
-                    weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
-
-                # Show the stat of the user
-                ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
-                '''
-                if command[0] == "/stat" or command[0] == "/stat@weeelabdev_bot": # Check if the message is the command /stat
-                    found_user = False # create a control variable used to check if name.surname is found
-                    allowed = False
-                    if len(command)==1:
-                        user_name = complete_name
-                        #print user_name
-                        allowed = True
-                    elif ((len(command) != 1) and (level==1)):  # Check if the command has option or not
-                        user_name = str(command[1]) # store the option in a variable
-                        allowed = True
-                    else:
-                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to see stat of other users! \nOnly admin can!')
-                    if allowed:
-                        for lines in log_lines:
-                            if not ("INLAB" in lines) and (user_name == lines[47:lines.rfind(">")]):
-                                found_user = True
-                                # extract the hours and minute from char 39 until ], splitted by :
-                                (user_hours, user_minutes) = lines[39:lines.rfind("]")].split(':')
-                                # convert hours and minutes in datetime type
-                                partial_hours = datetime.timedelta(hours=int(user_hours), minutes=int(user_minutes)) 
-                                hours_sum += partial_hours # sum to the previous hours 
-                        if not found_user:
-                            weee_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly? (name.surname)')      
-                        else:
-                            total_second = hours_sum.total_seconds()
-                            total_hours = int(total_second // 3600)
-                            total_minutes = int((total_second % 3600) // 60)
-                            weee_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {:02d}:{:02d}\nLatest log update:\n*{}*'.format(nameExtr(user_name), total_hours, total_minutes, log_update_data))
-                            # write the stat of the user
-
-                # Show the top list of the users
-                ''' Command "/top", Show a list of the top users in lab (defaul top 50).
-                '''
-                if command[0] == "/top" or command[0] == "/top@weeelabdev_bot": # Check if the message is the command /top
-                    if level == 1:
-                        for lines in log_lines:
-                            if not ("INLAB" in lines):
-                                name = lines[47:lines.rfind(">")].encode('utf-8') 
-                                (user_hours, user_minutes) = lines[39:lines.rfind("]")].split(':')
-                                partial_hours = datetime.timedelta(hours=int(user_hours), minutes=int(user_minutes)) 
-                                if (name in users_name): # check if user was already found
-                                    users_hours[name] += partial_hours # add to the key with the same name the value partial_hours
                                 else:
-                                    users_name.append(name) # create a new key with the name
-                                    users_hours[name] = partial_hours # add the hours to the key
-                        # sort the dict by value in descendet order 
-                        sorted_top_list = sorted(users_hours.items(), key=operator.itemgetter(1), reverse=True) 
-                        for rival in sorted_top_list: # print the elements sorted
-                            position += 1 # update the counter of position on top list
-                            if position  <= number_top_list: # check if the list is completed
-                                # extract the hours and minutes from dict, splitted by :
-                                total_second = rival[1].total_seconds()
+                                    if (len(command) == 1 and lines_message > 0):
+                                        lines_printed = len(log_lines)
+                                    else:
+                                        log_data = log_lines[lines_printed][1:11]
+                                        log_line_to_print = '\n*' + log_data +'*\n_' + log_lines[lines_printed][47:log_lines[lines_printed].rfind(">")] + '_' + log_lines[lines_printed][log_lines[lines_printed].rfind(">")+1:len(log_lines[lines_printed])]
+                                        log_print = log_print + '{}\n'.format(log_line_to_print)
+                                        lines_message += 1
+                                if lines_message > 25:
+                                    log_print = log_print.replace('[', '\[')
+                                    log_print = log_print.replace('::', ':')
+                                    weee_bot.send_message(last_chat_id, '{}\n'.format(log_print))
+                                    lines_message = 0
+                                    log_print = ''
+                        log_print = log_print.replace('[', '\[')
+                        log_print = log_print.replace('::', ':')
+                        weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
+
+                    # Show the stat of the user
+                    ''' Command "/stat name.surname", Show hours spent in lab by name.surname user.
+                    '''
+                    if command[0] == "/stat" or command[0] == "/stat@weeelab_bot": # Check if the message is the command /stat
+                        found_user = False # create a control variable used to check if name.surname is found
+                        allowed = False
+                        if len(command)==1:
+                            user_name = complete_name
+                            #print user_name
+                            allowed = True
+                        elif ((len(command) != 1) and (level==1)):  # Check if the command has option or not
+                            user_name = str(command[1]) # store the option in a variable
+                            allowed = True
+                        else:
+                            weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to see stat of other users! \nOnly admin can!')
+                        if allowed:
+                            for lines in log_lines:
+                                if not ("INLAB" in lines) and (user_name == lines[47:lines.rfind(">")]):
+                                    found_user = True
+                                    # extract the hours and minute from char 39 until ], splitted by :
+                                    (user_hours, user_minutes) = lines[39:lines.rfind("]")].split(':')
+                                    # convert hours and minutes in datetime type
+                                    partial_hours = datetime.timedelta(hours=int(user_hours), minutes=int(user_minutes)) 
+                                    hours_sum += partial_hours # sum to the previous hours 
+                            if not found_user:
+                                weee_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly? (name.surname)')      
+                            else:
+                                total_second = hours_sum.total_seconds()
                                 total_hours = int(total_second // 3600)
                                 total_minutes = int((total_second % 3600) // 60)
-                                # add the user to the top list
-                                for user in user_file["users"]:
-                                    user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
-                                    if rival[0]==user_complete_name:
-                                        if (user["level"]==1 or user["level"]==2):
-                                            top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
-                                        else:
-                                            top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
-                        weee_bot.send_message(last_chat_id, '{}\nLatest log update: \n*{}*'.format(top_list_print, log_update_data)) # send the top list to the user that makes the request
-                    else: 
-                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admin can use!')
-                # Show help
-                ''' Command "/help", Show an help.
-                '''
-                if command[0] == "/help" or command[0] == "/help@weeelabdev_bot": # Check if the message is the command /help
-                    help_message = "Available commands and options:\n\n\
+                                weee_bot.send_message(last_chat_id, 'Stat for the user {}\nHH:MM = {:02d}:{:02d}\nLatest log update:\n*{}*'.format(nameExtr(user_name), total_hours, total_minutes, log_update_data))
+                                # write the stat of the user
+
+                    # Show the top list of the users
+                    ''' Command "/top", Show a list of the top users in lab (defaul top 50).
+                    '''
+                    if command[0] == "/top" or command[0] == "/top@weeelab_bot": # Check if the message is the command /top
+                        if level == 1:
+                            for lines in log_lines:
+                                if not ("INLAB" in lines):
+                                    name = lines[47:lines.rfind(">")].encode('utf-8') 
+                                    (user_hours, user_minutes) = lines[39:lines.rfind("]")].split(':')
+                                    partial_hours = datetime.timedelta(hours=int(user_hours), minutes=int(user_minutes)) 
+                                    if (name in users_name): # check if user was already found
+                                        users_hours[name] += partial_hours # add to the key with the same name the value partial_hours
+                                    else:
+                                        users_name.append(name) # create a new key with the name
+                                        users_hours[name] = partial_hours # add the hours to the key
+                            # sort the dict by value in descendet order 
+                            sorted_top_list = sorted(users_hours.items(), key=operator.itemgetter(1), reverse=True) 
+                            for rival in sorted_top_list: # print the elements sorted
+                                position += 1 # update the counter of position on top list
+                                if position  <= number_top_list: # check if the list is completed
+                                    # extract the hours and minutes from dict, splitted by :
+                                    total_second = rival[1].total_seconds()
+                                    total_hours = int(total_second // 3600)
+                                    total_minutes = int((total_second % 3600) // 60)
+                                    # add the user to the top list
+                                    for user in user_file["users"]:
+                                        user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
+                                        if rival[0]==user_complete_name:
+                                            if (user["level"]==1 or user["level"]==2):
+                                                top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] *{}*\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                                            else:
+                                                top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
+                            weee_bot.send_message(last_chat_id, '{}\nLatest log update: \n*{}*'.format(top_list_print, log_update_data)) # send the top list to the user that makes the request
+                        else: 
+                            weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admin can use!')
+                    # Show help
+                    ''' Command "/help", Show an help.
+                    '''
+                    if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
+                        help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
 /log - Show last 5 login\n\
     + _number_ - Show last _number_ login\n\
     + _all_ - Show all login\n\
 /stat - Show hours spent in lab by the user\n"
-                    if (level == 1):
-                        help_message += "\n*only for admin user*\n\
+                        if (level == 1):
+                            help_message += "\n*only for admin user*\n\
 /stat _name.surname_ - Show hours spent in lab by this user\n\
 /top - Show a list of top users in lab\n"
-                    weee_bot.send_message(last_chat_id, '{}'.format(help_message))
+                        weee_bot.send_message(last_chat_id, '{}'.format(help_message))
+                else:
+                    weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact us [mail] (weeeopen@polito.it), visit our [WeeeOpen FB page](https://www.facebook.com/weeeopenpolito/) and the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
+                user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact us [mail] (weeeopen@polito.it), visit our [WeeeOpen FB page](https://www.facebook.com/weeeopenpolito/) and the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
-            user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
+                weee_bot.send_message(last_chat_id, 'Sorry! It is not allowed to use this bot in a group\n Write it in private!')
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
                 pass
             else:
