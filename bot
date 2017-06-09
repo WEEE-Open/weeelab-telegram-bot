@@ -279,8 +279,7 @@ For a list of the commands allowed send /help.')
                 ''' Command "/help", Show an help.
                 '''
                 if command[0] == "/help" or command[0] == "/help@weeelab_bot": # Check if the message is the command /help
-                    help_message = "Available commands and options:\n\
-\n*For all team*\n\
+                    help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
 /log - Show last 5 login\n\
     + _number_ - Show last _number_ login\n\
