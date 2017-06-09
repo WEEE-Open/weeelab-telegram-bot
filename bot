@@ -302,9 +302,7 @@ For a list of the commands allowed send /help.')
                         weee_bot.send_message(last_chat_id, '{}'.format(help_message))
                 else:
                     weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact us [mail] (weeeopen@polito.it), visit our [WeeeOpen FB page](https://www.facebook.com/weeeopenpolito/) and the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
-                user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
-            else:
-                weee_bot.send_message(last_chat_id, 'Sorry! It is not allowed to use this bot in a group\n Write it in private!')
+            user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
                 pass
             else:
