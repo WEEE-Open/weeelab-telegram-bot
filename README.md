@@ -32,7 +32,7 @@ run:
 Available commands:
 
 * `inlab` : Show the people in lab
-* `log`   : Show the complete OC_PATH file (only for admin user, by default only 5 lines)
+* `log`   : Show the complete OC_PATH file (only for admin user, by default lines of the day)
   * `[number]`   : Show the `[number]` most recent lines of `OC_PATH` file.
   * `all`      : Show all lines of OC_PATH file.
 * `stat`   :  Show hours spent in lab by the user.
