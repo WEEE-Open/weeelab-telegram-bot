@@ -158,7 +158,7 @@ The goal of this bot is to obtain information about who is currently in the lab,
 who has done what, compute some stats and, in general, simplify the life of our members \
 and to avoid waste of paper as well. \n\
 All data is read from a weeelab log file, which is fetched from an OwnCloud shared folder. \n\
-For a list of the commands allowed send /help.')
+For a list of the available commands send /help.')
                 # Show how many students are in lab right now
                 ''' Command "/inlab", Show the number of people in lab.
                     Command "/inlab who", Show the name of the people in lab.
@@ -229,7 +229,7 @@ For a list of the commands allowed send /help.')
                         user_name = str(command[1]) # store the option in a variable
                         allowed = True
                     else:
-                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to see stat of other users! \nOnly admin can!')
+                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to view other users stats!\nOnly admins can!')
                     if allowed:
                         for lines in log_lines:
                             if not ("INLAB" in lines) and (user_name == lines[47:lines.rfind(">")]):
@@ -282,7 +282,7 @@ For a list of the commands allowed send /help.')
                                             top_list_print = top_list_print + '{}) \[{:02d}:{:02d}] {}\n'.format(position, total_hours, total_minutes, nameExtr(rival[0]))
                         weee_bot.send_message(last_chat_id, '{}\nLatest log update: \n*{}*'.format(top_list_print, log_update_data)) # send the top list to the user that makes the request
                     else: 
-                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admin can use!')
+                        weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function!\nOnly admin can use it!')
                 # Show help
                 ''' Command "/help", Show an help.
                 '''
@@ -299,7 +299,7 @@ For a list of the commands allowed send /help.')
 /top - Show a list of top users in lab\n"
                     weee_bot.send_message(last_chat_id, '{}'.format(help_message))
             else:
-                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot \nPlease contact us [mail] (weeeopen@polito.it), visit our [WeeeOpen FB page](https://www.facebook.com/weeeopenpolito/) and the site [WeeeOpen](http://weeeopen.polito.it/) for more info. \nAfter authorization /start the bot.')
+                weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this bot.\nPlease contact us via [email](weeeopen@polito.it) or [Facebook page](https://www.facebook.com/weeeopenpolito/), or visit our [website](http://weeeopen.polito.it/) for more info. \nAfter being authorized /start the bot.')
             user_bot_contents = oc.get_file_contents(USER_BOT_PATH) # read the content of the user file stored in owncloud server
             if (str(last_user_id) in user_bot_contents): # Check if the user is already recorded
                 pass
