@@ -63,7 +63,7 @@ class BotHandler:
             return -1  # in case of error return an error code used in the main function
 
         
-# function created by Ste (teschio) complete code at https://github.com/WEEE-Open/weeelab
+# function created by @Hyd3L, complete code at https://github.com/WEEE-Open/weeelab
 # Return <Name Surname> from <name.surname> string
 def nameExtr(username):
     firstName = username.split('.')[0].capitalize()  # Extract the name and capitalize it
