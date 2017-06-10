@@ -355,14 +355,10 @@ given user. Have you typed it correctly? (name.surname)')
                                 total_minutes = int(
                                     (total_second % 3600) // 60)
                                 weee_bot.send_message(
-                                    last_chat_id, 'Stat for the user {}\n'
-                                                  + 'HH:MM = {:02d}:{:02d}\n'
-                                                  + 'Latest log update:\n*{}*'
-                                                  .format(
-                                                          name_ext(user_name),
-                                                          total_hours,
-                                                          total_minutes,
-                                                          log_update_data))
+                                    last_chat_id, 'Stat for the user {}\n\
+HH:MM = {:02d}:{:02d}\nLatest log update:\n*{}*'.format(name_ext(
+                                        user_name), total_hours, total_minutes,
+                                        log_update_data))
                                 # write the stat of the user
 
                     # Show the top list of the users
@@ -418,21 +414,13 @@ given user. Have you typed it correctly? (name.surname)')
                                                user["level"] == 2:
                                                 top_list_print = \
                                                     top_list_print \
-                                                    + '{}) \[{:02d}:{:02d}]'\
-                                                    + '*{}*\n'.format(
-                                                        position,
-                                                        total_hours,
-                                                        total_minutes,
-                                                        name_ext(rival[0]))
+                                                    + '{}) \[{:02d}:{:02d}]\
+*{}*\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
                                             else:
                                                 top_list_print = \
                                                     top_list_print \
                                                     + '{}) \[{:02d}:{:02d}]'\
-                                                    + '{}\n'.format(
-                                                        position,
-                                                        total_hours,
-                                                        total_minutes,
-                                                        name_ext(rival[0]))
+'{}\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
                             weee_bot.send_message(
                                 last_chat_id,
                                 '{}\nLatest log update: \n*{}*'.format(
