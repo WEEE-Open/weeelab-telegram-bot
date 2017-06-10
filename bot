@@ -3,7 +3,7 @@
 
 '''
 WEEELAB_BOT - Telegram bot.
-Author: God
+Author: WeeeOpen Team
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -16,19 +16,14 @@ Author: God
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 NOTE: The print commands are only for debug.
 '''
-# system library needed to read the environment variables
-import os
-# library to make requests to telegram server
-import requests
-# library to make requests to owncloud server, more details on https://github.com/owncloud/pyocclient
-import owncloud
-# library to handle time
-import datetime
+# Modules
+import os  # system library needed to read the environment variables
+import requests  # library to make requests to telegram server
+import owncloud  # library to make requests to owncloud server, more details on https://github.com/owncloud/pyocclient
+import datetime  # library to handle time
 from datetime import timedelta
-# library to handle dictionary
-import operator
-#library for evaluation of json file
-import json
+import operator  # library to handle dictionary
+import json  #library for evaluation of json file
 
 # get environment variables
 OC_URL = os.environ.get('OC_URL') # url of the owncloud server
