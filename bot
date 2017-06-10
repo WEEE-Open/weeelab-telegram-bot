@@ -16,23 +16,25 @@ Author: WeeeOpen Team
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 NOTE: The print commands are only for debug.
 '''
+
 # Modules
 import os  # system library needed to read the environment variables
 import requests  # library to make requests to telegram server
-import owncloud  # library to make requests to owncloud server, more details on https://github.com/owncloud/pyocclient
+import owncloud  # library to make requests to OwnCloud server, more details on https://github.com/owncloud/pyocclient
 import datetime  # library to handle time
 from datetime import timedelta
 import operator  # library to handle dictionary
-import json  #library for evaluation of json file
+import json  # library for evaluation of json file
 
 # get environment variables
-OC_URL = os.environ.get('OC_URL') # url of the owncloud server
+OC_URL = os.environ.get('OC_URL')  # url of the OwnCloud server
 OC_USER = os.environ.get('OC_USER')  # OwnCloud username
-OC_PWD = os.environ.get('OC_PWD') # OwnCloud password
-LOG_PATH = os.environ.get('LOG_PATH') # path of the log file to read in owncloud (/folder/file.txt)
-TOKEN_BOT = os.environ.get('TOKEN_BOT') # Telegram token for the bot API
-USER_BOT_PATH = os.environ.get('USER_BOT_PATH') # path of the file to store bot users in owncloud (/folder/file.txt)
-USER_PATH = os.environ.get('USER_PATH') # path of the file with authorized users in owncloud (/folder/file.json)
+OC_PWD = os.environ.get('OC_PWD')  # OwnCloud password
+USER_PATH = os.environ.get('USER_PATH')  # path of the file with authorized users in OwnCloud (/folder/file.json)
+LOG_PATH = os.environ.get('LOG_PATH')  # path of the log file to read in OwnCloud (/folder/file.txt)
+USER_BOT_PATH = os.environ.get('USER_BOT_PATH')  # path of the file to store bot users in OwnCloud (/folder/file.txt)
+TOKEN_BOT = os.environ.get('TOKEN_BOT')  # Telegram token for the bot API
+
 
 # class with method used by the bot, for more details see https://core.telegram.org/bots/api
 class BotHandler:
