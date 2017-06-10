@@ -414,13 +414,13 @@ HH:MM = {:02d}:{:02d}\nLatest log update:\n*{}*'.format(name_ext(
                                                user["level"] == 2:
                                                 top_list_print = \
                                                     top_list_print \
-                                                    + '{}) \[{:02d}:{:02d}]\
+                                                    + '{}) \[{:02d}:{:02d}] \
 *{}*\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
                                             else:
                                                 top_list_print = \
                                                     top_list_print \
-                                                    + '{}) \[{:02d}:{:02d}]'\
-'{}\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
+                                                    + '{}) \[{:02d}:{:02d}] \
+{}\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
                             weee_bot.send_message(
                                 last_chat_id,
                                 '{}\nLatest log update: \n*{}*'.format(
