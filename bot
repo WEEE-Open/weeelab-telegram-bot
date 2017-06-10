@@ -62,12 +62,13 @@ class BotHandler:
         else:
             return -1  # in case of error return an error code used in the main function
 
-'''function created by Ste (teschio) complete code at https://github.com/WEEE-Open/weeelab
-extract the name and surname from a string of type name.surname to obtain Name Surname'''
+        
+# function created by Ste (teschio) complete code at https://github.com/WEEE-Open/weeelab
+# Return <Name Surname> from <name.surname> string
 def nameExtr(username):
-    firstName = username.split('.')[0].capitalize() # Extract the name and capitalize it
-    lastName = username.split('.')[1].capitalize() # Extract the surname and capitalize it
-    return firstName + " " + lastName # Return a string of type "Name Surname"
+    firstName = username.split('.')[0].capitalize()  # Extract the name and capitalize it
+    lastName = username.split('.')[1].capitalize()  # Extract the surname and capitalize it
+    return firstName + " " + lastName  # Return a string of type "Name Surname"
 
 # set variable used in main function
 weee_bot = BotHandler(TOKEN_BOT) # create the bot object
