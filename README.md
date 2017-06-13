@@ -16,15 +16,15 @@ Deployment of this bot has been tested only on Heroku: just connect the repo.
 
 For local installation, get `python2` and run `pip install -r requirements.txt` to install dependencies.
 
-`bot` is the main script, and it requires some environment variables to 
+`weeelab_bot.py` is the main script, and it requires some environment variables (imported by `variables.py`) to 
 run:
 * `OC_URL`: Url of the owncloud server
 * `OC_USER`: OwnCloud username
 * `OC_PWD`: OwnCloud password
 * `TOKEN_BOT`: Telegram token for the bot API
 * `LOG_PATH`: Path of the file to read in owncloud (/folder/file.txt)
-* `USER_BOTH_PATH`: Path of the file to store bot users in owncloud (/folder/file.txt)
-* `USER_PATH`: Path of the file with authorized users in owncloud (/folder/file.json)
+* `USER_BOTH_PATH`: Path of the file to store bot users in OwnCloud (/folder/file.txt)
+* `USER_PATH`: Path of the file with authorized users in OwnCloud (/folder/file.json)
 
 ## Command syntax
 `/start` the bot and type `/[COMMAND] [OPTION]`.  
