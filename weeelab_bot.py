@@ -190,6 +190,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.')
                     if command[0] == "/inlab" or \
                        command[0] == "/inlab@weeelabdev_bot":
                         # Check if the message is the command /inlab
+                        people_inlab = log_file.count("INLAB")
                         for index in lines_inlab:
                             user_inlab = log_lines[index][
                                          47:log_lines[index].rfind(">")]
@@ -204,7 +205,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.')
                                                       + '- *' + \
                                                       name_ext(user_inlab) \
                                                       + '*'
-                                else:
+                                elif user_inlab == user_complete_name:
                                     user_inlab_list = user_inlab_list + '\n' \
                                                       + '- ' \
                                                       + name_ext(user_inlab)
