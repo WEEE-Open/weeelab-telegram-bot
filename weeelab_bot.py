@@ -50,11 +50,12 @@ class BotHandler:
                             params).json()['result']  # return an array of json
 
     def send_message(self, chat_id, text, parse_mode='Markdown',
-                     disable_web_page_preview=True):
+                     disable_web_page_preview=True, reply_markup=None):
         """ method to send text messages [ Telegram API -> sendMessage ]
         """
         params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode,
-                  'disable_web_page_preview': disable_web_page_preview}
+                  'disable_web_page_preview': disable_web_page_preview,
+                  'reply_markup': reply_markup}
         return requests.post(self.api_url + 'sendMessage', params)
         # On success, the sent Message is returned.
 
@@ -136,8 +137,8 @@ def main():
                                if 'INLAB' in lines]
                 # store the data of the last update of the log file,
                 # the data is in UTC so we add 2 for eu/it local time
-                log_update_data = oc.file_info(LOG_PATH)\
-                                    .get_last_modified() + timedelta(hours=2)
+                log_update_data = oc.file_info(LOG_PATH) \
+                                      .get_last_modified() + timedelta(hours=2)
                 last_update_id = last_update['update_id']
                 # store the id of the bot taken from the message
                 new_offset = last_update_id + 1
@@ -175,20 +176,22 @@ def main():
                     """ Command "/start", Start info
                     """
                     if command[0] == "/start" or \
-                       command[0] == "/start@weeelabdev_bot":
+                                    command[0] == "/start@weeelabdev_bot":
                         # Check if the message is the command /start
+                        keyboard = {"KeyboardButton": {"text": '/inlab'}}
                         weee_bot.send_message(last_chat_id, '\
 *WEEE-Open Telegram bot*.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
-an OwnCloud shared folder. \nFor a list of the commands allowed send /help.')
+an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',
+                                              reply_markup=keyboard)
                     # Show how many students are in lab right now
                     """ Command "/inlab", Show the number and the name of 
                         people in lab.
                     """
                     if command[0] == "/inlab" or \
-                       command[0] == "/inlab@weeelabdev_bot":
+                                    command[0] == "/inlab@weeelabdev_bot":
                         # Check if the message is the command /inlab
                         people_inlab = log_file.count("INLAB")
                         for index in lines_inlab:
@@ -200,7 +203,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.')
                                                      + '.' \
                                                      + user["surname"].lower()
                                 if (user_inlab == user_complete_name and
-                                   (user["level"] == 1 or user["level"] == 2)):
+                                        (user["level"] == 1 or user["level"] == 2)):
                                     user_inlab_list = user_inlab_list + '\n' \
                                                       + '- *' + \
                                                       name_ext(user_inlab) \
@@ -233,7 +236,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                     """
                     # Api limit message too long
                     if command[0] == "/log" or \
-                       command[0] == "/log@weeelabdev_bot":
+                                    command[0] == "/log@weeelabdev_bot":
                         # Check if the message is the command /log
                         lines_to_print = len(log_lines)
                         if len(command) > 1 and command[1].isdigit() \
@@ -269,7 +272,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                                   lines_printed].rfind(">")] \
                                             + '_' + log_lines[lines_printed][
                                                     log_lines[lines_printed]
-                                                    .rfind(">")
+                                                        .rfind(">")
                                                     + 1:len(
                                                         log_lines[
                                                             lines_printed])]
@@ -295,7 +298,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         Show hours spent in lab by name.surname user.
                     """
                     if command[0] == "/stat" or \
-                       command[0] == "/stat@weeelabdev_bot":
+                                    command[0] == "/stat@weeelabdev_bot":
                         # Check if the message is the command /stat
                         found_user = False
                         # create a control variable used
@@ -306,7 +309,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                             # print user_name
                             allowed = True
                         elif (len(command) != 1) and \
-                             (level == 1):
+                                (level == 1):
                             # Check if the command has option or not
                             user_name = str(command[1])
                             # store the option in a variable
@@ -318,8 +321,8 @@ to see stat of other users! \nOnly admin can!')
                         if allowed:
                             for lines in log_lines:
                                 if not ("INLAB" in lines) and \
-                                       (user_name == lines[
-                                                     47:lines.rfind(">")]):
+                                        (user_name == lines[
+                                                      47:lines.rfind(">")]):
                                     found_user = True
                                     # extract the hours and minute
                                     # from char 39 until ], splitted by :
@@ -352,7 +355,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                         Show a list of the top users in lab (defaul top 50).
                     """
                     if command[0] == "/top" or \
-                       command[0] == "/top@weeelabdev_bot":
+                                    command[0] == "/top@weeelabdev_bot":
                         # Check if the message is the command /top
                         if level == 1:
                             for lines in log_lines:
@@ -397,16 +400,16 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                             + user["surname"].lower()
                                         if rival[0] == user_complete_name:
                                             if user["level"] == 1 or \
-                                               user["level"] == 2:
+                                                            user["level"] == 2:
                                                 top_list_print = \
                                                     top_list_print \
                                                     + '{}) \[{:02d}:{:02d}] \
-*{}*\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
+*{}*\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
                                             else:
                                                 top_list_print = \
                                                     top_list_print \
                                                     + '{}) \[{:02d}:{:02d}] \
-{}\n'.format(position,total_hours,total_minutes,name_ext(rival[0]))
+{}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
                             weee_bot.send_message(
                                 last_chat_id,
                                 '{}\nLatest log update: \n*{}*'.format(
@@ -421,7 +424,7 @@ function! \nOnly admin can use!')
                     """ Command "/help", Show an help.
                     """
                     if command[0] == "/help" or \
-                       command[0] == "/help@weeelab_bot":
+                                    command[0] == "/help@weeelab_bot":
                         # Check if the message is the command /help
                         help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n/log - Show last 5 login\n+ _number_ - \
@@ -457,6 +460,7 @@ After authorization /start the bot.')
                 oc.put_file_contents(
                     USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
+
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
