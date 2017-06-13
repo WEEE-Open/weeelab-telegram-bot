@@ -16,7 +16,7 @@ Deployment of this bot has been tested only on Heroku: just connect the repo.
 
 For local installation, get `python2` and run `pip install -r requirements.txt` to install dependencies.
 
-`weeelab_bot.py` is the main script, and it requires some environment variables (imported by `variables.py`) to 
+`weeelab_bot.py` is the main script, and it requires some environment variables (imported from `variables.py`) to 
 run:
 * `OC_URL`: Url of the owncloud server
 * `OC_USER`: OwnCloud username
