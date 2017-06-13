@@ -171,7 +171,7 @@ For a list of the available commands send /help.')
                             user_complete_name = user["name"].lower() + '.' + user["surname"].lower()
                             if (user_inlab == user_complete_name and (user["level"]==1 or user["level"]==2)):
                                 user_inlab_list = user_inlab_list + '\n' + '- *' + nameExtr(user_inlab) + '*'
-                            else:
+                            elif user_inlab == user_complete_name:
                                 user_inlab_list = user_inlab_list + '\n' + '- ' + nameExtr(user_inlab)
                     if people_inlab == 0: # Check if there aren't people in lab
                         # Send a message to the user that makes the request /inlab
