@@ -178,14 +178,12 @@ def main():
                     if command[0] == "/start" or \
                                     command[0] == "/start@weeelabdev_bot":
                         # Check if the message is the command /start
-                        keyboard = {"KeyboardButton": {"text": '/inlab'}}
                         weee_bot.send_message(last_chat_id, '\
 *WEEE-Open Telegram bot*.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
-an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',
-                                              reply_markup=keyboard)
+an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                     # Show how many students are in lab right now
                     """ Command "/inlab", Show the number and the name of 
                         people in lab.
@@ -377,7 +375,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                         # create a new key with the name
                                         users_hours[name] = partial_hours
                                         # add the hours to the key
-                            # sort the dict by value in descendet order 
+                            # sort the dict by value in descendet order
                             sorted_top_list = sorted(users_hours.items(),
                                                      key=operator.itemgetter(
                                                          1), reverse=True)
