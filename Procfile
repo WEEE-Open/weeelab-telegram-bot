@@ -1,1 +1,1 @@
-worker: python weeelab_bot.py
+web: python weeelab_bot.py
