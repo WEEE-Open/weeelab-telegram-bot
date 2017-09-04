@@ -368,7 +368,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                 if month_log == month:
                                     log_file = oc.get_file_contents(LOG_PATH)
                                 else:
-                                    log_file = oc.get_file_contents(LOG_BASE + "log20170" + log_datafile + ".txt")
+                                    log_file = oc.get_file_contents(LOG_BASE + "log20170" + str(log_datafile) + ".txt")
                                 for lines in log_lines:
                                     if not ("INLAB" in lines):
                                         name = lines[47:lines.rfind(">")].encode(
