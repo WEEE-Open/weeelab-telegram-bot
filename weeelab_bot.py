@@ -164,6 +164,7 @@ def main():
                         complete_name = \
                             user["name"].lower() + '.' \
                             + user["surname"].lower()
+                        print complete_name
                 print last_update['message']  # DEBUG
 
             except KeyError:  # catch the exception if raised
