@@ -67,7 +67,7 @@ class BotHandler:
     def get_last_update(self):
         """method to get last message if there is"""
         get_result = self.get_updates()  # recall the function to get updates
-        if get_result is not None
+        if get_result is not None:
             if len(get_result) > 0:  # check if there are new messages
                 return get_result[-1]  # return the last message in json format
             else:
