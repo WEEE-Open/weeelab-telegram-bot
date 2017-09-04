@@ -261,32 +261,32 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     log_print = log_print + '{}\n'.format(
                                         log_line_to_print)
                                     lines_message += 1
-                        else:
-                            if len(command) == 1 and lines_message > 0:
-                                lines_printed = len(log_lines)
-                            else:
-                                log_data = log_lines[
+                                else:
+                                    if len(command) == 1 and lines_message > 0:
+                                        lines_printed = len(log_lines)
+                                     else:
+                                        log_data = log_lines[
                                                 lines_printed][1:11]
-                                log_line_to_print = \
-                                    '\n*' + log_data + '*\n_' \
-                                    + log_lines[lines_printed][
-                                    47:log_lines[
-                                    lines_printed].rfind(">")] \
-                                    + '_' + log_lines[lines_printed][
-                                    log_lines[lines_printed]
-                                     .rfind(">")
-                                    + 1:len(log_lines[lines_printed])]
-                                log_print = log_print + '{}\n'.format(
-                                    log_line_to_print)
-                                lines_message += 1
-                        if lines_message > 25:
-                            log_print = log_print.replace('[', '\[')
-                            log_print = log_print.replace('::', ':')
-                            weee_bot.send_message(last_chat_id,
+                                         log_line_to_print = \
+                                             '\n*' + log_data + '*\n_' \
+                                            + log_lines[lines_printed][
+                                            47:log_lines[
+                                            lines_printed].rfind(">")] \
+                                             + '_' + log_lines[lines_printed][
+                                            log_lines[lines_printed]
+                                            .rfind(">")
+                                            + 1:len(log_lines[lines_printed])]
+                                        log_print = log_print + '{}\n'.format(
+                                            log_line_to_print)
+                                        lines_message += 1
+                            if lines_message > 25:
+                                log_print = log_print.replace('[', '\[')
+                                log_print = log_print.replace('::', ':')
+                                weee_bot.send_message(last_chat_id,
                                                           '{}\n'.format(
                                                               log_print))
-                            lines_message = 0
-                            log_print = ''
+                                lines_message = 0
+                                log_print = ''
                         log_print = log_print.replace('[', '\[')
                         log_print = log_print.replace('::', ':')
                         weee_bot.send_message(
