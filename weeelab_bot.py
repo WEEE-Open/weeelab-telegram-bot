@@ -368,9 +368,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                 month_log = 5
                                 year_log = 2017
                             for log_datayear in range(year_log, year+1):
-                                print str(log_datayear)
                                 for log_datamonth in range(month_log, month+1):
-                                    print str(log_datamonth)
                                     try:
                                         if month_log == month and year_log == year:
                                             log_file = oc.get_file_contents(LOG_PATH)
@@ -407,7 +405,6 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                             sorted_top_list = sorted(users_hours.items(),
                                                     key=operator.itemgetter(
                                                     1), reverse=True)
-                            print sorted_top_list
                             for rival in sorted_top_list:
                                 # print the elements sorted
                                 position += 1
