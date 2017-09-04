@@ -122,6 +122,8 @@ def main():
         top_list_print = 'Top User List!\n'
         position = 0
         number_top_list = 50
+        today = datetime.date.today()
+        month = today.month
         # Initialize the number of users to print for command /top
 
         if last_update != -1:
@@ -358,63 +360,72 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                     command[0] == "/top@weeelabdev_bot":
                         # Check if the message is the command /top
                         if level == 1:
-                            for lines in log_lines:
-                                if not ("INLAB" in lines):
-                                    name = lines[47:lines.rfind(">")].encode(
-                                        'utf-8')
-                                    (user_hours, user_minutes) = \
-                                        lines[39:lines.rfind("]")].split(':')
-                                    partial_hours = datetime.timedelta(
-                                        hours=int(user_hours),
-                                        minutes=int(user_minutes))
-                                    if name in users_name:
-                                        # check if user was already found
-                                        users_hours[name] += partial_hours
-                                        # add to the key with the same name
-                                        # the value partial_hours
-                                    else:
-                                        users_name.append(name)
-                                        # create a new key with the name
-                                        users_hours[name] = partial_hours
-                                        # add the hours to the key
-                            # sort the dict by value in descendet order
-                            sorted_top_list = sorted(users_hours.items(),
-                                                     key=operator.itemgetter(
-                                                         1), reverse=True)
-                            for rival in sorted_top_list:
-                                # print the elements sorted
-                                position += 1
-                                # update the counter of position on top list
-                                if position <= number_top_list:
-                                    # check if the list is completed
-                                    # extract the hours and minutes from dict,
-                                    # splitted by :
-                                    total_second = rival[1].total_seconds()
-                                    total_hours = int(total_second // 3600)
-                                    total_minutes = int(
-                                        (total_second % 3600) // 60)
-                                    # add the user to the top list
-                                    for user in user_file["users"]:
-                                        user_complete_name = \
-                                            user["name"].lower() + '.' \
-                                            + user["surname"].lower()
-                                        if rival[0] == user_complete_name:
-                                            if user["level"] == 1 or \
-                                                            user["level"] == 2:
-                                                top_list_print = \
-                                                    top_list_print \
-                                                    + '{}) \[{:02d}:{:02d}] \
+                            if len(command) == 1:
+                                month_log = month
+                            elif command[1] == "all":
+                                month_log = 5
+                            for log_datafile in range(month_log, month):
+                                if month_log == month:
+                                    log_file = oc.get_file_contents(LOG_PATH)
+                                else:
+                                    log_file = oc.get_file_contents(LOG_BASE + "log20170" + log_datafile + ".txt")
+                                for lines in log_lines:
+                                    if not ("INLAB" in lines):
+                                        name = lines[47:lines.rfind(">")].encode(
+                                            'utf-8')
+                                        (user_hours, user_minutes) = \
+                                            lines[39:lines.rfind("]")].split(':')
+                                        partial_hours = datetime.timedelta(
+                                            hours=int(user_hours),
+                                            minutes=int(user_minutes))
+                                        if name in users_name:
+                                            # check if user was already found
+                                            users_hours[name] += partial_hours
+                                            # add to the key with the same name
+                                            # the value partial_hours
+                                        else:
+                                            users_name.append(name)
+                                            # create a new key with the name
+                                            users_hours[name] = partial_hours
+                                            # add the hours to the key
+                                # sort the dict by value in descendet order
+                                sorted_top_list = sorted(users_hours.items(),
+                                                         key=operator.itemgetter(
+                                                            1), reverse=True)
+                                for rival in sorted_top_list:
+                                    # print the elements sorted
+                                    position += 1
+                                    # update the counter of position on top list
+                                    if position <= number_top_list:
+                                        # check if the list is completed
+                                        # extract the hours and minutes from dict,
+                                        # splitted by :
+                                        total_second = rival[1].total_seconds()
+                                        total_hours = int(total_second // 3600)
+                                        total_minutes = int(
+                                            (total_second % 3600) // 60)
+                                        # add the user to the top list
+                                        for user in user_file["users"]:
+                                            user_complete_name = \
+                                                user["name"].lower() + '.' \
+                                                + user["surname"].lower()
+                                            if rival[0] == user_complete_name:
+                                                if user["level"] == 1 or \
+                                                                user["level"] == 2:
+                                                    top_list_print = \
+                                                        top_list_print \
+                                                        + '{}) \[{:02d}:{:02d}] \
 *{}*\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
-                                            else:
-                                                top_list_print = \
-                                                    top_list_print \
-                                                    + '{}) \[{:02d}:{:02d}] \
+                                                else:
+                                                    top_list_print = \
+                                                        top_list_print \
+                                                        + '{}) \[{:02d}:{:02d}] \
 {}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
-                            weee_bot.send_message(
-                                last_chat_id,
-                                '{}\nLatest log update: \n*{}*'.format(
+                                weee_bot.send_message(
+                                    last_chat_id,
+                                    '{}\nLatest log update: \n*{}*'.format(
                                     top_list_print, log_update_data))
-                            # send the top list to the user
+                                # send the top list to the user
                         else:
                             weee_bot.send_message(
                                 last_chat_id,

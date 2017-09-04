@@ -8,6 +8,8 @@ OC_PWD = os.environ.get('OC_PWD')  # OwnCloud password
 USER_PATH = os.environ.get('USER_PATH')
 # path of the log file to read in OwnCloud (/folder/file.txt)
 LOG_PATH = os.environ.get('LOG_PATH')
+# base path
+LOG_BASE = os.environ.get('LOG_BASE')
 # path of the file to store bot users in OwnCloud (/folder/file.txt)
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')  # Telegram token for the bot API
