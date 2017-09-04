@@ -48,6 +48,8 @@ class BotHandler:
         params = {'offset': offset, 'timeout': timeout}
         return requests.get(self.api_url + 'getUpdates',
                             params).json()['result']  # return an array of json
+        except KeyError:  # catch the exception if raised
+            print "ERROR! (getupdate)"  # DEBUG
 
     def send_message(self, chat_id, text, parse_mode='Markdown',
                      disable_web_page_preview=True, reply_markup=None):
@@ -102,18 +104,18 @@ def main():
         # takes the last message from the server
         #  Variables for /inlab command
         user_inlab_list = ''
-        people_inlab = 0
-        found_user_inlab = False
-        #  Variables for /log command
-        lines_to_print = 0  # default lines number to send
+        # people_inlab = 0
+        # found_user_inlab = False
+        # Variables for /log command
+        # lines_to_print = 0  # default lines number to send
         lines_message = 0  # number of lines of the message
         log_data = ''
         log_print = ''
         # Variables for /stat command
         user_hours = 0  # initialize hour variable, type int
         user_minutes = 0  # initialize minute variable, type int
-        total_hours = 0
-        total_minutes = 0
+        # total_hours = 0
+        # total_minutes = 0
         hours_sum = datetime.timedelta(hours=user_hours, minutes=user_minutes)
         # Initialize hours sum variable, type datetime
         # Variables for /top command
@@ -154,7 +156,7 @@ def main():
                 last_user_name = last_update['message']['from']['first_name']
                 # store the name of the user read from the message
                 # in a variable
-                last_user_username = last_update['message']['from']['username']
+                # last_user_username = last_update['message']['from']['username']
                 # store the username of the user read from the message
                 # in a variable
                 message_type = last_update['message']['chat']['type']
@@ -164,10 +166,13 @@ def main():
                         complete_name = \
                             user["name"].lower() + '.' \
                             + user["surname"].lower()
-                        print complete_name
                 print last_update['message']  # DEBUG
 
             except KeyError:  # catch the exception if raised
+                last_chat_id = None
+                last_user_id = None
+                last_user_name = None
+                message_type = None
                 print "ERROR!"  # DEBUG
 
             if message_type == "private":
