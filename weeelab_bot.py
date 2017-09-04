@@ -369,6 +369,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                 year_log = 2017
                             for log_datayear in range(year_log, year):
                                 for log_datamonth in range(month_log, month):
+                                    print str(log_datamonth)
                                     try:
                                         if month_log == month and year_log == year:
                                             log_file = oc.get_file_contents(LOG_PATH)
