@@ -105,7 +105,7 @@ def main():
         # people_inlab = 0
         # found_user_inlab = False
         # Variables for /log command
-        # lines_to_print = 0  # default lines number to send
+        lines_to_print = 0  # default lines number to send
         lines_message = 0  # number of lines of the message
         log_data = ''
         log_print = ''
