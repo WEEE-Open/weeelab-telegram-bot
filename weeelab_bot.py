@@ -370,11 +370,15 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                             for log_datayear in range(year_log, year):
                                 for log_datamonth in range(month_log, month):
                                     try:
-                                        if month_log == month and year_log = year:
+                                        if month_log == month and year_log == year:
                                             log_file = oc.get_file_contents(LOG_PATH)
                                             log_lines = log_file.splitlines()
                                         else:
-                                            log_file = oc.get_file_contents(LOG_BASE + "log" + str(log_datayear) + "0" + str(log_datamonth) + ".txt")
+                                            if log_datamonth < 10:
+                                                datamonth = "0" + str(log_datamonth)
+                                            else:
+                                                datamonth = str(log_datamonth)
+                                            log_file = oc.get_file_contents(LOG_BASE + "log" + str(log_datayear) + datamonth + ".txt")
                                             log_lines = log_file.splitlines()
                                         for lines in log_lines:
                                             if not ("INLAB" in lines):
