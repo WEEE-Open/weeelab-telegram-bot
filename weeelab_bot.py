@@ -400,46 +400,46 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                                     # create a new key with the name
                                                     users_hours[name] = partial_hours
                                                     # add the hours to the key
-                                        # sort the dict by value in descendet order
-                                        sorted_top_list = sorted(users_hours.items(),
-                                                                key=operator.itemgetter(
-                                                                1), reverse=True)
-                                        for rival in sorted_top_list:
-                                            # print the elements sorted
-                                            position += 1
-                                            # update the counter of position on top list
-                                            if position <= number_top_list:
-                                                # check if the list is completed
-                                                # extract the hours and minutes from dict,
-                                                # splitted by :
-                                                total_second = rival[1].total_seconds()
-                                                total_hours = int(total_second // 3600)
-                                                total_minutes = int(
-                                                    (total_second % 3600) // 60)
-                                                # add the user to the top list
-                                                for user in user_file["users"]:
-                                                    user_complete_name = \
-                                                        user["name"].lower() + '.' \
-                                                        + user["surname"].lower()
-                                                    if rival[0] == user_complete_name:
-                                                        if user["level"] == 1 or \
-                                                                    user["level"] == 2:
-                                                            top_list_print = \
-                                                                top_list_print \
-                                                                + '{}) \[{:02d}:{:02d}] \
-*{}*\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
-                                                        else:
-                                                            top_list_print = \
-                                                                top_list_print \
-                                                                + '{}) \[{:02d}:{:02d}] \
-{}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
-                                        weee_bot.send_message(
-                                            last_chat_id,
-                                            '{}\nLatest log update: \n*{}*'.format(
-                                            top_list_print, log_update_data))
-                                        # send the top list to the user
                                     except owncloud.owncloud.HTTPResponseError:
                                         print "Error open file."
+                            # sort the dict by value in descendet order
+                            sorted_top_list = sorted(users_hours.items(),
+                                                    key=operator.itemgetter(
+                                                    1), reverse=True)
+                            for rival in sorted_top_list:
+                                # print the elements sorted
+                                position += 1
+                                # update the counter of position on top list
+                                if position <= number_top_list:
+                                    # check if the list is completed
+                                    # extract the hours and minutes from dict,
+                                    # splitted by :
+                                    total_second = rival[1].total_seconds()
+                                    total_hours = int(total_second // 3600)
+                                    total_minutes = int(
+                                            (total_second % 3600) // 60)
+                                    # add the user to the top list
+                                    for user in user_file["users"]:
+                                        user_complete_name = \
+                                            user["name"].lower() + '.' \
+                                            + user["surname"].lower()
+                                        if rival[0] == user_complete_name:
+                                            if user["level"] == 1 or \
+                                                        user["level"] == 2:
+                                                top_list_print = \
+                                                        top_list_print \
+                                                        + '{}) \[{:02d}:{:02d}] \
+*{}*\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
+                                            else:
+                                                top_list_print = \
+                                                    top_list_print \
+                                                    + '{}) \[{:02d}:{:02d}] \
+{}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
+                            weee_bot.send_message(
+                                    last_chat_id,
+                                    '{}\nLatest log update: \n*{}*'.format(
+                                    top_list_print, log_update_data))
+                                    # send the top list to the user
                         else:
                             weee_bot.send_message(
                                 last_chat_id,
