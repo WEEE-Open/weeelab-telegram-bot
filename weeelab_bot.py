@@ -279,6 +279,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         log_print = log_print + '{}\n'.format(
                                             log_line_to_print)
                                         lines_message += 1
+                                        print lines_message
                             if lines_message > 25:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
