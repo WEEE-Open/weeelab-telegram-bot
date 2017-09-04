@@ -264,10 +264,10 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 else:
                                     if len(command) == 1 and lines_message > 0:
                                         lines_printed = len(log_lines)
-                                     else:
+                                    else:
                                         log_data = log_lines[
                                                 lines_printed][1:11]
-                                         log_line_to_print = \
+                                        log_line_to_print = \
                                              '\n*' + log_data + '*\n_' \
                                             + log_lines[lines_printed][
                                             47:log_lines[
