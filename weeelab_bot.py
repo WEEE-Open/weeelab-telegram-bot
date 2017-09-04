@@ -291,9 +291,8 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         log_print = log_print.replace('[', '\[')
                         log_print = log_print.replace('::', ':')
                         print log_print
-                        weee_bot.send_message(
-                            last_chat_id, '{}\nLatest log update: *{}*'
-                                .format(log_print, log_update_data))
+                        print last_chat_id
+                        weee_bot.send_message(last_chat_id, '{}\nLatest log update: *{}*'.format(log_print, log_update_data))
 
                     # Show the stat of the user
                     """ Command "/stat name.surname", 
