@@ -45,14 +45,9 @@ class BotHandler:
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
-        try:
-            params = {'offset': offset, 'timeout': timeout}
-            result = requests.get(self.api_url + 'getUpdates',
+        params = {'offset': offset, 'timeout': timeout}
+        return requests.get(self.api_url + 'getUpdates',
                             params).json()['result']  # return an array of json
-        except KeyError:  # catch the exception if raised
-            result = None
-            print "ERROR! (getupdate)"  # DEBUG
-        return result
 
     def send_message(self, chat_id, text, parse_mode='Markdown',
                      disable_web_page_preview=True, reply_markup=None):
@@ -67,11 +62,8 @@ class BotHandler:
     def get_last_update(self):
         """method to get last message if there is"""
         get_result = self.get_updates()  # recall the function to get updates
-        if get_result is not None:
-            if len(get_result) > 0:  # check if there are new messages
-                return get_result[-1]  # return the last message in json format
-            else:
-                return -1
+        if len(get_result) > 0:  # check if there are new messages
+            return get_result[-1]  # return the last message in json format
         else:
             return -1
             # in case of error return an error code used in the main function
