@@ -368,6 +368,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                 month_log = 5
                                 year_log = 2017
                             for log_datayear in range(year_log, year+1):
+                                print str(log_datayear)
                                 for log_datamonth in range(month_log, month+1):
                                     print str(log_datamonth)
                                     try:
@@ -403,6 +404,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                     except owncloud.owncloud.HTTPResponseError:
                                         print "Error open file."
                             # sort the dict by value in descendet order
+                            print users_hours.items()
                             sorted_top_list = sorted(users_hours.items(),
                                                     key=operator.itemgetter(
                                                     1), reverse=True)
