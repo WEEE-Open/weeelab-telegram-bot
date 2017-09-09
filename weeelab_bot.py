@@ -365,7 +365,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                 month_log = month
                                 year_log = year
                             elif command[1] == "all":
-                                month_log = 5
+                                month_log = 4
                                 year_log = 2017
                             for log_datayear in range(year_log, year+1):
                                 for log_datamonth in range(month_log, month+1):
@@ -434,6 +434,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                                     top_list_print \
                                                     + '{}) \[{:02d}:{:02d}] \
 {}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
+                            print sorted_top_list
                             weee_bot.send_message(
                                     last_chat_id,
                                     '{}\nLatest log update: \n*{}*'.format(
