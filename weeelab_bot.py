@@ -405,6 +405,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                             sorted_top_list = sorted(users_hours.items(),
                                                     key=operator.itemgetter(
                                                     1), reverse=True)
+                            print sorted_top_list
                             for rival in sorted_top_list:
                                 # print the elements sorted
                                 position += 1
@@ -434,7 +435,6 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                                     top_list_print \
                                                     + '{}) \[{:02d}:{:02d}] \
 {}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
-                            print sorted_top_list
                             weee_bot.send_message(
                                     last_chat_id,
                                     '{}\nLatest log update: \n*{}*'.format(
