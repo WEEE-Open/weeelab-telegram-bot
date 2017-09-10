@@ -110,6 +110,9 @@ def main():
         # call the function to check if there are new messages
         last_update = weee_bot.get_last_update(new_offset)
         # takes the last message from the server
+        last_update_id = last_update['update_id']
+        # store the id of the bot taken from the message
+        new_offset = last_update_id + 1
         #  Variables for /inlab command
         user_inlab_list = ''
         # people_inlab = 0
@@ -152,9 +155,6 @@ def main():
                 # the data is in UTC so we add 2 for eu/it local time
                 log_update_data = oc.file_info(LOG_PATH) \
                                       .get_last_modified() + timedelta(hours=2)
-                last_update_id = last_update['update_id']
-                # store the id of the bot taken from the message
-                new_offset = last_update_id + 1
                 # store the update id of the bot
                 command = last_update['message']['text'].split()
                 # store all the words in the message in an array
