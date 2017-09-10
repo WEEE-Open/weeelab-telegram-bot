@@ -67,13 +67,14 @@ class BotHandler:
 
     def get_last_update(self, offset=None):
         """method to get last message if there is"""
+        global new_offset
         get_result = self.get_updates(offset)  # recall the function to get updates
         if not get_result:
             return -1
         elif len(get_result) > 0:  # check if there are new messages
             print len(get_result)
             print get_result
-            global new_offset = get_result[0]['update_id'] + 1
+            new_offset = get_result[0]['update_id'] + 1
             return get_result[0]  # return the last message in json format
         else:
             return -1
