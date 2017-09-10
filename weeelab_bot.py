@@ -100,11 +100,12 @@ weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
 
 def main():
     """main function of the bot"""
+    global new_offset
     oc = owncloud.Client(OC_URL)
     # create an object of type Client to connect to the cloud url
     oc.login(OC_USER, OC_PWD)
     # connect to the cloud using authorize username and password
-    global new_offset = None
+    new_offset = None
     # set at beginning an offset None for the get_updates function
 
     while True:
