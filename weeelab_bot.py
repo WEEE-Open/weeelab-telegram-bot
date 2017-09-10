@@ -70,6 +70,7 @@ class BotHandler:
         global new_offset
         get_result = self.get_updates(offset)  # recall the function to get updates
         if not get_result:
+            new_offset = None
             return -1
         elif len(get_result) > 0:  # check if there are new messages
             print len(get_result)
