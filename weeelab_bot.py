@@ -73,7 +73,7 @@ class BotHandler:
         elif len(get_result) > 0:  # check if there are new messages
             print len(get_result)
             print get_result
-            return get_result[0]  # return the last message in json format
+            return get_result[1]  # return the last message in json format
         else:
             return -1
             # in case of error return an error code used in the main function
@@ -109,6 +109,7 @@ def main():
         #weee_bot.get_updates(new_offset)
         # call the function to check if there are new messages
         last_update = weee_bot.get_last_update(new_offset)
+        new_offset = None
         # takes the last message from the server
         # Variables for /inlab command
         user_inlab_list = ''
