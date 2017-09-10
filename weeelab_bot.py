@@ -70,6 +70,8 @@ class BotHandler:
         if not get_result:
             return -1
         elif len(get_result) > 0:  # check if there are new messages
+            print len(get_result)
+            print get_result
             return get_result[-1]  # return the last message in json format
         else:
             return -1
