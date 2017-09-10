@@ -137,14 +137,17 @@ def main():
         month = today.month
         year = today.year
         # Initialize variables
+        level = 0
         last_chat_id = None
         last_user_id = None
         last_user_name = None
         message_type = None
+        print level
+        print message_type
 
         if last_update != -1:
             try:
-                level = 0
+
                 complete_name = ''
                 log_file = oc.get_file_contents(LOG_PATH)
                 # log file stored in Owncloud server
