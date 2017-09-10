@@ -156,7 +156,7 @@ def main():
                                       .get_last_modified() + timedelta(hours=2)
                 last_update_id = last_update['update_id']
                 # store the id of the bot taken from the message
-                new_offset = last_update_id + 1
+                new_offset = last_update_id + 2
                 # store the update id of the bot
                 command = last_update['message']['text'].split()
                 # store all the words in the message in an array
@@ -497,7 +497,7 @@ After authorization /start the bot.')
                 oc.put_file_contents(
                     USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
-            time.sleep(10)
+
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
