@@ -108,7 +108,6 @@ def main():
     # set at beginning an offset None for the get_updates function
 
     while True:
-        #weee_bot.get_updates(new_offset)
         # call the function to check if there are new messages
         last_update = weee_bot.get_last_update(new_offset)
         # takes the last message from the server
@@ -184,13 +183,8 @@ def main():
                             user["name"].lower() + '.' \
                             + user["surname"].lower()
                 print last_update['message']  # DEBUG
-                last_update = -1
 
             except KeyError:  # catch the exception if raised
-                last_update = -1
-                last_chat_id = None
-                last_user_id = None
-                last_user_name = None
                 message_type = None
                 print "ERROR!"  # DEBUG
 
@@ -209,7 +203,6 @@ about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
 an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
-                        print "Messaggio inviato"
                     # Show how many students are in lab right now
                     """ Command "/inlab", Show the number and the name of 
                         people in lab.
