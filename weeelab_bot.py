@@ -73,6 +73,7 @@ class BotHandler:
         elif len(get_result) > 0:  # check if there are new messages
             print len(get_result)
             print get_result
+            global new_offset = get_result[0]['update_id'] + 1
             return get_result[0]  # return the last message in json format
         else:
             return -1
@@ -102,7 +103,7 @@ def main():
     # create an object of type Client to connect to the cloud url
     oc.login(OC_USER, OC_PWD)
     # connect to the cloud using authorize username and password
-    new_offset = None
+    global new_offset = None
     # set at beginning an offset None for the get_updates function
 
     while True:
@@ -154,7 +155,7 @@ def main():
                                       .get_last_modified() + timedelta(hours=2)
                 last_update_id = last_update['update_id']
                 # store the id of the bot taken from the message
-                new_offset = last_update_id + 1
+                #new_offset = last_update_id + 1
                 # store the update id of the bot
                 command = last_update['message']['text'].split()
                 # store all the words in the message in an array
