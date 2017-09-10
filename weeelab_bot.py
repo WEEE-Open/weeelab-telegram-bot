@@ -70,17 +70,14 @@ class BotHandler:
 
     def get_last_update(self, offset=None):
         """method to get last message if there is"""
-        global new_offset
         get_result = self.get_updates(offset)  # recall the function to get updates
         if not get_result:
-            new_offset = None
             return -1
         elif len(get_result) > 0:  # check if there are new messages
             print len(get_result)
             print get_result
             return get_result[0]  # return the last message in json format
         else:
-            new_offset = None
             return -1
             # in case of error return an error code used in the main function
 
@@ -113,6 +110,7 @@ def main():
     # set at beginning an offset None for the get_updates function
 
     while True:
+        time.sleep(5)
         #weee_bot.get_updates(new_offset)
         # call the function to check if there are new messages
         last_update = weee_bot.get_last_update(new_offset)
