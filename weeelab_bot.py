@@ -42,7 +42,7 @@ class BotHandler:
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
         # set bot url from the token
 
-    def get_updates(self, offset=None, timeout=30):
+    def get_updates(self, offset=None, timeout=0):
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
@@ -142,12 +142,9 @@ def main():
         last_user_id = None
         last_user_name = None
         message_type = None
-        print level
-        print message_type
 
         if last_update != -1:
             try:
-
                 complete_name = ''
                 log_file = oc.get_file_contents(LOG_PATH)
                 # log file stored in Owncloud server
@@ -209,8 +206,6 @@ about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
 an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
-                        print level
-                        print message_type
                     # Show how many students are in lab right now
                     """ Command "/inlab", Show the number and the name of 
                         people in lab.
