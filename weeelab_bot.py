@@ -146,7 +146,6 @@ def main():
 
         if last_update != -1:
             try:
-                last_update = -1
                 complete_name = ''
                 log_file = oc.get_file_contents(LOG_PATH)
                 # log file stored in Owncloud server
@@ -185,6 +184,7 @@ def main():
                             user["name"].lower() + '.' \
                             + user["surname"].lower()
                 print last_update['message']  # DEBUG
+                last_update = -1
 
             except KeyError:  # catch the exception if raised
                 last_update = -1
