@@ -24,6 +24,7 @@ import requests  # library to make requests to telegram server
 #  https://github.com/owncloud/pyocclient
 import owncloud
 import datetime  # library to handle time
+import time
 from datetime import timedelta
 import operator  # library to handle dictionary
 import json  # library for evaluation of json file
@@ -41,7 +42,7 @@ class BotHandler:
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
         # set bot url from the token
 
-    def get_updates(self, offset=None, timeout=10000):
+    def get_updates(self, offset=None, timeout=30):
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
@@ -74,7 +75,6 @@ class BotHandler:
         elif len(get_result) > 0:  # check if there are new messages
             print len(get_result)
             print get_result
-            new_offset = get_result[0]['update_id'] + 1
             return get_result[0]  # return the last message in json format
         else:
             return -1
@@ -100,7 +100,6 @@ weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
 
 def main():
     """main function of the bot"""
-    global new_offset
     oc = owncloud.Client(OC_URL)
     # create an object of type Client to connect to the cloud url
     oc.login(OC_USER, OC_PWD)
@@ -157,7 +156,7 @@ def main():
                                       .get_last_modified() + timedelta(hours=2)
                 last_update_id = last_update['update_id']
                 # store the id of the bot taken from the message
-                #new_offset = last_update_id + 1
+                new_offset = last_update_id + 1
                 # store the update id of the bot
                 command = last_update['message']['text'].split()
                 # store all the words in the message in an array
@@ -498,7 +497,7 @@ After authorization /start the bot.')
                 oc.put_file_contents(
                     USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
-            last_update = -1
+            time.sleep(1)
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
