@@ -46,6 +46,7 @@ class BotHandler:
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
+        global new_offset
         try:
             params = {'offset': offset, 'timeout': timeout}
             print offset
@@ -53,6 +54,7 @@ class BotHandler:
                                   params).json()['result']  # return an array of json
         except KeyError: # catch the exception if raised
             result = None
+            new_offset= None
             # print "ERROR! (getupdate)" # DEBUG
         return result
 
@@ -99,6 +101,7 @@ weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
 
 def main():
     """main function of the bot"""
+    global new_offset
     oc = owncloud.Client(OC_URL)
     # create an object of type Client to connect to the cloud url
     oc.login(OC_USER, OC_PWD)
