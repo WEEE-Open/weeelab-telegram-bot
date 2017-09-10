@@ -415,6 +415,8 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                             # print sorted_top_list
                             for rival in sorted_top_list:
                                 # print the elements sorted
+                                position += 1
+                                # update the counter of position on top list
                                 if position < number_top_list:
                                     # check if the list is completed
                                     # extract the hours and minutes from dict,
@@ -425,8 +427,6 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                             (total_second % 3600) // 60)
                                     # add the user to the top list
                                     for user in user_file["users"]:
-                                        position += 1
-                                        # update the counter of position on top list
                                         user_complete_name = \
                                             user["name"].lower() + '.' \
                                             + user["surname"].lower()
