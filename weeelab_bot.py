@@ -137,7 +137,11 @@ def main():
         today = datetime.date.today()
         month = today.month
         year = today.year
-        # Initialize the number of users to print for command /top
+        # Initialize variables
+        last_chat_id = None
+        last_user_id = None
+        last_user_name = None
+        message_type = None
 
         if last_update != -1:
             try:
