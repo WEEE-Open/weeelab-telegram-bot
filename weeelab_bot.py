@@ -41,7 +41,7 @@ class BotHandler:
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
         # set bot url from the token
 
-    def get_updates(self, offset=None, timeout=1000):
+    def get_updates(self, offset=None, timeout=10000):
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
