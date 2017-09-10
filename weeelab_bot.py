@@ -68,7 +68,6 @@ class BotHandler:
 
     def get_last_update(self, offset=None):
         """method to get last message if there is"""
-        global new_offset
         get_result = self.get_updates(offset)  # recall the function to get updates
         if not get_result:
             return -1
@@ -207,6 +206,8 @@ about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
 an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
+                        print level
+                        print message_type
                     # Show how many students are in lab right now
                     """ Command "/inlab", Show the number and the name of 
                         people in lab.
