@@ -503,6 +503,8 @@ After authorization /start the bot.')
                     USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
 
+        last_update = -1
+
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
