@@ -49,7 +49,7 @@ class BotHandler:
         global new_offset
         try:
             params = {'offset': offset, 'timeout': timeout}
-            print offset
+            #print offset
             result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
         except KeyError: # catch the exception if raised
@@ -108,9 +108,9 @@ def main():
     # set at beginning an offset None for the get_updates function
 
     while True:
-        weee_bot.get_last_update(new_offset)
+        #weee_bot.get_updates(new_offset)
         # call the function to check if there are new messages
-        last_update = weee_bot.get_last_update()
+        last_update = weee_bot.get_last_update(new_offset)
         # takes the last message from the server
         # Variables for /inlab command
         user_inlab_list = ''
@@ -146,6 +146,7 @@ def main():
 
         if last_update != -1:
             try:
+                last_update = -1
                 complete_name = ''
                 log_file = oc.get_file_contents(LOG_PATH)
                 # log file stored in Owncloud server
@@ -186,6 +187,7 @@ def main():
                 print last_update['message']  # DEBUG
 
             except KeyError:  # catch the exception if raised
+                last_update = -1
                 last_chat_id = None
                 last_user_id = None
                 last_user_name = None
@@ -207,6 +209,7 @@ about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
 an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
+                        print "Messaggio inviato"
                     # Show how many students are in lab right now
                     """ Command "/inlab", Show the number and the name of 
                         people in lab.
@@ -501,8 +504,6 @@ After authorization /start the bot.')
                 oc.put_file_contents(
                     USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
-
-        last_update = -1
 
 
 # call the main() until a keyboard interrupt is called
