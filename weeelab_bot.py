@@ -159,7 +159,7 @@ def main():
                                       .get_last_modified() + timedelta(hours=2)
                 last_update_id = last_update['update_id']
                 # store the id of the bot taken from the message
-                new_offset = last_update_id 
+                new_offset = last_update_id +1
                 # store the update id of the bot
                 command = last_update['message']['text'].split()
                 # store all the words in the message in an array
