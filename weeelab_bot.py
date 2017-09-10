@@ -113,6 +113,7 @@ def main():
         time.sleep(5)
         #weee_bot.get_updates(new_offset)
         # call the function to check if there are new messages
+        new_offset = new_offset + 1
         last_update = weee_bot.get_last_update(new_offset)
         # takes the last message from the server
         # Variables for /inlab command
@@ -163,7 +164,7 @@ def main():
                                       .get_last_modified() + timedelta(hours=2)
                 last_update_id = last_update['update_id']
                 # store the id of the bot taken from the message
-                new_offset = last_update_id +1
+                new_offset = last_update_id
                 # store the update id of the bot
                 command = last_update['message']['text'].split()
                 # store all the words in the message in an array
