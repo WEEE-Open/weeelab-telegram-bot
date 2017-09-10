@@ -106,9 +106,9 @@ def main():
     # set at beginning an offset None for the get_updates function
 
     while True:
-        weee_bot.get_updates(new_offset)
+        #weee_bot.get_updates(new_offset)
         # call the function to check if there are new messages
-        last_update = weee_bot.get_last_update()
+        last_update = weee_bot.get_last_update(new_offset)
         # takes the last message from the server
         #  Variables for /inlab command
         user_inlab_list = ''
