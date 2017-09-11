@@ -53,7 +53,7 @@ class BotHandler:
         print requests.get(self.api_url + 'getUpdates',
                            params).json()
         result = requests.get(self.api_url + 'getUpdates',
-                                  params).json()  # return an array of json
+                                  params).json()['result']  # return an array of json
 
         #except KeyError: # catch the exception if raised
             #result = None
@@ -73,7 +73,7 @@ class BotHandler:
 
     def get_last_update(self, offset=None):
         """method to get last message if there is"""
-        get_result = self.get_updates(offset)['result']  # recall the function to get updates
+        get_result = self.get_updates(offset)  # recall the function to get updates
         if not get_result:
             return -1
         elif len(get_result) > 0:  # check if there are new messages
