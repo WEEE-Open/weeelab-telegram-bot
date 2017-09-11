@@ -50,8 +50,11 @@ class BotHandler:
         #try:
         params = {'offset': offset, 'timeout': timeout}
             #print offset
+        print requests.get(self.api_url + 'getUpdates',
+                           params).json()
         result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
+
         #except KeyError: # catch the exception if raised
             #result = None
             #new_offset= None
