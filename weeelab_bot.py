@@ -109,7 +109,7 @@ def main():
     # connect to the cloud using authorize username and password
     new_offset = None
     # set at beginning an offset None for the get_updates function
-    datemess = 0
+    datemess = -1
 
     while True:
         # call the function to check if there are new messages
