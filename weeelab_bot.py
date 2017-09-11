@@ -42,13 +42,13 @@ class BotHandler:
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
         # set bot url from the token
 
-    def get_updates(self, offset=None, timeout=30, allowed_updates = ["message"]):
+    def get_updates(self, offset=None, timeout=30):
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
         global new_offset
         try:
-            params = {'offset': offset, 'timeout': timeout, 'allowed_updates': allowed_updates}
+            params = {'offset': offset, 'timeout': timeout}
             #print offset
             result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
