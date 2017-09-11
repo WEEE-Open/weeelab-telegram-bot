@@ -53,6 +53,7 @@ class BotHandler:
             result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
             if result[0]['date'] == datemess:
+                print result[0]['date']
                 result = None
         except KeyError: # catch the exception if raised
             result = None
@@ -145,6 +146,7 @@ def main():
         last_user_id = None
         last_user_name = None
         message_type = None
+        print datemess
 
         if last_update != -1:
             try:
