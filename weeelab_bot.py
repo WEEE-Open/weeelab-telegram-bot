@@ -52,7 +52,7 @@ class BotHandler:
             #print offset
             result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
-            if result[0]['date'] == datemess
+            if result[0]['date'] == datemess:
                 result = None
         except KeyError: # catch the exception if raised
             result = None
