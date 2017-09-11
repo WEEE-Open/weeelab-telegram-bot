@@ -57,8 +57,8 @@ class BotHandler:
                 result = None
         except KeyError: # catch the exception if raised
             result = None
-            new_offset= None
-            # print "ERROR! (getupdate)" # DEBUG
+            new_offset = None
+            print "ERROR! (getupdate)" # DEBUG
         return result
 
     def send_message(self, chat_id, text, parse_mode='Markdown',
