@@ -46,19 +46,16 @@ class BotHandler:
         """ method to receive incoming updates using long polling
             [Telegram API -> getUpdates ]
         """
-        global new_offset, datemess
+        global new_offset
         try:
             params = {'offset': offset, 'timeout': timeout}
             #print offset
             result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
-            if result[0]['date'] == datemess:
-                print result[0]['date']
-                result = None
         except KeyError: # catch the exception if raised
             result = None
-            new_offset = None
-            print "ERROR! (getupdate)" # DEBUG
+            new_offset= None
+            # print "ERROR! (getupdate)" # DEBUG
         return result
 
     def send_message(self, chat_id, text, parse_mode='Markdown',
@@ -102,14 +99,13 @@ weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
 
 def main():
     """main function of the bot"""
-    global new_offset, datemess
+    global new_offset
     oc = owncloud.Client(OC_URL)
     # create an object of type Client to connect to the cloud url
     oc.login(OC_USER, OC_PWD)
     # connect to the cloud using authorize username and password
     new_offset = None
     # set at beginning an offset None for the get_updates function
-    datemess = -1
 
     while True:
         # call the function to check if there are new messages
@@ -146,11 +142,9 @@ def main():
         last_user_id = None
         last_user_name = None
         message_type = None
-        print datemess
 
         if last_update != -1:
             try:
-                datemess = last_update['date']
                 complete_name = ''
                 log_file = oc.get_file_contents(LOG_PATH)
                 # log file stored in Owncloud server
