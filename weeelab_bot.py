@@ -47,14 +47,14 @@ class BotHandler:
             [Telegram API -> getUpdates ]
         """
         global new_offset
-        try:
-            params = {'offset': offset, 'timeout': timeout}
+        #try:
+        params = {'offset': offset, 'timeout': timeout}
             #print offset
-            result = requests.get(self.api_url + 'getUpdates',
+        result = requests.get(self.api_url + 'getUpdates',
                                   params).json()['result']  # return an array of json
-        except KeyError: # catch the exception if raised
-            result = None
-            new_offset= None
+        #except KeyError: # catch the exception if raised
+            #result = None
+            #new_offset= None
             # print "ERROR! (getupdate)" # DEBUG
         return result
 
