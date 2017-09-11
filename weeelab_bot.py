@@ -490,13 +490,16 @@ After authorization /start the bot.')
             else:
                 # Store a new user name and id in a file on owncloud server,
                 # encoding in utf.8
-                user_bot_contents = user_bot_contents.decode('utf-8') \
+                try:
+                    user_bot_contents = user_bot_contents.decode('utf-8') \
                                     + '\'' + last_user_name.encode('utf-8') \
                                     + '\'' + ': ' + '\'' + str(last_user_id) \
                                     + '\'' + ', '
-                oc.put_file_contents(
-                    USER_BOT_PATH, user_bot_contents.encode('utf-8'))
+                    oc.put_file_contents(
+                        USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
+                except AttributeError:
+                    pass
 
 
 # call the main() until a keyboard interrupt is called
