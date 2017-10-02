@@ -1,6 +1,6 @@
 # weeelab-telegram-bot
 [![License](http://img.shields.io/:license-GPL3.0-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
-![Version](https://img.shields.io/badge/version-0.1-yellow.svg)
+![Version](https://img.shields.io/badge/version-1.0-yellow.svg)
 
 WEEE-Open Telegram bot.
 
@@ -37,6 +37,7 @@ Available commands:
   * `all`      : Show all lines of OC_PATH file.
 * `stat`   :  Show hours spent in lab by the user.
 * `top`   :  Show a list of top users in lab (only for admin, default top 50)
+  * `all`      : Show the top users from the beginning.
 * `help`  :  Show all the commands and a short explanations.
 
 ## TODO
