@@ -123,6 +123,7 @@ def main():
 
         if last_update != -1: 
             try: 
+                print last_update['message'] # DEBUG
                 level = 0
                 complete_name = ''
                 log_file = oc.get_file_contents(LOG_PATH) # log file stored in owncloud server
@@ -142,7 +143,6 @@ def main():
                     if user["telegramID"] == str(last_user_id):
                         level = user["level"]
                         complete_name = user["name"].lower() + '.' + user["surname"].lower()
-                print last_update['message'] # DEBUG
 
             except KeyError: # catch the exception if raised
                 print "ERROR!" # DEBUG
