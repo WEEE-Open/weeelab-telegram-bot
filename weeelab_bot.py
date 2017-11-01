@@ -467,8 +467,8 @@ function! \nOnly admin can use!')
                                     command[0] == "/help@weeelab_bot":
                         # Check if the message is the command /help
                         help_message = "Available commands and options:\n\n\
-/inlab - Show the people in lab\n/log - Show last 5 login\n+ _number_ - \
-Show last _number_ login\n+ _all_ - Show all login\n/stat - Show hours spent \
+/inlab - Show the people in lab\n/log - Show login of the day\n+ _number_ - \
+Show last _number_ login\n+ _all_ - Show all login of the month\n/stat - Show hours spent \
 in lab by the user\n"
                         if level == 1:
                             help_message += "\n*only for admin user*\n\
