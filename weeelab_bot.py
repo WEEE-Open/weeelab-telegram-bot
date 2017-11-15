@@ -495,7 +495,7 @@ After authorization /start the bot.')
                 # encoding in utf.8
                 try:
                     user_bot_contents = user_bot_contents.decode('utf-8') \
-                                    + '\'' + last_user_name.encode('utf-8') \
+                                    + '\'' + last_user_name.decode('utf-8') \
                                     + '\'' + ': ' + '\'' + str(last_user_id) \
                                     + '\'' + ', '
                     oc.put_file_contents(
