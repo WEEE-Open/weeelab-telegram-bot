@@ -485,7 +485,8 @@ bot \nPlease contact us [mail] (weeeopen@polito.it), visit our \
 After authorization /start the bot.')
             else:
                 print "group"  # DEBUG
-            user_bot_contents = oc.get_file_contents(USER_BOT_PATH, encoding='utf-8')
+            user_bot_content = oc.get_file_contents(USER_BOT_PATH)
+            user_bot_contents = user_bot_content.encode('utf-8')
             # read the content of the user file stored in owncloud server
             if str(last_user_id) in user_bot_contents:
                 # Check if the user is already recorded
