@@ -486,7 +486,7 @@ After authorization /start the bot.')
             else:
                 print "group"  # DEBUG
             user_bot_content = oc.get_file_contents(USER_BOT_PATH)
-            user_bot_contents = user_bot_content.encode('utf-8')
+            user_bot_contents = user_bot_content.decode('utf-8')
             # read the content of the user file stored in owncloud server
             if str(last_user_id) in user_bot_contents:
                 # Check if the user is already recorded
@@ -495,10 +495,10 @@ After authorization /start the bot.')
                 # Store a new user name and id in a file on owncloud server,
                 # encoding in utf.8
                 try:
-                    user_bot_contents = user_bot_contents.encode('utf-8') \
-                                    + '\'' + last_user_name.encode('utf-8') \
-                                    + '\'' + ': ' + '\'' + str(last_user_id).encode('utf-8') \
-                                    + '\'' + str(', ').encode('utf-8')
+                    user_bot_contents = user_bot_contents.decode('utf-8') \
+                                    + '\'' + last_user_name.decode('utf-8') \
+                                    + '\'' + ': ' + '\'' + str(last_user_id).decode('utf-8') \
+                                    + '\'' + str(', ').decode('utf-8')
                     oc.put_file_contents(
                         USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
