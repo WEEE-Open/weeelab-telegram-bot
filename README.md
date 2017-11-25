@@ -38,6 +38,7 @@ Available commands:
 * `stat`   :  Show hours spent in lab by the user.
 * `top`   :  Show a list of top users in lab (only for admin, default top 50)
   * `all`      : Show the top users from the beginning.
+* `user`  :  Add a new user (name surname serial telegramID nickname (optional) level).
 * `help`  :  Show all the commands and a short explanations.
 
 ## TODO
