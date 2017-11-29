@@ -68,3 +68,10 @@ Nell'attuale mega-classe generale oppure procedurale e basta, non e' obbligatori
 ### Varie ed eventuali
 - Togliere 1 commento per riga, e' inutile e non aggiunge nulla
 - Non inizializzare inutilmente le variabili utilizzate nei foreach, visto che il foreach le inizializza
+- Python 3
+- Le classi sopra descritte vanno utilizzate anche nel weeelab, quando sara' riscritto in Python 3. Implementare le parti necessarie al bot e basta, il resto lo faremo dopo e separeremo i repo.
+
+### Branch
+- `master` versione di produzione del bot
+- `dev` versione di sviluppo, utilizzata dal bot dev
+- `dev-telepot` da cancellare\mergiare
