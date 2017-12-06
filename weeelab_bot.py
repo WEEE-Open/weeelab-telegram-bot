@@ -495,6 +495,8 @@ After authorization /start the bot.')
                 # Store a new user name and id in a file on owncloud server,
                 # encoding in utf.8
                 try:
+                    print type(user_bot_contents)
+                    print type(last_user_name)
                     user_bot_contents = user_bot_contents \
                                     + " '" + last_user_name \
                                     + "' : " \
