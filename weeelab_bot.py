@@ -496,10 +496,10 @@ After authorization /start the bot.')
                 # encoding in utf.8
                 try:
                     user_bot_contents = user_bot_contents \
-                                    + "' " + str(last_user_name) \
+                                    + " '" + str(last_user_name) \
                                     + "' : " \
-                                    + "' " + str(last_user_id) \
-                                    + "' , "
+                                    + "'" + str(last_user_id) \
+                                    + "' ,"
                     oc.put_file_contents(
                         USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
