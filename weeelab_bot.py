@@ -500,7 +500,7 @@ After authorization /start the bot.')
                                     + '\'' + ': ' + '\'' + str(last_user_id).decode('utf-8') \
                                     + '\'' + str(', ').decode('utf-8')
                     oc.put_file_contents(
-                        USER_BOT_PATH, user_bot_contents.encode('utf-8'))
+                        USER_BOT_PATH, user_bot_contents)
                 # write on the file the new data
                 except (AttributeError, UnicodeEncodeError):
                     print "ERROR user.txt"
