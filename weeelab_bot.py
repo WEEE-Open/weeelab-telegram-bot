@@ -496,7 +496,7 @@ After authorization /start the bot.')
                 # encoding in utf.8
                 try:
                     user_bot_contents = user_bot_contents \
-                                    + " '" + last_user_name.decode('utf-8') \
+                                    + " '" + last_user_name \
                                     + "' : " \
                                     + "'" + str(last_user_id) \
                                     + "',"
