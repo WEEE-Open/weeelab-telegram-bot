@@ -499,7 +499,7 @@ After authorization /start the bot.')
                     print type(last_user_name)
                     user_bot_contents = user_bot_contents \
                                     + " '" + last_user_name \
-                                    + "' : " \
+                                    + "': " \
                                     + "'" + str(last_user_id) \
                                     + "',"
                     oc.put_file_contents(
