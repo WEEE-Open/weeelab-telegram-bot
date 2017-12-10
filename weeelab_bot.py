@@ -84,16 +84,10 @@ class BotHandler:
 
 
 def name_ext(username):
-    """ function created by @Hyd3L, complete code at
-        https://github.com/WEEE-Open/weeelab
-        Return <Name Surname> from <name.surname> string
     """
-    first_name = username.split('.')[0].capitalize()
-    # Extract the name and capitalize it
-    last_name = username.split('.')[1].capitalize()
-    # Extract the surname and capitalize it
-    return first_name + " " + last_name
-    # Return a string of type "Name Surname"
+    Return <Name Surname> from <name.surname> string
+    """
+    return username.replace('.', ' ').title()
 
 
 # set variable used in main function
