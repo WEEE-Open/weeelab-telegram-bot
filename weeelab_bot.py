@@ -107,16 +107,10 @@ class Weeelab:
         self.last_update = -1
 
     def name_ext(self, username):
-        """ function created by @Hyd3L, complete code at
-            https://github.com/WEEE-Open/weeelab
-            Return <Name Surname> from <name.surname> string
         """
-        # Extract the name and capitalize it
-        first_name = username.split('.')[0].capitalize()
-        # Extract the surname and capitalize it
-        last_name = username.split('.')[1].capitalize()
-        # Return a string of type "Name Surname"
-        return first_name + " " + last_name
+        Return <Name Surname> from <name.surname> string
+        """
+        return username.replace('.', ' ').title()
 
     def oc_conn(self):
         """ function to connect with owncloud
