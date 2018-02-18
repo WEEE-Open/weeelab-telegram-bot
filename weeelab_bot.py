@@ -376,7 +376,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                             elif command[1] == "all":
                                 month_log = 1
                                 year_log = 2017
-                            for log_datayear in range(year_log, year+1):
+                            for log_datayear in range(year_log, year+(year-year_log+1)):
                                 for log_datamonth in range(month_log, month+1):
                                     try:
                                         if log_datamonth == month and log_datayear == year:
