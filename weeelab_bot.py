@@ -292,7 +292,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         log_print = log_print + '{}\n'.format(
                                             log_line_to_print)
                                         lines_message += 1
-                            if lines_message > 20:
+                            if lines_message > 15:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
                                 weee_bot.send_message(last_chat_id,
