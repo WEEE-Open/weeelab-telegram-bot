@@ -258,7 +258,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 and lines_to_print > int(command[1]):
                             # check if the command is "/log [number]"
                             lines_to_print = int(command[1])
-                            toprint = range(lines_to_print, 0))
+                            toprint = range(lines_to_print, 0)
                         for lines_printed in toprint:
                             if not ("INLAB" in log_lines[lines_printed]):
                                 if log_data == log_lines[lines_printed][1:11]:
