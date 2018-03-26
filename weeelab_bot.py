@@ -257,7 +257,6 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 and lines_to_print > int(command[1]):
                             # check if the command is "/log [number]"
                             lines_to_print = int(command[1])
-                            print "ok"
                             log_lines.reverse()
                         for lines_printed in reversed(range(0, lines_to_print)):
                             if not ("INLAB" in log_lines[lines_printed]):
@@ -293,7 +292,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         log_print = log_print + '{}\n'.format(
                                             log_line_to_print)
                                         lines_message += 1
-                            if lines_message > 25:
+                            if lines_message > 20:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
                                 weee_bot.send_message(last_chat_id,
