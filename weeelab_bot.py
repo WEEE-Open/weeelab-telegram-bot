@@ -225,7 +225,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                                                       + '*'
                                 elif user_inlab == user_complete_name:
                                     user_inlab_list = user_inlab_list + '\n' \
-                                                      + '- ' \
+                                                      + '- ' + \
                                                       user["name"] + \
                                                       user["surname"]
                         if people_inlab == 0:
