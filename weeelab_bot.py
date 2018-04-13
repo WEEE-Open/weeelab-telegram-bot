@@ -178,7 +178,7 @@ def main():
                         level = user["level"]
                         complete_name = \
                             user["name"].lower() + '.' \
-                            + user["surname"].lower().replace(" ", "")
+                            + user["surname"].lower()
                 print last_update['message']  # DEBUG
 
             except KeyError:  # catch the exception if raised
@@ -220,12 +220,14 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                                         (user["level"] == 1 or user["level"] == 2)):
                                     user_inlab_list = user_inlab_list + '\n' \
                                                       + '- *' + \
-                                                      name_ext(user_inlab) \
+                                                      user["name"] + \
+                                                      user["surname"] + \
                                                       + '*'
                                 elif user_inlab == user_complete_name:
                                     user_inlab_list = user_inlab_list + '\n' \
                                                       + '- ' \
-                                                      + name_ext(user_inlab)
+                                                      user["name"] + \
+                                                      user["surname"]
                         if people_inlab == 0:
                             # Check if there aren't people in lab
                             # Send a message to the user that makes
