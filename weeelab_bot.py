@@ -219,15 +219,15 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                                 if (user_inlab == user_complete_name and
                                         (user["level"] == 1 or user["level"] == 2)):
                                     user_inlab_list = user_inlab_list + '\n' \
-                                                      + '- *' + \
-                                                      user["name"] + \
-                                                      user["surname"] + \
+                                                      + '- *' \
+                                                      + user["name"] \
+                                                      + user["surname"] \
                                                       + '*'
                                 elif user_inlab == user_complete_name:
                                     user_inlab_list = user_inlab_list + '\n' \
-                                                      + '- ' + \
-                                                      user["name"] + \
-                                                      user["surname"]
+                                                      + '- ' \
+                                                      + user["name"] \
+                                                      + user["surname"]
                         if people_inlab == 0:
                             # Check if there aren't people in lab
                             # Send a message to the user that makes
