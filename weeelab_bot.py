@@ -178,7 +178,7 @@ def main():
                         level = user["level"]
                         complete_name = \
                             user["name"].lower() + '.' \
-                            + user["surname"].lower()
+                            + user["surname"].lower().replace(" ", "")
                 print last_update['message']  # DEBUG
 
             except KeyError:  # catch the exception if raised
@@ -215,7 +215,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                             for user in user_file["users"]:
                                 user_complete_name = user["name"].lower() \
                                                      + '.' \
-                                                     + user["surname"].lower()
+                                                     + user["surname"].lower().replace(" ", "")
                                 if (user_inlab == user_complete_name and
                                         (user["level"] == 1 or user["level"] == 2)):
                                     user_inlab_list = user_inlab_list + '\n' \
@@ -432,7 +432,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                     for user in user_file["users"]:
                                         user_complete_name = \
                                             user["name"].lower() + '.' \
-                                            + user["surname"].lower()
+                                            + user["surname"].lower().replace(" ", "")
                                         if rival[0] == user_complete_name:
                                             position += 1
                                             # update the counter of position on top list
