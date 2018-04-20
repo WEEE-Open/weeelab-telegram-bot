@@ -292,14 +292,13 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                              + '_' + log_lines[lines_printed][
                                             log_lines[lines_printed]
                                             .rfind(">")
-                                            + 1:len(log_lines[lines_printed])]
+                                            + 1:len(log_lines[lines_printed])].replace('_', '\_')
                                         log_print = log_print + '{}\n'.format(
                                             log_line_to_print)
                                         lines_message += 1
                             if lines_message > 15:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
-                                log_print = log_print.replace('_', '\_')
                                 weee_bot.send_message(last_chat_id,
                                                           '{}\n'.format(
                                                               log_print))
@@ -307,7 +306,6 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 log_print = ''
                         log_print = log_print.replace('[', '\[')
                         log_print = log_print.replace('::', ':')
-                        log_print = log_print.replace('_', '\_')
                         weee_bot.send_message(
                             last_chat_id, '{}\nLatest log update: *{}*'
                                 .format(log_print, log_update_data))
