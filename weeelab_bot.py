@@ -299,6 +299,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                             if lines_message > 15:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
+                                log_print = log_print.replace('_', '\_')
                                 weee_bot.send_message(last_chat_id,
                                                           '{}\n'.format(
                                                               log_print))
@@ -306,6 +307,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 log_print = ''
                         log_print = log_print.replace('[', '\[')
                         log_print = log_print.replace('::', ':')
+                        log_print = log_print.replace('_', '\_')
                         weee_bot.send_message(
                             last_chat_id, '{}\nLatest log update: *{}*'
                                 .format(log_print, log_update_data))
