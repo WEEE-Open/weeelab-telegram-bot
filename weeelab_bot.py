@@ -138,6 +138,8 @@ def main():
         last_chat_id = None
         last_user_id = None
         last_user_name = None
+        last_user_username = None
+        last_user_surname = None
         message_type = None
 
         if last_update != -1:
@@ -169,7 +171,14 @@ def main():
                 last_user_name = last_update['message']['from']['first_name']
                 # store the name of the user read from the message
                 # in a variable
-                # last_user_username = last_update['message']['from']['username']
+                if 'username' in last_update['message']['from']:
+                    last_user_username = last_update['message']['from']['username']
+                else:
+                    last_user_username = "no username"
+                if 'surname' in last_update['message']['from']:
+                    last_user_surname = last_update['message']['from']['surname']
+                else:
+                    last_user_surname = ""
                 # store the username of the user read from the message
                 # in a variable
                 message_type = last_update['message']['chat']['type']
@@ -480,9 +489,9 @@ in lab by the user\n"
                 else:
                     weee_bot.send_message(
                         last_chat_id, 'Sorry! You are not allowed to use this \
-bot \nPlease contact us [mail] (weeeopen@polito.it), visit our \
-[WeeeOpen FB page] (https://www.facebook.com/weeeopenpolito/) and the site \
-[WeeeOpen](http://weeeopen.polito.it/) for more info. \n\
+bot \nPlease contact us via [email](weeeopen@polito.it), visit our \
+[WEEE Open FB page](https://www.facebook.com/weeeopenpolito/) or the site \
+[WEEE Open](http://weeeopen.polito.it/) for more info. \n\
 After authorization /start the bot.')
             else:
                 print "group"  # DEBUG
@@ -496,11 +505,7 @@ After authorization /start the bot.')
                 # Store a new user name and id in a file on owncloud server,
                 # encoding in utf.8
                 try:
-                    user_bot_contents = user_bot_contents \
-                                    + " '" + last_user_name \
-                                    + "': " \
-                                    + "'" + str(last_user_id) \
-                                    + "',"
+                    user_bot_contents = user_bot_contents + "{} {} ({}): {}\n".format(last_user_name, last_user_surname, last_user_username, last_user_id)
                     oc.put_file_contents(
                         USER_BOT_PATH, user_bot_contents.encode('utf-8'))
                 # write on the file the new data
