@@ -213,7 +213,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                                          47:log_lines[index].rfind(">")]
                             # extract the name of the person
                             for user in user_file["users"]:
-                                user_complete_name = user["name"].lower() \
+                                user_complete_name = user["name"].lower().replace(" ", "") \
                                                      + '.' \
                                                      + user["surname"].lower().replace(" ", "")
                                 if (user_inlab == user_complete_name and
