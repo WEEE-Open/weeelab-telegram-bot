@@ -288,7 +288,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 res_item = requests.get(TARALLO +
                                                         '/v1/items/' + item +
                                                         '/history?length=' +
-                                                        limit, cookies=cookie)
+                                                        str(limit), cookies=cookie)
                                 if res_item.status_code != 200:
                                     weee_bot.send_message(
                                         last_chat_id, 'Sorry item not found.')
