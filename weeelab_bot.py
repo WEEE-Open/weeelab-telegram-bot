@@ -92,7 +92,8 @@ def name_ext(username):
 
 # set variable used in main function
 weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
-
+# add a global variable that shouldn't be global but it is
+tarallo_cookie = None
 
 def main():
     """main function of the bot"""
@@ -272,23 +273,11 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     limit = 1
                                 elif limit > 50:
                                     limit = 50
-                            body = dict()
-                            body['username'] = BOT_USER
-                            body['password'] = BOT_PSW
-                            headers = {"Content-Type": "application/json"}
-                            res = requests.post(TARALLO + '/v1/session',
-                                                data=json.dumps(body),
-                                                headers=headers)
-                            if res.status_code != 200:
-                                weee_bot.send_message(
-                                    last_chat_id,
-                                    'Sorry error during authentication.')
-                            else:
-                                cookie = res.cookies
+                            if tarallo_login():
                                 res_item = requests.get(TARALLO +
                                                         '/v1/items/' + item +
                                                         '/history?length=' +
-                                                        str(limit), cookies=cookie)
+                                                        str(limit), cookies=tarallo_cookie)
                                 if res_item.status_code != 200:
                                     weee_bot.send_message(
                                         last_chat_id, 'Sorry item not found.')
@@ -316,6 +305,10 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     if lines_message != 0:
                                         weee_bot.send_message(last_chat_id, msg)
                                         lines_message = 0
+                            else:
+                                weee_bot.send_message(
+                                    last_chat_id,
+                                    'Sorry, cannot authenticate with T.A.R.A.L.L.O.')
                                         
 
                     # Show log file
@@ -576,6 +569,41 @@ After authorization /start the bot.')
                 except (AttributeError, UnicodeEncodeError):
                     print "ERROR user.txt"
                     pass
+
+
+def tarallo_login():
+    """
+    Try to log in, if necessary.
+
+    :rtype: bool
+    :return: Logged in or not?
+    """
+    whoami = requests.get(TARALLO + '/v1/session')
+
+    if whoami.status_code == 200:
+        return True
+
+    # Attempting to log in would be pointless, there's some other error
+    if whoami.status_code != 403:
+        return False
+
+    body = dict()
+    body['username'] = BOT_USER
+    body['password'] = BOT_PSW
+    headers = {"Content-Type": "application/json"}
+    res = requests.post(TARALLO + '/v1/session',
+        data=json.dumps(body),
+        headers=headers)
+
+    if res.status_code == 200:
+        global tarallo_cookie
+        try:
+            tarallo_cookie = res.cookies
+        except:
+            return False
+        return True
+    else:
+        return False
 
 
 # call the main() until a keyboard interrupt is called
