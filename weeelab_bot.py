@@ -304,7 +304,9 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     print result
                                     print limit
                                     print result[1]
+                                    print range(0, limit-1)
                                     for index in range(0, limit-1):
+                                        print index
                                         h_user = result[index]['user']
                                         h_change = change.get(result[index]['change'])
                                         h_location = result[index]['other']
