@@ -288,7 +288,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime(
                                             '%d-%m-%Y %H:%M:%S')
                                         if change == 'M':
-                                            msg += '📍 Moved to *{}*\n'.format(h_location)
+                                            msg += '➡️ Moved to *{}*\n'.format(h_location)
                                         elif change == 'U':
                                             msg += '🛠️ Updated features\n'
                                         elif change == 'C':
