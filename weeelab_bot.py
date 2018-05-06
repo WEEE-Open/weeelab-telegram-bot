@@ -265,7 +265,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         else:
                             item = command[1]
                             if len(command) < 3:
-                                limit = 3
+                                limit = 4
                             else:
                                 limit = int(command[2])
                                 if limit < 1:
@@ -280,10 +280,10 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 if res_item.status_code == 200:
                                     result = res_item.json()['data']
                                     msg = '*History of item {}*\n'.format(item)
-                                    entries = 1
+                                    entries = 0
                                     for index in range(0, len(result)):
                                         change = result[index]['change']
-                                        h_user = result[index]['user'].replace('_', '\_').replace('*', '\*')
+                                        h_user = result[index]['user'].replace('_', '\_')
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime(
                                             '%d-%m-%Y %H:%M:%S')
@@ -300,7 +300,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         else:
                                             msg += 'Unknown change {}'.format(change)
                                         entries += 1
-                                        msg += '{} by _{}_\n\n'.format(h_time, h_user)
+                                        msg += '{} by {}\n\n'.format(h_time, h_user)
                                         if entries >= 4:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
