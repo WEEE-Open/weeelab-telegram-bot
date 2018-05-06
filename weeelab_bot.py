@@ -302,6 +302,8 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     msg = '*History of item {}*\n'.format(item)
                                     lines_message = 1
                                     print result
+                                    print limit
+                                    print resilt[1]
                                     for index in range(0, limit-1):
                                         h_user = result[index]['user']
                                         h_change = change.get(result[index]['change'])
