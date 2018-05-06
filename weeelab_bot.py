@@ -265,7 +265,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         else:
                             item = command[1]
                             if len(command) < 3:
-                                limit = 4
+                                limit = 3
                             else:
                                 limit = int(command[2])
                                 if limit < 1:
@@ -280,7 +280,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 if res_item.status_code == 200:
                                     result = res_item.json()['data']
                                     msg = '*History of item {}*\n'.format(item)
-                                    entries = 0
+                                    entries = 1
                                     for index in range(0, len(result)):
                                         change = result[index]['change']
                                         h_user = result[index]['user'].replace('_', '\_').replace('*', '\*')
