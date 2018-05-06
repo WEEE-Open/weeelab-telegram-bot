@@ -265,7 +265,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         else:
                             item = command[1]
                             if len(command) < 3:
-                                limit = 5
+                                limit = 4
                             else:
                                 limit = int(command[2])
                                 if limit < 1:
@@ -301,7 +301,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                             msg += 'Unknown change {}'.format(change)
                                         entries += 1
                                         msg += '{} by _{}_\n\n'.format(h_time, h_user)
-                                        if entries >= 5:
+                                        if entries >= 4:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
                                             entries = 0
@@ -310,7 +310,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         entries = 0
                                 elif res_item.status_code == 404:
                                     weee_bot.send_message(
-                                        last_chat_id, 'Ttem {} not found.'.format(item))
+                                        last_chat_id, 'Item {} not found.'.format(item))
                                 else:
                                     weee_bot.send_message(
                                         last_chat_id, 'Sorry, an error has occurred (HTTP status from T.A.R.A.L.L.O.: {}).'.format(str(res_item.status_code)))
