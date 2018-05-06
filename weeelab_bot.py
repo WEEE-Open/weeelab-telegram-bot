@@ -309,7 +309,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         msg = msg + \
                                               '_Change type:_   {}\n_New location:_   {}\n_User:_   {}\n_Time changed:_   {}\n\n'.format(h_change, h_location, h_user, h_time)
                                         lines_message += 4
-                                        if lines_message >= 16:
+                                        if lines_message >= 12:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
                                             lines_message = 0
