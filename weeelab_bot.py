@@ -255,10 +255,10 @@ lab right now:\n{}'.format(user_inlab_list))
                                                   'There are {} students in \
 lab right now:\n{}'.format(people_inlab, user_inlab_list))
 
-                    """ Command "/blame", Show the history of an item
+                    """ Command "/history", Show the history of an item
                     """
-                    if command[0] == "/blame" or \
-                                    command[0] == "/blame@weeelab_bot":
+                    if command[0] == "/history" or \
+                                    command[0] == "/history@weeelab_bot":
                         if len(command) < 2:
                             weee_bot.send_message(
                                 last_chat_id, 'Sorry insert the item to search')
