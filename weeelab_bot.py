@@ -295,14 +295,14 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 else:
                                     result = res_item.json()['data']
                                     if limit > len(result):
-                                        limit = len(result)-1
+                                        limit = len(result)
                                     change = {'C': 'Create', 'R': 'Rename',
                                               'U': 'Update', 'D': 'Delete',
                                               'M': 'Move'}
                                     msg = '*History of item {}*\n'.format(item)
                                     lines_message = 1
-                                    for index in range(0, limit+1):
-                                        h_user = result[index]['user']
+                                    for index in range(0, limit):
+                                        h_user = result[index]['user'].replace('_', '\_')
                                         h_change = change.get(result[index]['change'])
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
