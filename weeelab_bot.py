@@ -284,7 +284,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     last_chat_id,
                                     'Sorry error during authentication.')
                             else:
-                                cookie = res.cookies['session']
+                                cookie = res.cookies
                                 res_item = requests.get(TARALLO +
                                                         '/v1/items/' + item +
                                                         '/history?length=' +
