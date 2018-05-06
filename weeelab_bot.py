@@ -302,6 +302,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         entries += 1
                                         msg += '{} by {}\n\n'.format(h_time, h_user)
                                         if entries >= 4:
+                                            print msg
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
                                             entries = 0
