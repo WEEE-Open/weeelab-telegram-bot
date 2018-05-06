@@ -288,15 +288,15 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime(
                                             '%d-%m-%Y %H:%M:%S')
                                         if change == 'M':
-                                            msg += 'Moved to *{}*\n'.format(h_location)
+                                            msg += '📍 Moved to *{}*\n'.format(h_location)
                                         elif change == 'U':
-                                            msg += 'Updated features\n'
+                                            msg += '🛠️ Updated features\n'
                                         elif change == 'C':
-                                            msg += 'Created\n'
+                                            msg += '📋 Created\n'
                                         elif change == 'R':
-                                            msg += 'Renamed from *{}*\n'.format(h_location)
+                                            msg += '✏️ Renamed from *{}*\n'.format(h_location)
                                         elif change == 'D':
-                                            msg += 'Deleted\n'
+                                            msg += '❌ Deleted\n'
                                         else:
                                             msg += 'Unknown change {}'.format(change)
                                         entries += 1
