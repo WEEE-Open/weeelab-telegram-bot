@@ -265,7 +265,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         else:
                             item = command[1]
                             if len(command) < 3:
-                                limit = 3
+                                limit = 5
                             else:
                                 limit = int(command[2])
                                 if limit < 1:
@@ -280,7 +280,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 if res_item.status_code == 200:
                                     result = res_item.json()['data']
                                     msg = '*History of item {}*\n'.format(item)
-                                    entries = 1
+                                    entries = 0
                                     for index in range(0, len(result)):
                                         change = result[index]['change']
                                         h_user = result[index]['user'].replace('_', '\_').replace('*', '\*')
@@ -299,9 +299,9 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                             msg += 'Deleted\n'
                                         else:
                                             msg += 'Unknown change {}'.format(change)
-                                        entries += 1
+                                        entries += 5
                                         msg += '{} by _{}_\n\n'.format(h_time, h_user)
-                                        if entries >= 3:
+                                        if entries >= 4:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
                                             entries = 0
