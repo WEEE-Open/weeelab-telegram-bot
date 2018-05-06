@@ -265,7 +265,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                         else:
                             item = command[1]
                             if len(command) < 3:
-                                limit = 20
+                                limit = 3
                             else:
                                 limit = int(command[2])
                                 if limit < 1:
@@ -307,7 +307,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
                                         msg = msg + \
-                                              '_Change type:_   {}\n_New location:_   {}\n_User:_   {}\n_Time changed:_   {}\n\n'.format(h_change, h_location, h_user, h_time)
+                                              '_Change type:_ {}\n_New location:_ {}\n_User:_ {}\n_Time changed:_ {}\n\n'.format(h_change, h_location, h_user, h_time)
                                         lines_message += 4
                                         if lines_message >= 12:
                                             weee_bot.send_message(last_chat_id, msg)
