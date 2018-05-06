@@ -295,27 +295,21 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                 else:
                                     result = res_item.json()['data']
                                     if limit > len(result):
-                                        limit = len(result)
+                                        limit = len(result)-1
                                     change = {'C': 'Create', 'R': 'Rename',
                                               'U': 'Update', 'D': 'Delete',
                                               'M': 'Move'}
                                     msg = '*History of item {}*\n'.format(item)
                                     lines_message = 1
-                                    print result
-                                    print limit
-                                    print result[1]
-                                    print range(0, limit-1)
-                                    for index in range(0, limit):
-                                        print index
+                                    for index in range(0, limit+1):
                                         h_user = result[index]['user']
                                         h_change = change.get(result[index]['change'])
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
                                         msg = msg + \
                                               '_Change type:_   {}\n_New location:_   {}\n_User:_   {}\n_Time changed:_   {}\n\n'.format(h_change, h_location, h_user, h_time)
-                                        print "new_message:\n" + msg
                                         lines_message += 4
-                                        if lines_message >= 8:
+                                        if lines_message >= 16:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
                                             lines_message = 0
