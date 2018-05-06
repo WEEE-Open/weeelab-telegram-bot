@@ -301,9 +301,9 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                               'M': 'Move'}
                                     msg = '*History of item {}*\n'.format(item)
                                     lines_message = 1
+                                    print result
                                     for index in range(0, limit-1):
                                         h_user = result[index]['user']
-                                        print result[index]['change']
                                         h_change = change.get(result[index]['change'])
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
