@@ -294,6 +294,8 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         last_chat_id, 'Sorry item not found.')
                                 else:
                                     result = res_item.json()['data']
+                                    if limit > len(result):
+                                        limit = len(result)
                                     change = {'C': 'Create', 'R': 'Rename',
                                               'U': 'Update', 'D': 'Delete',
                                               'M': 'Move'}
@@ -305,7 +307,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
                                         msg = msg + \
-                                              '_Last change_: {}\n_New location_: \t {}\n_Last user_: \t {}\n_Last time changed_: \t {}\n\n'.format(h_change, h_location, h_user, h_time)
+                                              '_Last change:_   {}\n_New location:_   {}\n_Last user:_   {}\n_Last time changed:_   {}\n\n'.format(h_change, h_location, h_user, h_time)
                                         lines_message += 4
                                         if lines_message >= 16:
                                             weee_bot.send_message(last_chat_id, msg)
