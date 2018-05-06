@@ -299,9 +299,9 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                             msg += 'Deleted\n'
                                         else:
                                             msg += 'Unknown change {}'.format(change)
-                                        entries += 5
+                                        entries += 1
                                         msg += '{} by _{}_\n\n'.format(h_time, h_user)
-                                        if entries >= 4:
+                                        if entries >= 5:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
                                             entries = 0
