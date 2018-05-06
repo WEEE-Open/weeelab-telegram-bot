@@ -201,7 +201,7 @@ def main():
                     """ Command "/start", Start info
                     """
                     if command[0] == "/start" or \
-                                    command[0] == "/start@weeelabdev_bot":
+                                    command[0] == "/start@weeelab_bot":
                         # Check if the message is the command /start
                         weee_bot.send_message(last_chat_id, '\
 *WEEE-Open Telegram bot*.\nThe goal of this bot is to obtain information \
@@ -214,7 +214,7 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                         people in lab.
                     """
                     if command[0] == "/inlab" or \
-                                    command[0] == "/inlab@weeelabdev_bot":
+                                    command[0] == "/inlab@weeelab_bot":
                         # Check if the message is the command /inlab
                         people_inlab = log_file.count("INLAB")
                         for index in lines_inlab:
@@ -253,6 +253,68 @@ lab right now:\n{}'.format(user_inlab_list))
                             weee_bot.send_message(last_chat_id,
                                                   'There are {} students in \
 lab right now:\n{}'.format(people_inlab, user_inlab_list))
+
+                    """ Command "/blame", Show the history of an item
+                    """
+                    if command[0] == "/blame" or \
+                                    command[0] == "/blame@weeelab_bot":
+                        # Check if the message is the command /inlab
+                        if len(command) < 2:
+                            weee_bot.send_message(
+                                last_chat_id, 'Sorry insert the item to search')
+                        else:
+                            item = command[1]
+                            if len(command) < 3:
+                                limit = 20
+                            else:
+                                limit = int(command[2])
+                                if limit < 1:
+                                    limit = 1
+                                elif limit > 50:
+                                    limit = 50
+                            body = dict()
+                            body['username'] = BOT_USER
+                            body['password'] = BOT_PSW
+                            headers = {"Content-Type": "application/json"}
+                            res = requests.post(TARALLO + '/v1/session',
+                                                data=json.dumps(body),
+                                                headers=headers)
+                            if res.status_code != 200:
+                                weee_bot.send_message(
+                                    last_chat_id,
+                                    'Sorry error during authentication.')
+                            else:
+                                cookie = res.cookies['session']
+                                res_item = requests.get(TARALLO +
+                                                        '/v1/items/' + item +
+                                                        '/history?length=' +
+                                                        limit, cookies=cookie)
+                                if res_item.status_code != 200:
+                                    weee_bot.send_message(
+                                        last_chat_id, 'Sorry item not found.')
+                                else:
+                                    result = res_item.json()['data']
+                                    change = {'C': 'Create', 'R': 'Rename',
+                                              'U': 'Update', 'D': 'Delete',
+                                              'M': 'Move'}
+                                    msg = 'History of item {}\n'.format(item)
+                                    lines_message = 1
+                                    for index in range(0, limit-1):
+                                        h_user = result[index]['user']
+                                        h_change = change[result[index]['change']]
+                                        h_location = result[index]['other']
+                                        h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
+                                        msg = msg + \
+                                              'Last change: {}\nNew location: {}\nLast user: {}\nLast time changed: {}\n'.format(h_change, h_location, h_user, h_time)
+                                        lines_message += 4
+                                        if lines_message >= 16:
+                                            weee_bot.send_message(last_chat_id, msg)
+                                            msg = ''
+                                            lines_message = 0
+                                    if lines_message != 0:
+                                        weee_bot.send_message(last_chat_id, msg)
+                                        lines_message = 0
+                                        
 
                     # Show log file
                     """ Command "/log", Show the complete LOG_PATH file 
@@ -427,9 +489,9 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                     except owncloud.owncloud.HTTPResponseError:
                                         print "Error open file."
                             # sort the dict by value in descendet order
-                            sorted_top_list = sorted(users_hours.items(),
-                                                    key=operator.itemgetter(
-                                                    1), reverse=True)
+                            sorted_top_list = sorted(
+                                users_hours.items(),
+                                key=operator.itemgetter(1), reverse=True)
                             # print sorted_top_list
                             for rival in sorted_top_list:
                                 # print the elements sorted

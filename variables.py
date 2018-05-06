@@ -13,3 +13,6 @@ LOG_BASE = os.environ.get('LOG_BASE')
 # path of the file to store bot users in OwnCloud (/folder/file.txt)
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')  # Telegram token for the bot API
+BOT_USER = os.environ.get('BOT_USER') # user tarallo
+BOT_PSW = os.environ.get('BOT_PSW') # password tarallo
+TARALLO = os.environ.get('TARALLO')  # Url tarallo
