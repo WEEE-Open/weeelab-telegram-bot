@@ -115,7 +115,7 @@ def main():
         # found_user_inlab = False
         # Variables for /log command
         lines_to_print = 0  # default lines number to send
-        lines_message = 0  # number of lines of the message
+        entries = 0  # number of lines of the message
         log_data = ''
         log_print = ''
         # Variables for /stat command
@@ -259,7 +259,6 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                     """
                     if command[0] == "/blame" or \
                                     command[0] == "/blame@weeelab_bot":
-                        # Check if the message is the command /inlab
                         if len(command) < 2:
                             weee_bot.send_message(
                                 last_chat_id, 'Sorry insert the item to search')
@@ -278,33 +277,43 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                                         '/v1/items/' + item +
                                                         '/history?length=' +
                                                         str(limit), cookies=tarallo_cookie)
-                                if res_item.status_code != 200:
-                                    weee_bot.send_message(
-                                        last_chat_id, 'Sorry item not found.')
-                                else:
+                                if res_item.status_code == 200:
                                     result = res_item.json()['data']
-                                    if limit > len(result):
-                                        limit = len(result)
-                                    change = {'C': 'Create', 'R': 'Rename',
-                                              'U': 'Update', 'D': 'Delete',
-                                              'M': 'Move'}
                                     msg = '*History of item {}*\n'.format(item)
-                                    lines_message = 1
-                                    for index in range(0, limit):
-                                        h_user = result[index]['user'].replace('_', '\_')
-                                        h_change = change.get(result[index]['change'])
+                                    entries = 1
+                                    for index in range(0, len(result)):
+                                        change = result[index]['change']
+                                        h_user = result[index]['user'].replace('_', '\_').replace('*', '\*')
                                         h_location = result[index]['other']
-                                        h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
-                                        msg = msg + \
-                                              '_Change type:_ {}\n_New location:_ {}\n_User:_ {}\n_Time changed:_ {}\n\n'.format(h_change, h_location, h_user, h_time)
-                                        lines_message += 4
-                                        if lines_message >= 12:
+                                        h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime(
+                                            '%d-%m-%Y %H:%M:%S')
+                                        if change == 'M':
+                                            msg += 'Moved to *{}*\n'.format(h_location)
+                                        elif change == 'U':
+                                            msg += 'Updated features\n'
+                                        elif change == 'C':
+                                            msg += 'Created\n'
+                                        elif change == 'R':
+                                            msg += 'Renamed from *{}*\n'.format(h_location)
+                                        elif change == 'D':
+                                            msg += 'Deleted\n'
+                                        else:
+                                            msg += 'Unknown change {}'.format(change)
+                                        entries += 1
+                                        msg += '{} by _{}_\n\n'.format(h_time, h_user)
+                                        if entries >= 3:
                                             weee_bot.send_message(last_chat_id, msg)
                                             msg = ''
-                                            lines_message = 0
-                                    if lines_message != 0:
+                                            entries = 0
+                                    if entries != 0:
                                         weee_bot.send_message(last_chat_id, msg)
-                                        lines_message = 0
+                                        entries = 0
+                                elif res_item.status_code == 404:
+                                    weee_bot.send_message(
+                                        last_chat_id, 'Ttem {} not found.'.format(item))
+                                else:
+                                    weee_bot.send_message(
+                                        last_chat_id, 'Sorry, an error has occurred (HTTP status from T.A.R.A.L.L.O.: {}).'.format(str(res_item.status_code)))
                             else:
                                 weee_bot.send_message(
                                     last_chat_id,
@@ -343,9 +352,9 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                                     log_lines[lines_printed])]
                                     log_print = log_print + '{}\n'.format(
                                         log_line_to_print)
-                                    lines_message += 1
+                                    entries += 1
                                 else:
-                                    if len(command) == 1 and lines_message > 0:
+                                    if len(command) == 1 and entries > 0:
                                         lines_printed = len(log_lines)
                                     else:
                                         log_data = log_lines[
@@ -361,14 +370,14 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                             + 1:len(log_lines[lines_printed])].replace('_', '\_')
                                         log_print = log_print + '{}\n'.format(
                                             log_line_to_print)
-                                        lines_message += 1
-                            if lines_message > 15:
+                                        entries += 1
+                            if entries > 15:
                                 log_print = log_print.replace('[', '\[')
                                 log_print = log_print.replace('::', ':')
                                 weee_bot.send_message(last_chat_id,
                                                           '{}\n'.format(
                                                               log_print))
-                                lines_message = 0
+                                entries = 0
                                 log_print = ''
                         log_print = log_print.replace('[', '\[')
                         log_print = log_print.replace('::', ':')
