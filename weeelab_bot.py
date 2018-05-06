@@ -297,7 +297,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     change = {'C': 'Create', 'R': 'Rename',
                                               'U': 'Update', 'D': 'Delete',
                                               'M': 'Move'}
-                                    msg = 'History of item {}\n'.format(item)
+                                    msg = '*History of item {}*\n'.format(item)
                                     lines_message = 1
                                     for index in range(0, limit-1):
                                         h_user = result[index]['user']
@@ -305,7 +305,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
                                         msg = msg + \
-                                              'Last change: {}\nNew location: {}\nLast user: {}\nLast time changed: {}\n'.format(h_change, h_location, h_user, h_time)
+                                              '_Last change_: {}\n_New location_: \t {}\n_Last user_: \t {}\n_Last time changed_: \t {}\n\n'.format(h_change, h_location, h_user, h_time)
                                         lines_message += 4
                                         if lines_message >= 16:
                                             weee_bot.send_message(last_chat_id, msg)
