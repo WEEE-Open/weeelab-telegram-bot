@@ -556,7 +556,7 @@ After authorization /start the bot.')
                     pass
 
 
-def get_name_and_surname(user_entry: map):
+def get_name_and_surname(user_entry):
     if "name" in user_entry and "surname" in user_entry:
         return "{} {}".format(user_entry["name"], user_entry["surname"])
 
