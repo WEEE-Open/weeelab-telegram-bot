@@ -399,7 +399,7 @@ to see stat of other users! \nOnly admin can!')
                                     # extract the hours and minute
                                     # from char 39 until ], splitted by :
                                     (user_hours, user_minutes) = \
-                                        lines[39:lines.rfind("]")].split(':')
+                                        lines[39:lines.lfind("]")].split(':')
                                     # convert hours and minutes in datetime
                                     partial_hours = datetime.timedelta(
                                         hours=int(user_hours),
@@ -416,8 +416,8 @@ given user. Have you typed it correctly? (name.surname)')
                                 total_minutes = int(
                                     (total_second % 3600) // 60)
                                 weee_bot.send_message(
-                                    last_chat_id, 'Stat for the user {}\n\
-HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(asd, total_hours, total_minutes,
+                                    last_chat_id, 'Stat for {}\n\
+HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(user_name, total_hours, total_minutes,
                                         log_update_data))
                                 # write the stat of the user
 
