@@ -83,13 +83,6 @@ class BotHandler:
             # in case of error return an error code used in the main function
 
 
-def name_ext(username):
-    """
-    Return <Name Surname> from <name.surname> string
-    """
-    return username.replace('.', ' ').title()
-
-
 # set variable used in main function
 weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
 # add a global variable that shouldn't be global but it is
@@ -186,9 +179,8 @@ def main():
                 for user in user_file["users"]:
                     if user["telegramID"] == str(last_user_id):
                         level = user["level"]
-                        complete_name = \
-                            user["name"].lower() + '.' \
-                            + user["surname"].lower()
+                        complete_name = user["username"]
+                        name_and_surname = get_name_and_surname(user)
                 print last_update['message']  # DEBUG
 
             except KeyError:  # catch the exception if raised
@@ -223,23 +215,11 @@ an OwnCloud shared folder. \nFor a list of the commands allowed send /help.',)
                                          47:log_lines[index].rfind(">")]
                             # extract the name of the person
                             for user in user_file["users"]:
-                                user_complete_name = user["name"].lower().replace(" ", "") \
-                                                     + '.' \
-                                                     + user["surname"].lower().replace(" ", "")
-                                if (user_inlab == user_complete_name and
-                                        (user["level"] == 1 or user["level"] == 2)):
-                                    user_inlab_list = user_inlab_list + '\n' \
-                                                      + '- *' \
-                                                      + user["name"] \
-                                                      + " " \
-                                                      + user["surname"] \
-                                                      + '*'
-                                elif user_inlab == user_complete_name:
-                                    user_inlab_list = user_inlab_list + '\n' \
-                                                      + '- ' \
-                                                      + user["name"] \
-                                                      + " " \
-                                                      + user["surname"]
+                                if user_inlab == user["username"]:
+                                    if user["level"] == 1 or user["level"] == 2:
+                                        user_inlab_list = user_inlab_list + '\n- *{}*'.format(get_name_and_surname(user))
+                                    else:
+                                        user_inlab_list = user_inlab_list + '\n- {}'.format(get_name_and_surname(user))
                         if people_inlab == 0:
                             # Check if there aren't people in lab
                             # Send a message to the user that makes
@@ -437,8 +417,7 @@ given user. Have you typed it correctly? (name.surname)')
                                     (total_second % 3600) // 60)
                                 weee_bot.send_message(
                                     last_chat_id, 'Stat for the user {}\n\
-HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
-                                        user_name), total_hours, total_minutes,
+HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(asd, total_hours, total_minutes,
                                         log_update_data))
                                 # write the stat of the user
 
@@ -509,10 +488,7 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                             (total_second % 3600) // 60)
                                     # add the user to the top list
                                     for user in user_file["users"]:
-                                        user_complete_name = \
-                                            user["name"].lower() + '.' \
-                                            + user["surname"].lower().replace(" ", "")
-                                        if rival[0] == user_complete_name:
+                                        if rival[0] == user["username"]:
                                             position += 1
                                             # update the counter of position on top list
                                             if user["level"] == 1 or \
@@ -520,12 +496,12 @@ HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(name_ext(
                                                 top_list_print = \
                                                         top_list_print \
                                                         + '{}) \[{:02d}:{:02d}] \
-*{}*\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
+*{}*\n'.format(position, total_hours, total_minutes, get_name_and_surname(user))
                                             else:
                                                 top_list_print = \
                                                     top_list_print \
                                                     + '{}) \[{:02d}:{:02d}] \
-{}\n'.format(position, total_hours, total_minutes, name_ext(rival[0]))
+{}\n'.format(position, total_hours, total_minutes, get_name_and_surname(user))
                             weee_bot.send_message(
                                     last_chat_id,
                                     '{}\nLatest log update: \n*{}*'.format(
@@ -578,6 +554,16 @@ After authorization /start the bot.')
                 except (AttributeError, UnicodeEncodeError):
                     print "ERROR user.txt"
                     pass
+
+
+def get_name_and_surname(user_entry: map):
+    if "name" in user_entry and "surname" in user_entry:
+        return "{} {}".format(user_entry["name"], user_entry["surname"])
+
+    if "name" in user_entry:
+        return user_entry["name"]
+
+    return user_entry["username"]
 
 
 def tarallo_login():
