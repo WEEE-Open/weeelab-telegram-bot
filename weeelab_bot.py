@@ -399,7 +399,7 @@ to see stat of other users! \nOnly admin can!')
                                     # extract the hours and minute
                                     # from char 39 until ], splitted by :
                                     (user_hours, user_minutes) = \
-                                        lines[39:lines.lfind("]")].split(':')
+                                        lines[39:lines.find("]")].split(':')
                                     # convert hours and minutes in datetime
                                     partial_hours = datetime.timedelta(
                                         hours=int(user_hours),
