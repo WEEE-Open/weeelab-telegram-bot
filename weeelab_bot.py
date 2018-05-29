@@ -263,7 +263,7 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     entries = 0
                                     for index in range(0, len(result)):
                                         change = result[index]['change']
-                                        h_user = result[index]['user'].replace('_', '\_')
+                                        h_user = escape_all(result[index]['user'])
                                         h_location = result[index]['other']
                                         h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime(
                                             '%d-%m-%Y %H:%M:%S')
@@ -339,15 +339,16 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
                                     else:
                                         log_data = log_lines[
                                                 lines_printed][1:11]
+                                        # TODO: this is unreadable
                                         log_line_to_print = \
                                              '\n*' + log_data + '*\n_' \
                                             + log_lines[lines_printed][
                                             47:log_lines[
                                             lines_printed].rfind(">")] \
-                                             + '_' + log_lines[lines_printed][
+                                             + '_' + escape_all(log_lines[lines_printed][
                                             log_lines[lines_printed]
                                             .rfind(">")
-                                            + 1:len(log_lines[lines_printed])].replace('_', '\_')
+                                            + 1:len(log_lines[lines_printed])])
                                         log_print = log_print + '{}\n'.format(
                                             log_line_to_print)
                                         entries += 1
@@ -599,6 +600,8 @@ def tarallo_login():
     else:
         return False
 
+def escape_all(string):
+    return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
