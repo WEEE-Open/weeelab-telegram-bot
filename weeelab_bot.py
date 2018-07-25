@@ -421,6 +421,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 							# TODO: this also downloads the file for each request. Maybe don't do it every time.
 							logs.get_log()
+							logs.log.reverse()
 							today_only = False
 
 							if len(command) > 1 and command[1].isdigit():
