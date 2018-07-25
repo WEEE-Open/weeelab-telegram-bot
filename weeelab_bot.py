@@ -78,16 +78,61 @@ class BotHandler:
 			return -1
 
 
-# set variable used in main function
-weee_bot = BotHandler(TOKEN_BOT)  # create the bot object
-# add a global variable that shouldn't be global but it is
-tarallo_cookie = None
+class TaralloSession:
+	def __init__(self):
+		self.cookie = None
+		self.last_status = None
+
+	def login(self, username, password):
+		"""
+		Try to log in, if necessary.
+
+		:rtype: bool
+		:return: Logged in or not?
+		"""
+
+		if self.cookie is not None:
+			whoami = requests.get(TARALLO + '/v1/session', cookies=self.cookie)
+			self.last_status = whoami.status_code
+
+			if whoami.status_code == 200:
+				return True
+
+			# Attempting to log in would be pointless, there's some other error
+			if whoami.status_code != 403:
+				return False
+
+		body = dict()
+		body['username'] = username
+		body['password'] = password
+		headers = {"Content-Type": "application/json"}
+		res = requests.post(TARALLO + '/v1/session', data=json.dumps(body), headers=headers)
+		self.last_status = res.status_code
+
+		if res.status_code == 200:
+			self.cookie = res.cookies
+			return True
+		else:
+			return False
+
+	def get_history(self, item, limit):
+		history = requests.get(TARALLO + '/v1/items/{}/history?length={}'.format(item, str(limit)), cookies=self.cookie)
+		self.last_status = history.status_code
+
+		if history.status_code == 200:
+			return history.json()['data']
+		elif history.status_code == 404:
+			return None
+		else:
+			raise RuntimeError("Unexpected return code")
 
 
 def main():
 	"""main function of the bot"""
 	global new_offset
 	oc = owncloud.Client(OC_URL)
+	weee_bot = BotHandler(TOKEN_BOT)
+	tarallo = TaralloSession()
 	# create an object of type Client to connect to the cloud url
 	oc.login(OC_USER, OC_PWD)
 	# connect to the cloud using authorize username and password
@@ -247,51 +292,47 @@ lab right now:\n{}'.format(people_inlab, user_inlab_list))
 									limit = 1
 								elif limit > 50:
 									limit = 50
-							if tarallo_login():
-								res_item = requests.get(TARALLO + '/v1/items/{}/history?length={}'.format(item, str(limit)), cookies=tarallo_cookie)
-								if res_item.status_code == 200:
-									result = res_item.json()['data']
-									msg = '*History of item {}*\n'.format(item)
-									entries = 0
-									for index in range(0, len(result)):
-										change = result[index]['change']
-										h_user = escape_all(result[index]['user'])
-										h_location = result[index]['other']
-										h_time = datetime.datetime.fromtimestamp(int(result[index]['time'])).strftime(
-											'%d-%m-%Y %H:%M:%S')
-										if change == 'M':
-											msg += '➡️ Moved to *{}*\n'.format(h_location)
-										elif change == 'U':
-											msg += '🛠️ Updated features\n'
-										elif change == 'C':
-											msg += '📋 Created\n'
-										elif change == 'R':
-											msg += '✏️ Renamed from *{}*\n'.format(h_location)
-										elif change == 'D':
-											msg += '❌ Deleted\n'
-										else:
-											msg += 'Unknown change {}'.format(change)
-										entries += 1
-										msg += '{} by {}\n\n'.format(h_time, h_user)
-										if entries >= 4:
-											weee_bot.send_message(last_chat_id, msg)
-											msg = ''
-											entries = 0
-									if entries != 0:
-										weee_bot.send_message(last_chat_id, msg)
+							try:
+								if tarallo.login(BOT_USER, BOT_PSW):
+									history = tarallo.get_history(item, limit)
+									if history is None:
+										weee_bot.send_message(
+											last_chat_id, 'Item {} not found.'.format(item))
+									else:
+										msg = '*History of item {}*\n'.format(item)
 										entries = 0
-								elif res_item.status_code == 404:
-									weee_bot.send_message(
-										last_chat_id, 'Item {} not found.'.format(item))
+										for index in range(0, len(history)):
+											change = history[index]['change']
+											h_user = escape_all(history[index]['user'])
+											h_location = history[index]['other']
+											h_time = datetime.datetime.fromtimestamp(int(history[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
+											if change == 'M':
+												msg += '➡️ Moved to *{}*\n'.format(h_location)
+											elif change == 'U':
+												msg += '🛠️ Updated features\n'
+											elif change == 'C':
+												msg += '📋 Created\n'
+											elif change == 'R':
+												msg += '✏️ Renamed from *{}*\n'.format(h_location)
+											elif change == 'D':
+												msg += '❌ Deleted\n'
+											else:
+												msg += 'Unknown change {}'.format(change)
+											entries += 1
+											msg += '{} by {}\n\n'.format(h_time, h_user)
+											if entries >= 4:
+												weee_bot.send_message(last_chat_id, msg)
+												msg = ''
+												entries = 0
+										if entries != 0:
+											weee_bot.send_message(last_chat_id, msg)
+											entries = 0
 								else:
-									weee_bot.send_message(
-										last_chat_id,
-										'Sorry, an error has occurred (HTTP status from T.A.R.A.L.L.O.: {}).'.format(
-											str(res_item.status_code)))
-							else:
-								weee_bot.send_message(
-									last_chat_id,
-									'Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+									weee_bot.send_message(last_chat_id, 'Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+							except RuntimeError:
+									weee_bot\
+										.send_message(last_chat_id,	'Sorry, an error has occurred (HTTP status: {}).'
+										.format(str(tarallo.last_status)))
 
 					# Show log file
 					""" Command "/log", Show the complete LOG_PATH file 
@@ -541,39 +582,6 @@ def get_name_and_surname(user_entry):
 		return user_entry["name"]
 
 	return user_entry["username"]
-
-
-def tarallo_login():
-	"""
-	Try to log in, if necessary.
-
-	:rtype: bool
-	:return: Logged in or not?
-	"""
-	whoami = requests.get(TARALLO + '/v1/session')
-
-	if whoami.status_code == 200:
-		return True
-
-	# Attempting to log in would be pointless, there's some other error
-	if whoami.status_code != 403:
-		return False
-
-	body = dict()
-	body['username'] = BOT_USER
-	body['password'] = BOT_PSW
-	headers = {"Content-Type": "application/json"}
-	res = requests.post(TARALLO + '/v1/session', data=json.dumps(body), headers=headers)
-
-	if res.status_code == 200:
-		global tarallo_cookie
-		try:
-			tarallo_cookie = res.cookies
-		except:
-			return False
-		return True
-	else:
-		return False
 
 
 def escape_all(string):
