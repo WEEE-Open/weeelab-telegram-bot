@@ -421,12 +421,15 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 							# TODO: this also downloads the file for each request. Maybe don't do it every time.
 							logs.get_log()
+							today_only = False
 
 							if len(command) > 1 and command[1].isdigit():
 								# Command is "/log [number]"
 								lines_to_print = int(command[1])
 							else:
-								lines_to_print = 5
+								# Won't actually print 50 lines, it stops as soon as it finds another day
+								today_only = True
+								lines_to_print = 50
 
 							# Can't print lines that don't exist
 							lines_to_print = min(len(logs.log), lines_to_print)
@@ -437,6 +440,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								day = '<b>' + line.day() + '</b>\n'
 
 								if day not in days:
+									if today_only and len(days) >= 1:
+										break
 									days[day] = []
 
 								entry = logs.search_user_username(line.username)
@@ -606,7 +611,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							command[0] == "/help@weeelab_bot":
 							help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
-/log <i>n</i> - Show log of the day\n\
+/log - Show log of the day\n\
 /log <i>n</i> - Show last <i>n</i> log lines\n\
 /log <i>all</i> - Show entire log from this month\n\
 /stat - Show hours you've spent in lab\n\
