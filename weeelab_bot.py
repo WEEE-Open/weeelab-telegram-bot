@@ -24,7 +24,6 @@ import requests  # library to make requests to telegram server
 import owncloud
 import datetime  # library to handle time
 from datetime import timedelta
-import operator
 import json
 import re
 import traceback
@@ -61,7 +60,12 @@ class BotHandler:
 
 		On success, the sent Message is returned.
 		"""
-		params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode, 'disable_web_page_preview': disable_web_page_preview, 'reply_markup': reply_markup}
+		params = {
+			'chat_id': chat_id,
+			'text': text,
+			'parse_mode': parse_mode,
+			'disable_web_page_preview': disable_web_page_preview,
+			'reply_markup': reply_markup}
 		return requests.post(self.api_url + 'sendMessage', params)
 
 	def get_last_update(self):
@@ -251,6 +255,7 @@ class WeeelabLine:
 	def day(self):
 		return self.time_in.split("")[0]
 
+
 def escape_all(string):
 	return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
 
@@ -322,8 +327,6 @@ def main():
 						# prepend something to every message...
 						msg = ''
 						level = user["level"]
-						complete_name = user["username"]
-						name_and_surname = logs.get_name_and_surname(user)
 
 						if command[0] == "/start" or \
 							command[0] == "/start@weeelab_bot":
@@ -341,7 +344,6 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							inlab = logs.get_log().get_inlab()
 
 							if len(inlab) == 0:
-								#weee_bot.send_message(last_chat_id, 'Nobody is in lab right now.')
 								msg = 'Nobody is in lab right now.'
 							elif len(inlab) == 1:
 								msg = 'There is one student in lab right now:\n'
@@ -406,13 +408,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 													entries = 0
 											if entries != 0:
 												weee_bot.send_message(last_chat_id, msg)
-												entries = 0
 									else:
 										weee_bot.send_message(last_chat_id, 'Sorry, cannot authenticate with T.A.R.A.L.L.O.')
 								except RuntimeError:
-										weee_bot\
-											.send_message(last_chat_id,	'Sorry, an error has occurred (HTTP status: {}).'
-											.format(str(tarallo.last_status)))
+									fail_msg = 'Sorry, an error has occurred (HTTP status: {}).'.format(str(tarallo.last_status))
+									weee_bot.send_message(last_chat_id,	fail_msg)
 
 						# --- LOG --------------------------------------------------------------------------------------
 						elif command[0] == "/log" or \
@@ -435,7 +435,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								line = logs.log[i]
 								day = '<b>' + line.day() + '</b>\n'
 
-								if not day in days:
+								if day not in days:
 									days[day] = []
 
 								entry = logs.search_user_username(line.username)
