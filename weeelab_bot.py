@@ -142,7 +142,7 @@ class WeeelabLogs:
 
 	def get_log(self):
 		self.log = []
-		log_file = self.oc.get_file_contents(LOG_PATH)
+		log_file = self.oc.get_file_contents(LOG_PATH).decode('utf-8')
 		log_lines = log_file.splitlines()
 
 		for line in log_lines:
@@ -155,14 +155,14 @@ class WeeelabLogs:
 
 		# store the data of the last update of the log file,
 		# the data is in UTC so we add 2 for eu/it local time
-		# TODO: this is sometimes +1 because ora legale, use a timezone library and computer correct time
+		# TODO: this is sometimes +1 because ora legale, use a timezone library and compute correct time
 		self.log_last_update = self.oc.file_info(LOG_PATH).get_last_modified() + timedelta(hours=2)
 
 		return self
 
 	def get_users(self):
 		self.users = None
-		self.users = json.loads(self.oc.get_file_contents(USER_PATH))["users"]
+		self.users = json.loads(self.oc.get_file_contents(USER_PATH).decode('utf-8'))["users"]
 
 		return self
 
