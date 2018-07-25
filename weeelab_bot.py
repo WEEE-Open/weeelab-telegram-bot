@@ -427,10 +427,12 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							if len(command) > 1 and command[1].isdigit():
 								# Command is "/log [number]"
 								lines_to_print = int(command[1])
-							else:
+							elif len(command) == 1:
 								# Won't actually print 50 lines, it stops as soon as it finds another day
 								today_only = True
 								lines_to_print = 50
+							else:
+								lines_to_print = 500
 
 							# Can't print lines that don't exist
 							lines_to_print = min(len(logs.log), lines_to_print)
