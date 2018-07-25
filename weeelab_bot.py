@@ -421,7 +421,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 							# TODO: this also downloads the file for each request. Maybe don't do it every time.
 							logs.get_log()
-							# logs.log.reverse()
+							logs.log.reverse()
 							today_only = False
 
 							if len(command) > 1 and command[1].isdigit():
@@ -430,16 +430,16 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							elif len(command) == 1:
 								# Won't actually print 50 lines, it stops as soon as it finds another day
 								today_only = True
-								lines_to_print = 50
+								lines_to_print = len(logs.log)
 							else:
-								lines_to_print = 500
+								lines_to_print = len(logs.log)
 
 							# Can't print lines that don't exist
 							lines_to_print = min(len(logs.log), lines_to_print)
 
 							days = {}
 							# TODO: this range stuff can probably be simplified
-							for i in reversed(list(range(0, lines_to_print))):
+							for i in list(range(0, lines_to_print)):
 								line = logs.log[i]
 								day = '<b>' + line.day() + '</b>\n'
 
