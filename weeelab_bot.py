@@ -435,8 +435,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							lines_to_print = min(len(logs.log), lines_to_print)
 
 							days = {}
+							# TODO: this range stuff can probably be simplified
 							for i in reversed(list(range(0, lines_to_print))):
-								line = logs.log[i]
+								line = logs.log[len(logs.log) - 1 - i]
 								day = '<b>' + line.day() + '</b>\n'
 
 								if day not in days:
