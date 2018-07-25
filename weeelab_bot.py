@@ -254,7 +254,7 @@ class WeeelabLine:
 			self.inlab = False
 
 	def day(self):
-		return self.time_in.split("")[0]
+		return self.time_in.split(" ")[0]
 
 
 def escape_all(string):
@@ -390,13 +390,13 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 												h_location = history[index]['other']
 												h_time = datetime.datetime.fromtimestamp(int(history[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
 												if change == 'M':
-													msg += '➡️ Moved to *{}*\n'.format(h_location)
+													msg += '➡️ Moved to <b>{}</b>\n'.format(h_location)
 												elif change == 'U':
 													msg += '🛠️ Updated features\n'
 												elif change == 'C':
 													msg += '📋 Created\n'
 												elif change == 'R':
-													msg += '✏️ Renamed from *{}*\n'.format(h_location)
+													msg += '✏️ Renamed from <b>{}</b>\n'.format(h_location)
 												elif change == 'D':
 													msg += '❌ Deleted\n'
 												else:
@@ -609,7 +609,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 /log <i>n</i> - Show log of the day\n\
 /log <i>n</i> - Show last <i>n</i> log lines\n\
 /log <i>all</i> - Show entire log from this month\n\
-/stat - Show hours you've spent in lab\n"
+/stat - Show hours you've spent in lab\n\
+/history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
+/history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
 							if level == 1:
 								help_message += "\n<b>only for admin user</b>\n\
 /stat <i>name.surname</i> - Show hours spent in lab by this user\n\
