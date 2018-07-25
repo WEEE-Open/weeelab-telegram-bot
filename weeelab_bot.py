@@ -50,7 +50,8 @@ class BotHandler:
 		# print offset
 		print((requests.get(self.api_url + 'getUpdates', params).json()))
 		result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
-		self.offset = result[-1]['update_id'] + 1
+		if len(result) > 0:
+			self.offset = result[-1]['update_id'] + 1
 
 		return result
 
@@ -236,10 +237,10 @@ class WeeelabLogs:
 
 
 class WeeelabLine:
-	re = re.compile('\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)')
+	regex = re.compile('\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)')
 
 	def __init__(self, line: str):
-		res = re.match(self.re, line)
+		res = self.regex.match(line)
 		self.time_in = res.group(1)
 		self.time_out = res.group(2)
 		self.duration = res.group(3)
