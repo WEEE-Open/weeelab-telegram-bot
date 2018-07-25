@@ -4,9 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-requests = "*"
+pyocclient = ">=0.4"
+requests = ">=2.14.2"
 
 [dev-packages]
 
 [requires]
 python_version = "3.6"
+
+[scripts]
+bot = "python weeelab_bot.py"

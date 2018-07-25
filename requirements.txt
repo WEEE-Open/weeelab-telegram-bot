@@ -1,9 +1,2 @@
-appdirs==1.4.3
-DateTime==4.2
-packaging==16.8
-pyocclient==0.4
-pyparsing==2.2.0
-pytz==2017.2
-requests==2.14.2
-six==1.10.0
-zope.interface==4.4.1
+pyocclient>=0.4
+requests>=2.14.2

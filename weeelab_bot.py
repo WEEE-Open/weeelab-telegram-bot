@@ -20,14 +20,12 @@ NOTE: The print commands are only for debug.
 # Modules
 from variables import *  # internal library with the environment variables
 import requests  # library to make requests to telegram server
-# library to make requests to OwnCloud server, more details on
-#  https://github.com/owncloud/pyocclient
 # noinspection PyUnresolvedReferences
 import owncloud
 import datetime  # library to handle time
 from datetime import timedelta
-import operator  # library to handle dictionary
-import json  # library for evaluation of json file
+import operator
+import json
 
 
 class BotHandler:
