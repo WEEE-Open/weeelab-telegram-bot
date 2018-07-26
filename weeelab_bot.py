@@ -218,6 +218,19 @@ class WeeelabLogs:
 				print("ERROR writing user.txt")
 				pass
 
+	def try_get_name_and_surname(self, username: str):
+		"""
+		Get full name and surname from username, or return provided username if not found
+
+		:param username: Normalized, unique, official username
+		:return: Name and surname, or name only, or username only, or something usable
+		"""
+		entry = self.search_user_username(username)
+		if entry:
+			return self.get_name_and_surname(entry)
+		else:
+			return username
+
 	@staticmethod
 	def get_name_and_surname(user_entry: dict):
 		"""
@@ -352,11 +365,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								msg = 'There are {} students in lab right now:\n'.format(str(len(inlab)))
 
 							for username in inlab:
-								entry = logs.search_user_username(username)
-								if entry is None:
-									msg = msg + '\n- <b>{}</b>'.format(username)
-								else:
-									msg = msg + '\n- <b>{}</b>'.format(logs.get_name_and_surname(entry))
+								msg += '\n- <b>{}</b>'.format(logs.try_get_name_and_surname(username))
 
 							weee_bot.send_message(last_chat_id, msg)
 
@@ -421,47 +430,36 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 							# TODO: this also downloads the file for each request. Maybe don't do it every time.
 							logs.get_log()
-							logs.log.reverse()
-							today_only = False
 
 							if len(command) > 1 and command[1].isdigit():
 								# Command is "/log [number]"
-								lines_to_print = int(command[1])
-							elif len(command) == 1:
-								# Won't actually print 50 lines, it stops as soon as it finds another day
-								today_only = True
-								lines_to_print = len(logs.log)
+								days_to_print = int(command[1])
+							elif len(command) > 1 and command[1] == "all":
+								# This won't work. Will never work. There's a length limit on messages.
+								# Whatever, this variant had been missing for months and nobody even noticed...
+								days_to_print = 31
 							else:
-								lines_to_print = len(logs.log)
-
-							# Can't print lines that don't exist
-							lines_to_print = min(len(logs.log), lines_to_print)
+								days_to_print = 1
 
 							days = {}
-							# TODO: this range stuff can probably be simplified
-							for i in list(range(0, lines_to_print)):
-								line = logs.log[i]
-								day = '<b>' + line.day() + '</b>\n'
-
-								if day not in days:
-									if today_only and len(days) >= 1:
+							# reversed() doesn't create a copy
+							for line in reversed(logs.log):
+								this_day = line.day()
+								if this_day not in days:
+									if len(days) >= days_to_print:
 										break
-									days[day] = []
+									days[this_day] = []
 
-								entry = logs.search_user_username(line.username)
-								if entry:
-									print_name = logs.get_name_and_surname(entry)
-								else:
-									print_name = entry.username
+								print_name = logs.try_get_name_and_surname(line.username)
 
 								if line.inlab:
-									days[day].append('<i>{}</i> is in lab\n'.format(print_name))
+									days[this_day].append('<i>{}</i> is in lab\n'.format(print_name))
 								else:
-									days[day].append('<i>{}</i>: {}\n'.format(print_name, line.text))
+									days[this_day].append('<i>{}</i>: {}\n'.format(print_name, line.text))
 
 							msg = ''
-							for day in days:
-								msg = msg + day + ''.join(days[day]) + '\n'
+							for this_day in days:
+								msg += '<b>{day}</b>\n{rows}\n'.format(day=this_day, rows=''.join(days[this_day]))
 
 							msg = msg + 'Latest log update: <b>{}</b>'.format(logs.log_last_update)
 							weee_bot.send_message(last_chat_id, msg)
@@ -616,7 +614,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
 /log - Show log of the day\n\
-/log <i>n</i> - Show last <i>n</i> log lines\n\
+/log <i>n</i> - Show last <i>n</i> days worth of logs\n\
 /log <i>all</i> - Show entire log from this month\n\
 /stat - Show hours you've spent in lab\n\
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
