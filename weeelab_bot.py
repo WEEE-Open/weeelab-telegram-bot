@@ -3,7 +3,7 @@
 
 """
 WEEELAB_BOT - Telegram bot.
-Author: WeeeOpen Team
+Author: WEEE Open Team
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -14,19 +14,19 @@ Author: WeeeOpen Team
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-NOTE: The print commands are only for debug.
 """
 
 # Modules
 from variables import *  # internal library with the environment variables
-import requests  # library to make requests to telegram server
+import requests  # send HTTP requests to Telegram server
 # noinspection PyUnresolvedReferences
 import owncloud
-import datetime  # library to handle time
+import datetime
 from datetime import timedelta
 import json
-import re
-import traceback
+import re  # "Parse" logs
+import traceback  # Print stack traces in logs
+import random  # Pointless randomization of "Sorry, didn't understand that command" message
 
 
 class BotHandler:
@@ -45,9 +45,7 @@ class BotHandler:
 		""" method to receive incoming updates using long polling
 			[Telegram API -> getUpdates ]
 		"""
-		# try:
 		params = {'offset': self.offset, 'timeout': timeout}
-		# print offset
 		result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
 		if len(result) > 0:
 			self.offset = result[-1]['update_id'] + 1
@@ -352,6 +350,15 @@ def main():
 	tarallo = TaralloSession()
 	logs = WeeelabLogs(oc)
 
+	# Defined here just to avoid initializing the array multiple times.
+	# These are returned when a user sends an unkwnown command.
+	unknown_command_messages = [
+		"Sorry, I didn't understand that",
+		"What? I don't understand :(",
+		"Unknown command",
+		"I don't know that command, but do you know /history? It's pretty cool"
+	]
+
 	while True:
 		# call the function to check if there are new messages
 		last_update = weee_bot.get_last_update()
@@ -360,8 +367,6 @@ def main():
 		hours_sum = datetime.timedelta(hours=0, minutes=0)
 		# Initialize hours sum variable, type datetime
 		# Variables for /top command
-		users_name = []
-		users_hours = {}
 		top_list_print = 'Top User List!\n'
 		position = 0
 		number_top_list = 50
@@ -667,15 +672,15 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 /stat - Show hours you've spent in lab\n\
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
-							if level == 1:
+							if user["level"] == 1:
 								help_message += "\n<b>only for admin user</b>\n\
 /stat <i>name.surname</i> - Show hours spent in lab by this user\n\
 /top - Show a list of top users by hours spent\n"
 							weee_bot.send_message(last_chat_id, help_message)
 						else:
-							weee_bot.send_message(last_chat_id, "What? I don't understand :(\nType /help to see a list of commands")
+							weee_bot\
+								.send_message(last_chat_id, random.choice(unknown_command_messages) + "\n\nType /help for list of commands")
 			except:  # catch the exception if raised
-				message_type = None
 				print("ERROR!")
 				print(traceback.format_exc())
 
