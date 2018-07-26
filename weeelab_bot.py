@@ -180,16 +180,18 @@ class WeeelabLogs:
 		:param max_year:
 		:return:
 		"""
+		year = self.old_logs_year
+		month = self.old_logs_month
+
 		while True:
-			y = self.old_logs_year
-			m = self.old_logs_month + 1
-			if m >= 13:
-				m = 1
-				y = self.old_logs_year + 1
-			if y >= max_year and m >= max_month:
+			month += 1
+			if month >= 13:
+				month = 1
+				year += 1
+			if year >= max_year and month >= max_month:
 				break
 
-			filename = LOG_BASE + "log" + str(y) + str(m).zfill(2) + ".txt"
+			filename = LOG_BASE + "log" + str(year) + str(month).zfill(2) + ".txt"
 			print(f"Downloading {filename}")
 			log_file = self.oc.get_file_contents(filename).decode('utf-8')
 			log_lines = log_file.splitlines()
@@ -197,8 +199,8 @@ class WeeelabLogs:
 			for line in log_lines:
 				self.old_log.append(WeeelabLine(line))
 
-		self.old_logs_month = m
-		self.old_logs_year = y
+		self.old_logs_month = month
+		self.old_logs_year = year
 
 	def get_users(self):
 		self.users = None
