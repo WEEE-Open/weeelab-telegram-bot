@@ -142,8 +142,10 @@ class WeeelabLogs:
 
 		# Logs from past months (no lines from current month)
 		self.old_log = []
-		self.old_logs_month = None
-		self.old_logs_year = None
+		# Logs start from april 2017, these variables represent which log file has been fetched last, so it will start
+		# from the first one that actually exists (april 2017)
+		self.old_logs_month = 3
+		self.old_logs_year = 2017
 
 	def get_log(self):
 		self.log = []
