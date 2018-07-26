@@ -557,9 +557,10 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 								month_mins, total_mins = logs.count_time(target_username)
 
-								msg = f'Stat for {target_username}' \
-									f'\n{month_mins / 60}:{month_mins % 60} this month, <b>{total_mins / 60}:{total_mins % 60}</b> total.' \
-									f'\nLast log update: {logs.log_last_update}'
+								msg = f'Stat for {logs.try_get_name_and_surname(target_username)} (HH:MM):' \
+									f'\n<b>{month_mins // 60}:{month_mins % 60}</b> this month.' \
+									f'\n<b>{total_mins // 60}:{total_mins % 60}</b> total.' \
+									f'\n\nLast log update: {logs.log_last_update}'
 								weee_bot.send_message(last_chat_id, msg)
 
 						# --- TOP --------------------------------------------------------------------------------------
