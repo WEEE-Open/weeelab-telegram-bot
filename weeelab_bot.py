@@ -188,7 +188,7 @@ class WeeelabLogs:
 			if month >= 13:
 				month = 1
 				year += 1
-			if year >= max_year and month >= max_month:
+			if year >= max_year and month > max_month:
 				break
 
 			filename = LOG_BASE + "log" + str(year) + str(month).zfill(2) + ".txt"
