@@ -48,7 +48,6 @@ class BotHandler:
 		# try:
 		params = {'offset': self.offset, 'timeout': timeout}
 		# print offset
-		print((requests.get(self.api_url + 'getUpdates', params).json()))
 		result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
 		if len(result) > 0:
 			self.offset = result[-1]['update_id'] + 1
@@ -190,7 +189,9 @@ class WeeelabLogs:
 			if y >= max_year and m >= max_month:
 				break
 
-			log_file = self.oc.get_file_contents(LOG_BASE + "log" + str(y) + str(m).zfill(2) + ".txt").decode('utf-8')
+			filename = LOG_BASE + "log" + str(y) + str(m).zfill(2) + ".txt"
+			print(f"Downloading {filename}")
+			log_file = self.oc.get_file_contents(filename).decode('utf-8')
 			log_lines = log_file.splitlines()
 
 			for line in log_lines:
