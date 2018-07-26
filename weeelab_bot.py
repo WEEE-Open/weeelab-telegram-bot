@@ -140,17 +140,17 @@ class WeeelabLogs:
 		self.users = None
 		self.oc = oc
 
+		# Logs from past months (no lines from current month)
+		self.old_log = []
+		self.old_logs_month = None
+		self.old_logs_year = None
+
 	def get_log(self):
 		self.log = []
 		log_file = self.oc.get_file_contents(LOG_PATH).decode('utf-8')
 		log_lines = log_file.splitlines()
 
 		for line in log_lines:
-			if len(line) == 0:
-				# TODO: remove this print if it actually prints.
-				# or the "if" if it never prints.
-				print("Empty line in log (probably last line) => this check is actually useful")
-				continue
 			self.log.append(WeeelabLine(line))
 
 		# store the data of the last update of the log file,
@@ -160,11 +160,67 @@ class WeeelabLogs:
 
 		return self
 
+	def get_old_logs(self):
+		today = datetime.date.today()
+		prev_month = today.month - 1
+		if prev_month == 12:
+			prev_year = today.year - 1
+		else:
+			prev_year = today.year
+
+		if self.old_logs_year < prev_year or self.old_logs_month < prev_month:
+			self.update_old_logs(prev_month, prev_year)
+
+	def update_old_logs(self, max_month, max_year):
+		"""
+		Download old logs up to a date. Don't call directly, use get_old_logs.
+
+		:param max_month:
+		:param max_year:
+		:return:
+		"""
+		while True:
+			y = self.old_logs_year
+			m = self.old_logs_month + 1
+			if m >= 13:
+				m = 1
+				y = self.old_logs_year + 1
+			if y >= max_year and m >= max_month:
+				break
+
+			log_file = self.oc.get_file_contents(LOG_BASE + "log" + str(y) + str(m).zfill(2) + ".txt").decode('utf-8')
+			log_lines = log_file.splitlines()
+
+			for line in log_lines:
+				self.old_log.append(WeeelabLine(line))
+
+		self.old_logs_month = m
+		self.old_logs_year = y
+
 	def get_users(self):
 		self.users = None
 		self.users = json.loads(self.oc.get_file_contents(USER_PATH).decode('utf-8'))["users"]
 
 		return self
+
+	def count_time(self, username):
+		minutes_thismonth = 0
+
+		# noinspection PyUnusedLocal
+		line: WeeelabLine
+		for line in self.log:
+			if line.username == username:
+				minutes_thismonth += line.duration_minutes()
+
+		minutes_total = minutes_thismonth
+
+		# noinspection PyUnusedLocal
+		line: WeeelabLine
+		for line in self.old_log:
+			if line.username == username:
+				minutes_total += line.duration_minutes()
+
+		return minutes_thismonth, minutes_total
 
 	def get_inlab(self):
 		# PyCharm, you suggested that, why are you making me remove it?
@@ -269,6 +325,14 @@ class WeeelabLine:
 	def day(self):
 		return self.time_in.split(" ")[0]
 
+	def duration_minutes(self):
+		# TODO: calculate partials (time right now - time in)
+		if self.inlab:
+			return 0
+
+		parts = self.duration.split(':')
+		return int(parts[0]) * 60 + int(parts[1])
+
 
 def escape_all(string):
 	return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
@@ -296,9 +360,6 @@ def main():
 		top_list_print = 'Top User List!\n'
 		position = 0
 		number_top_list = 50
-		today = datetime.date.today()
-		month = today.month
-		year = today.year
 
 		if last_update != -1:
 			try:
@@ -340,7 +401,6 @@ def main():
 						# It's useful to keep around to prevent accidental concatenations and if we ever want to
 						# prepend something to every message...
 						msg = ''
-						level = user["level"]
 
 						if command[0] == "/start" or \
 							command[0] == "/start@weeelab_bot":
@@ -466,54 +526,36 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 						# --- STAT -------------------------------------------------------------------------------------
 						elif command[0] == "/stat" or \
-							command[0] == "/stat@weeelabdev_bot":
-							weee_bot.send_message(last_chat_id, "Yet to be reimplemented :(\n\
-							Also this time will count your hours across every month, not just the last one.")
-	# 						found_user = False
-	# 						# create a control variable used
-	# 						# to check if name.surname is found
-	# 						allowed = False
-	# 						if len(command) == 1:
-	# 							user_name = complete_name
-	# 							# print user_name
-	# 							allowed = True
-	# 						elif (len(command) != 1) and \
-	# 								(level == 1):
-	# 							# Check if the command has option or not
-	# 							user_name = str(command[1])
-	# 							# store the option in a variable
-	# 							allowed = True
-	# 						else:
-	# 							weee_bot.send_message(last_chat_id,
-	# 							                      'Sorry! You are not allowed \
-	# to see stat of other users! \nOnly admin can!')
-	# 						if allowed:
-	# 							for lines in log_lines:
-	# 								if not ("INLAB" in lines) and \
-	# 										(user_name == lines[47:lines.rfind(">")]):
-	# 									found_user = True
-	# 									# extract the hours and minute
-	# 									# from char 39 until ], splitted by :
-	# 									(user_hours, user_minutes) = lines[39:44].split(':')
-	# 									# convert hours and minutes in datetime
-	# 									partial_hours = datetime.timedelta(
-	# 										hours=int(user_hours),
-	# 										minutes=int(user_minutes))
-	# 									hours_sum += partial_hours
-	# 							# sum to the previous hours
-	# 							if not found_user:
-	# 								weee_bot.send_message(last_chat_id,
-	# 								                      'No statistics for the \
-	# given user. Have you typed it correctly? (name.surname)')
-	# 							else:
-	# 								total_second = hours_sum.total_seconds()
-	# 								total_hours = int(total_second // 3600)
-	# 								total_minutes = int(
-	# 									(total_second % 3600) // 60)
-	# 								weee_bot.send_message(
-	# 									last_chat_id, 'Stat for {}\n\
-	# HH:MM = {:02d}:{:02d}\n\nLatest log update:\n*{}*'.format(user_name, total_hours, total_minutes, logs.log_last_update))
-	# 					# write the stat of the user
+							command[0] == "/stat@weeelab_bot":
+
+							if len(command) == 1:
+								# User asking its own /stat
+								target_username = user["username"]
+							elif len(command) > 1 and user["level"] == 1:
+								# User asking somebody else's stats
+								# TODO: allow normal users to do /stat by specifying their own username. Pointless but more consistent.
+								target_username = str(command[1])
+								if logs.search_user_username(target_username) is None:
+									target_username = None
+									weee_bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly?')
+							else:
+								# Asked for somebody else's stats but not an admin
+								target_username = None
+								weee_bot.send_message(last_chat_id, 'Sorry! You are not allowed	to see stat of other users!\nOnly admins can!')
+
+							# Do we know what to search?
+							if target_username is not None:
+								# Downloads them only if needed
+								logs.get_old_logs()
+								# TODO: usual optimizations are possible
+								logs.get_log()
+
+								month_mins, total_mins = logs.count_time(target_username)
+
+								msg = f'Stat for {target_username}' \
+									f'\n{month_mins / 60}:{month_mins % 60} this month, <b>{total_mins / 60}:{total_mins % 60}</b> total.' \
+									f'\nLast log update: {logs.log_last_update}'
+								weee_bot.send_message(last_chat_id, msg)
 
 						# --- TOP --------------------------------------------------------------------------------------
 						elif command[0] == "/top" or \
@@ -578,7 +620,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 	# 									# splitted by :
 	# 									total_second = rival[1].total_seconds()
 	# 									total_hours = int(total_second // 3600)
-	# 									total_minutes = int(
+	# 									total_mins = int(
 	# 										(total_second % 3600) // 60)
 	# 									# add the user to the top list
 	# 									for user in user_file["users"]:
@@ -590,12 +632,12 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 	# 												top_list_print = \
 	# 													top_list_print \
 	# 													+ '{}) \[{:02d}:{:02d}] \
-	# *{}*\n'.format(position, total_hours, total_minutes, get_name_and_surname(user))
+	# *{}*\n'.format(position, total_hours, total_mins, get_name_and_surname(user))
 	# 											else:
 	# 												top_list_print = \
 	# 													top_list_print \
 	# 													+ '{}) \[{:02d}:{:02d}] \
-	# {}\n'.format(position, total_hours, total_minutes, get_name_and_surname(user))
+	# {}\n'.format(position, total_hours, total_mins, get_name_and_surname(user))
 	# 							weee_bot.send_message(
 	# 								last_chat_id,
 	# 								'{}\nLatest log update: \n*{}*'.format(
