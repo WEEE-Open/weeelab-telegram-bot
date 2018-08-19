@@ -219,6 +219,7 @@ class WeeelabLogs:
 				if month == 0:
 					month = 12
 					year -= 1
+				break
 
 		self.old_logs_month = month
 		self.old_logs_year = year
