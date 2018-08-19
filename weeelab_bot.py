@@ -372,6 +372,16 @@ class WeeelabLogs:
 
 		return user_entry["username"]
 
+	@staticmethod
+	def mm_to_hh_mm(minutes):
+		hh = minutes // 60
+		hh = str(hh).zfill(2)
+
+		mm = minutes % 60
+		mm = str(mm).zfill(2)
+
+		return hh, mm
+
 
 class WeeelabLine:
 	regex = re.compile('\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)')
@@ -618,10 +628,12 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								logs.get_log()
 
 								month_mins, total_mins = logs.count_time_user(target_username)
+								month_mins_hh, month_mins_mm = logs.mm_to_hh_mm(month_mins)
+								total_mins_hh, total_mins_mm = logs.mm_to_hh_mm(total_mins)
 
 								msg = f'Stat for {logs.try_get_name_and_surname(target_username)}:' \
-									f'\n<b>{month_mins // 60} h {month_mins % 60} m</b> this month.' \
-									f'\n<b>{total_mins // 60} h {total_mins % 60} m</b> in total.' \
+									f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
+									f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
 									f'\n\nLast log update: {logs.log_last_update}'
 								bot.send_message(last_chat_id, msg)
 
@@ -648,10 +660,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 									n += 1
 									entry = logs.get_entry_from_username(rival)
 									if entry is not None:
+										time_hh, time_mm = logs.mm_to_hh_mm(time)
 										if entry["level"] == 1 or entry["level"] == 2:
-											msg += f'{n}) [{time // 60}:{time % 60}] <b>{logs.try_get_name_and_surname(rival)}</b>\n'
+											msg += f'{n}) [{time_hh}:{time_mm}] <b>{logs.try_get_name_and_surname(rival)}</b>\n'
 										else:
-											msg += f'{n}) [{time // 60}:{time % 60}] {logs.try_get_name_and_surname(rival)}\n'
+											msg += f'{n}) [{time_hh}:{time_mm}] {logs.try_get_name_and_surname(rival)}\n'
 
 								msg += f'\nLast log update: {logs.log_last_update}'
 								bot.send_message(last_chat_id, msg)
