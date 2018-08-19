@@ -4,16 +4,16 @@
 """
 WEEELAB_BOT - Telegram bot.
 Author: WEEE Open Team
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 # Modules
@@ -26,7 +26,6 @@ from datetime import timedelta
 import json
 import re  # "Parse" logs
 import traceback  # Print stack traces in logs
-import random  # Pointless randomization of "Sorry, didn't understand that command" message
 
 
 class BotHandler:
@@ -57,7 +56,7 @@ class BotHandler:
 		[Telegram API -> getUpdates ]
 		"""
 		params = {'offset': self.offset, 'timeout': timeout}
-		result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
+		result = requests.get(self.api_url + 'getUpdates', params).json()['result']	 # return an array of json
 		if len(result) > 0:
 			self.offset = result[-1]['update_id'] + 1
 
@@ -82,7 +81,7 @@ class BotHandler:
 		method to get last message if there is.
 		in case of error return an error code used in the main function
 		"""
-		get_result = self.get_updates()  # recall the function to get updates
+		get_result = self.get_updates()	 # recall the function to get updates
 		if not get_result:
 			return -1
 		elif len(get_result) > 0:  # check if there are new messages
@@ -222,7 +221,13 @@ class WeeelabLogs:
 
 		return self
 
-	def count_time(self, username):
+	def count_time_user(self, username):
+		"""
+		Count time spent in lab for this user
+
+		:param username:
+		:return: Minutes this month and in total
+		"""
 		minutes_thismonth = 0
 
 		# noinspection PyUnusedLocal
@@ -240,6 +245,41 @@ class WeeelabLogs:
 				minutes_total += line.duration_minutes()
 
 		return minutes_thismonth, minutes_total
+
+	def count_time_month(self):
+		"""
+		Count time spent in lab for all users this month
+
+		:return: Dict with username as key, minutes as value
+		"""
+		minutes = {}
+
+		# noinspection PyUnusedLocal
+		line: WeeelabLine
+		for line in self.log:
+			if line.username not in minutes:
+				minutes[line.username] = 0
+			minutes[line.username] += line.duration_minutes()
+
+		return minutes
+
+	def count_time_all(self):
+		"""
+		Count time spent in lab for all users, all times
+
+		:return: Dict with username as key, minutes as value
+		"""
+		# Start from that
+		minutes = self.count_time_month()
+
+		# noinspection PyUnusedLocal
+		line: WeeelabLine
+		for line in self.old_log:
+			if line.username not in minutes:
+				minutes[line.username] = 0
+			minutes[line.username] += line.duration_minutes()
+
+		return minutes
 
 	def get_entries_inlab(self):
 		# PyCharm, you suggested that, why are you making me remove it?
@@ -568,7 +608,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								# TODO: usual optimizations are possible
 								logs.get_log()
 
-								month_mins, total_mins = logs.count_time(target_username)
+								month_mins, total_mins = logs.count_time_user(target_username)
 
 								msg = f'Stat for {logs.try_get_name_and_surname(target_username)}:' \
 									f'\n<b>{month_mins // 60} h {month_mins % 60} m</b> this month.' \
@@ -578,96 +618,36 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 						# --- TOP --------------------------------------------------------------------------------------
 						elif command[0] == "/top" or \
-							command[0] == "/top@weeelabdev_bot":
-							bot.send_message(last_chat_id, "Yet to be reimplemented :(")
-	# 						# Check if the message is the command /top
-	# 						if level == 1:
-	# 							if len(command) == 1:
-	# 								month_log = month
-	# 								month_range = month
-	# 								year_log = year
-	# 							elif command[1] == "all":
-	# 								month_log = 1
-	# 								month_range = 12
-	# 								year_log = 2017
-	# 							for log_datayear in range(year_log, year + 1):
-	# 								for log_datamonth in range(month_log, month_range + 1):
-	# 									try:
-	# 										if log_datamonth == month and log_datayear == year:
-	# 											log_file = oc.get_file_contents(LOG_PATH)
-	# 											log_lines = log_file.splitlines()
-	# 										else:
-	# 											if log_datamonth < 10:
-	# 												datamonth = "0" + str(log_datamonth)
-	# 											else:
-	# 												datamonth = str(log_datamonth)
-	# 											log_file = oc.get_file_contents(
-	# 												LOG_BASE + "log" + str(log_datayear) + datamonth + ".txt")
-	# 											log_lines = log_file.splitlines()
-	# 										for lines in log_lines:
-	# 											if not ("INLAB" in lines):
-	# 												name = lines[47:lines.rfind(">", 47, 80)].encode(
-	# 													'utf-8')
-	# 												(user_hours, user_minutes) = \
-	# 													lines[39:lines.rfind("]", 39, 46)].split(':')
-	# 												partial_hours = datetime.timedelta(
-	# 													hours=int(user_hours),
-	# 													minutes=int(user_minutes))
-	# 												if name in users_name:
-	# 													# check if user was already found
-	# 													users_hours[name] += partial_hours
-	# 												# add to the key with the same name
-	# 												# the value partial_hours
-	# 												else:
-	# 													users_name.append(name)
-	# 													# create a new key with the name
-	# 													users_hours[name] = partial_hours
-	# 										# add the hours to the key
-	# 									except owncloud.owncloud.HTTPResponseError:
-	# 										print()
-	# 										"Error open file."
-	# 							# sort the dict by value in descendet order
-	# 							sorted_top_list = sorted(
-	# 								list(users_hours.items()),
-	# 								key=operator.itemgetter(1), reverse=True)
-	# 							# print sorted_top_list
-	# 							for rival in sorted_top_list:
-	# 								# print the elements sorted
-	# 								if position < number_top_list:
-	# 									# check if the list is completed
-	# 									# extract the hours and minutes from dict,
-	# 									# splitted by :
-	# 									total_second = rival[1].total_seconds()
-	# 									total_hours = int(total_second // 3600)
-	# 									total_mins = int(
-	# 										(total_second % 3600) // 60)
-	# 									# add the user to the top list
-	# 									for user in user_file["users"]:
-	# 										if rival[0] == user["username"]:
-	# 											position += 1
-	# 											# update the counter of position on top list
-	# 											if user["level"] == 1 or \
-	# 												user["level"] == 2:
-	# 												top_list_print = \
-	# 													top_list_print \
-	# 													+ '{}) \[{:02d}:{:02d}] \
-	# *{}*\n'.format(position, total_hours, total_mins, get_name_and_surname(user))
-	# 											else:
-	# 												top_list_print = \
-	# 													top_list_print \
-	# 													+ '{}) \[{:02d}:{:02d}] \
-	# {}\n'.format(position, total_hours, total_mins, get_name_and_surname(user))
-	# 							weee_bot.send_message(
-	# 								last_chat_id,
-	# 								'{}\nLatest log update: \n*{}*'.format(
-	# 									top_list_print, log_update_data))
-	# 						# send the top list to the user
-	# 						else:
-	# 							weee_bot.send_message(
-	# 								last_chat_id,
-	# 								'Sorry! You are not allowed to use this \
-	# function! \nOnly admin can use!')
-						# Show help
+							command[0] == "/top@weeelab_bot":
+							if user["level"] == 1:
+								# Downloads them only if needed
+								logs.get_old_logs()
+								# TODO: usual optimizations are possible
+								logs.get_log()
+
+								if len(command) > 1 and command[1] == "all":
+									msg = 'Top User List!\n'
+									rank = logs.count_time_all()
+								else:
+									msg = 'Top Monthly User List!\n'
+									rank = logs.count_time_month()
+								# sort the dict by value in descending order (and convert dict to list of tuples)
+								rank = sorted(rank.items(), key=lambda x: x[1], reverse=True)
+
+								n = 0
+								for (rival, time) in rank:
+									n += 1
+									entry = logs.get_entry_from_username(rival)
+									if entry is not None:
+										if entry["level"] == 1 or entry["level"] == 2:
+											msg += f'{n}) [{time // 60}:{time % 60}] <b>{logs.try_get_name_and_surname(rival)}</b>\n'
+										else:
+											msg += f'{n}) [{time // 60}:{time % 60}] {logs.try_get_name_and_surname(rival)}\n'
+
+								msg += f'\nLast log update: {logs.log_last_update}'
+								bot.send_message(last_chat_id, msg)
+							else:
+								bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admins can')
 
 						# --- HELP -------------------------------------------------------------------------------------
 						elif command[0] == "/help" or \
@@ -683,7 +663,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							if user["level"] == 1:
 								help_message += "\n<b>only for admin users</b>\n\
 /stat <i>name.surname</i> - Show hours spent in lab by this user\n\
-/top - Show a list of top users by hours spent\n"
+/top - Show a list of top users by hours spent this month\n\
+/top all - Show a list of top users by hours spent\n"
 							bot.send_message(last_chat_id, help_message)
 						else:
 							bot\
