@@ -206,11 +206,19 @@ class WeeelabLogs:
 
 			filename = LOG_BASE + "log" + str(year) + str(month).zfill(2) + ".txt"
 			print(f"Downloading {filename}")
-			log_file = self.oc.get_file_contents(filename).decode('utf-8')
-			log_lines = log_file.splitlines()
+			try:
+				log_file = self.oc.get_file_contents(filename).decode('utf-8')
+				log_lines = log_file.splitlines()
 
-			for line in log_lines:
-				self.old_log.append(WeeelabLine(line))
+				for line in log_lines:
+					self.old_log.append(WeeelabLine(line))
+			except owncloud.owncloud.HTTPResponseError:
+				print(f"Failed downloading {filename}, will try again next time")
+				# Roll back to the previous month, since that's the last we have
+				month -= 1
+				if month == 0:
+					month = 12
+					year -= 1
 
 		self.old_logs_month = month
 		self.old_logs_year = year
