@@ -646,6 +646,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								# TODO: usual optimizations are possible
 								logs.get_log()
 
+								# TODO: add something like "/top 04 2018" that returns top list for April 2018
 								if len(command) > 1 and command[1] == "all":
 									msg = 'Top User List!\n'
 									rank = logs.count_time_all()
@@ -657,9 +658,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 								n = 0
 								for (rival, time) in rank:
-									n += 1
 									entry = logs.get_entry_from_username(rival)
 									if entry is not None:
+										n += 1
 										time_hh, time_mm = logs.mm_to_hh_mm(time)
 										if entry["level"] == 1 or entry["level"] == 2:
 											msg += f'{n}) [{time_hh}:{time_mm}] <b>{logs.try_get_name_and_surname(rival)}</b>\n'
