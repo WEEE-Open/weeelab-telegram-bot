@@ -489,7 +489,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 												else:
 													msg += f'Unknown change {change}'
 												entries += 1
-												msg += '{} by {}\n\n'.format(h_time, h_user)
+												msg += f'{h_time} by {logs.try_get_name_and_surname(h_user)}\n\n'
 												if entries >= 4:
 													bot.send_message(last_chat_id, msg)
 													msg = ''
