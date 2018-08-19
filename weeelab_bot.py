@@ -455,7 +455,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							else:
 								item = command[1]
 								if len(command) < 3:
-									limit = 4
+									limit = 6
 								else:
 									limit = int(command[2])
 									if limit < 1:
@@ -489,8 +489,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 												else:
 													msg += f'Unknown change {change}'
 												entries += 1
-												msg += '{} by {}\n'.format(h_time, logs.try_get_name_and_surname(h_user))
-												if entries >= 5:
+												msg += f'{h_time} by <i>{logs.try_get_name_and_surname(h_user)}</i>\n\n'
+												if entries >= 6:
 													bot.send_message(last_chat_id, msg)
 													msg = ''
 													entries = 0
