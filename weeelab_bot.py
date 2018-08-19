@@ -466,9 +466,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 									if tarallo.login(BOT_USER, BOT_PSW):
 										history = tarallo.get_history(item, limit)
 										if history is None:
-											bot.send_message(last_chat_id, 'Item {} not found.'.format(item))
+											bot.send_message(last_chat_id, f'Item {item} not found.')
 										else:
-											msg = '<b>History of item {}</b>\n'.format(item)
+											msg = f'<b>History of item {item}</b>\n\n'
 											entries = 0
 											for index in range(0, len(history)):
 												change = history[index]['change']
@@ -489,8 +489,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 												else:
 													msg += f'Unknown change {change}'
 												entries += 1
-												msg += f'{h_time} by {logs.try_get_name_and_surname(h_user)}\n\n'
-												if entries >= 4:
+												msg += '{} by {}\n'.format(h_time, logs.try_get_name_and_surname(h_user))
+												if entries >= 5:
 													bot.send_message(last_chat_id, msg)
 													msg = ''
 													entries = 0
