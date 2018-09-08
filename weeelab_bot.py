@@ -127,7 +127,7 @@ class TaralloSession:
 		res = requests.post(TARALLO + '/v1/session', data=json.dumps(body), headers=headers)
 		self.last_status = res.status_code
 
-		if res.status_code == 200:
+		if res.status_code == 204:
 			self.cookie = res.cookies
 			return True
 		else:
