@@ -693,6 +693,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							bot\
 								.send_message(last_chat_id, bot.unknown_command_message + "\n\nType /help for list of commands")
 			except:  # catch the exception if raised
+				print(last_update)
 				print("ERROR!")
 				print(traceback.format_exc())
 
