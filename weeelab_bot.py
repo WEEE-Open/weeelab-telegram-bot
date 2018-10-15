@@ -329,8 +329,6 @@ class WeeelabLogs:
 	def store_new_user(self, tid, name, surname, username):
 		new_users_file = self.oc.get_file_contents(USER_BOT_PATH)
 		new_users = new_users_file.decode('utf-8')
-		print(new_users)
-		print(tid)
 
 		if str(tid) in new_users:
 			return
@@ -338,7 +336,7 @@ class WeeelabLogs:
 			# Store a new user name and id in a file on owncloud server,
 			# encoding in utf.8
 			try:
-				new_users = new_users + "{} {} (@{}): {}\n".format(name, surname, username, id)
+				new_users = new_users + "{} {} (@{}): {}\n".format(name, surname, username, tid)
 				self.oc.put_file_contents(USER_BOT_PATH, new_users.encode('utf-8'))
 			except (AttributeError, UnicodeEncodeError):
 				print("ERROR writing user.txt")
@@ -695,8 +693,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 							bot\
 								.send_message(last_chat_id, bot.unknown_command_message + "\n\nType /help for list of commands")
 			except:  # catch the exception if raised
-				print(last_update)
 				print("ERROR!")
+				print(last_update)
 				print(traceback.format_exc())
 
 
