@@ -462,6 +462,7 @@ def main():
 					# TODO: get_users downloads users.json from the cloud. For performance this could be done only once in a while
 					logs.get_users()
 					user = logs.get_entry_from_tid(last_user_id)
+					print(user)
 
 					if user is None or user["level"] == 0:
 						bot.send_message(
