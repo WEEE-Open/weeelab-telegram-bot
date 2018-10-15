@@ -329,6 +329,8 @@ class WeeelabLogs:
 	def store_new_user(self, tid, name, surname, username):
 		new_users_file = self.oc.get_file_contents(USER_BOT_PATH)
 		new_users = new_users_file.decode('utf-8')
+		print(new_users)
+		print(tid)
 
 		if str(tid) in new_users:
 			return
@@ -462,7 +464,6 @@ def main():
 					# TODO: get_users downloads users.json from the cloud. For performance this could be done only once in a while
 					logs.get_users()
 					user = logs.get_entry_from_tid(last_user_id)
-					print(user)
 
 					if user is None or user["level"] == 0:
 						bot.send_message(
