@@ -641,7 +641,6 @@ After authorization /start the bot again.'.format(last_user_id))
 						# --- INLAB ------------------------------------------------------------------------------------
 						if command[0] == "/inlab" or \
 							command[0] == "/inlab@weeelab_bot":
-
 							handler.inlab()
 
 						# --- HISTORY ----------------------------------------------------------------------------------
@@ -749,9 +748,9 @@ After authorization /start the bot again.'.format(last_user_id))
 						elif command[0] == "/top" or \
 							command[0] == "/top@weeelab_bot":
 							if len(command) > 1:
-								handler.top(user_level, command[1])
+								handler.top(user["level"], command[1])
 							else:
-								handler.top(user_level)
+								handler.top(user["level"])
 
 						# --- HELP -------------------------------------------------------------------------------------
 						elif command[0] == "/help" or \
