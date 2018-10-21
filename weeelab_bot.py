@@ -473,7 +473,7 @@ def main():
 
 					if user is None or user["level"] == 0:
 						bot.send_message(
-							last_chat_id, 'Sorry <b>{}</b> You are not allowed to use this bot \
+							last_chat_id, 'Sorry user id: <b>{}</b>. \nYou are not allowed to use this bot \
 \nPlease contact us via email (weeeopen@polito.it), visit our \
 <a href="https://www.facebook.com/weeeopenpolito/">WEEE Open FB page</a> or the site \
 <a href="http://weeeopen.polito.it/">WEEE Open</a> for more info.\
