@@ -513,6 +513,39 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		msg = msg + 'Latest log update: <b>{}</b>'.format(self.logs.log_last_update)
 		self.send_message(msg)
 
+	def stat(self, username, user_level, cmd_target_user=None):
+		if cmd_target_user is None:
+			# User asking its own /stat
+			target_username = username
+		elif user_level == 1:
+			# User asking somebody else's stats
+			# TODO: allow normal users to do /stat by specifying their own username. Pointless but more consistent.
+			target_username = str(cmd_target_user)
+			if self.logs.get_entry_from_username(target_username) is None:
+				target_username = None
+				self.send_message('No statistics for the given user. Have you typed it correctly?')
+		else:
+			# Asked for somebody else's stats but not an admin
+			target_username = None
+			self.send_message('Sorry! You are not allowed	to see stat of other users!\nOnly admins can!')
+
+		# Do we know what to search?
+		if target_username is not None:
+			# Downloads them only if needed
+			self.logs.get_old_logs()
+			# TODO: usual optimizations are possible
+			self.logs.get_log()
+
+			month_mins, total_mins = self.logs.count_time_user(target_username)
+			month_mins_hh, month_mins_mm = self.logs.mm_to_hh_mm(month_mins)
+			total_mins_hh, total_mins_mm = self.logs.mm_to_hh_mm(total_mins)
+
+			msg = f'Stat for {self.logs.try_get_name_and_surname(target_username)}:' \
+				f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
+				f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
+				f'\n\nLast log update: {self.logs.log_last_update}'
+			self.send_message(msg)
+
 	def top(self, user_level, cmd_filter=None):
 		'''
 		Called with /top <filter>.
@@ -712,37 +745,10 @@ After authorization /start the bot again.'.format(last_user_id))
 						elif command[0] == "/stat" or \
 							command[0] == "/stat@weeelab_bot":
 
-							if len(command) == 1:
-								# User asking its own /stat
-								target_username = user["username"]
-							elif len(command) > 1 and user["level"] == 1:
-								# User asking somebody else's stats
-								# TODO: allow normal users to do /stat by specifying their own username. Pointless but more consistent.
-								target_username = str(command[1])
-								if logs.get_entry_from_username(target_username) is None:
-									target_username = None
-									bot.send_message(last_chat_id, 'No statistics for the given user. Have you typed it correctly?')
+							if len(command) > 1:
+								handler.stat(user["username"], user["level"], command[1])
 							else:
-								# Asked for somebody else's stats but not an admin
-								target_username = None
-								bot.send_message(last_chat_id, 'Sorry! You are not allowed	to see stat of other users!\nOnly admins can!')
-
-							# Do we know what to search?
-							if target_username is not None:
-								# Downloads them only if needed
-								logs.get_old_logs()
-								# TODO: usual optimizations are possible
-								logs.get_log()
-
-								month_mins, total_mins = logs.count_time_user(target_username)
-								month_mins_hh, month_mins_mm = logs.mm_to_hh_mm(month_mins)
-								total_mins_hh, total_mins_mm = logs.mm_to_hh_mm(total_mins)
-
-								msg = f'Stat for {logs.try_get_name_and_surname(target_username)}:' \
-									f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
-									f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
-									f'\n\nLast log update: {logs.log_last_update}'
-								bot.send_message(last_chat_id, msg)
+								handler.stat(user["username"], user["level"])
 
 						# --- TOP --------------------------------------------------------------------------------------
 						elif command[0] == "/top" or \
