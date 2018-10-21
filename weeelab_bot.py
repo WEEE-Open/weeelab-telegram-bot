@@ -423,6 +423,110 @@ class WeeelabLine:
 def escape_all(string):
 	return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
 
+class CommandHandler():
+	'''
+	Aggregates all the possible commands within one class.
+	'''
+
+	def __init__(self, bot, tarallo, logs, last_chat_id):
+		self.bot = bot
+		self.tarallo = tarallo
+		self.logs = logs
+		self.last_chat_id = last_chat_id
+
+	def send_message(self, message):
+		self.bot.send_message(self.last_chat_id, message)
+
+	def start(self):
+		'''
+		Called with /start
+		'''
+
+		self.send_message('\
+*WEEE Open Telegram bot*.\nThe goal of this bot is to obtain information \
+about who is currently in the lab, who has done what, compute some stats and, \
+in general, simplify the life of our members and to avoid waste of paper \
+as well. \nAll data is read from a weeelab log file, which is fetched from \
+an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
+
+	def inlab(self):
+		'''
+		Called with /inlab
+		'''
+
+		inlab = self.logs.get_log().get_entries_inlab()
+
+		if len(inlab) == 0:
+			msg = 'Nobody is in lab right now.'
+		elif len(inlab) == 1:
+			msg = 'There is one student in lab right now:\n'
+		else:
+			msg = 'There are {} students in lab right now:\n'.format(str(len(inlab)))
+
+		for username in inlab:
+			user_id = self.logs.try_get_id(username)
+			if user_id is None:
+				msg += '\n- {})'.format(self.logs.try_get_name_and_surname(username))
+			else:
+				msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, self.logs.try_get_name_and_surname(username))
+
+		self.send_message(msg)
+
+	def top(self, user_level, cmd_filter=None):
+		'''
+		Called with /top <filter>.
+		Currently, the only accepted filter is "all", and besides that,
+		it returns the monthly filter
+		'''
+		if user_level == 1:
+			# Downloads them only if needed
+			self.logs.get_old_logs()
+			# TODO: usual optimizations are possible
+			self.logs.get_log()
+
+			# TODO: add something like "/top 04 2018" that returns top list for April 2018
+			if cmd_filter == "all":
+				msg = 'Top User List!\n'
+				rank = self.logs.count_time_all()
+			else:
+				msg = 'Top Monthly User List!\n'
+				rank = self.logs.count_time_month()
+			# sort the dict by value in descending order (and convert dict to list of tuples)
+			rank = sorted(rank.items(), key=lambda x: x[1], reverse=True)
+
+			n = 0
+			for (rival, time) in rank:
+				entry = self.logs.get_entry_from_username(rival)
+				if entry is not None:
+					n += 1
+					time_hh, time_mm = self.logs.mm_to_hh_mm(time)
+					if entry["level"] == 1 or entry["level"] == 2:
+						msg += f'{n}) [{time_hh}:{time_mm}] <b>{self.logs.try_get_name_and_surname(rival)}</b>\n'
+					else:
+						msg += f'{n}) [{time_hh}:{time_mm}] {self.logs.try_get_name_and_surname(rival)}\n'
+
+			msg += f'\nLast log update: {self.logs.log_last_update}'
+			self.send_message(msg)
+		else:
+			self.send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
+
+	def help(self, user_level):
+		help_message = "Available commands and options:\n\n\
+/inlab - Show the people in lab\n\
+/log - Show log of the day\n\
+/log <i>n</i> - Show last <i>n</i> days worth of logs\n\
+/log <i>all</i> - Show entire log from this month\n\
+/stat - Show hours you've spent in lab\n\
+/history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
+/history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
+
+		if user_level == 1:
+			help_message += "\n<b>only for admin users</b>\n\
+/stat <i>name.surname</i> - Show hours spent in lab by this user\n\
+/top - Show a list of top users by hours spent this month\n\
+/top all - Show a list of top users by hours spent\n"
+		self.send_message(help_message)
+
 
 def main():
 	"""main function of the bot"""
@@ -481,6 +585,9 @@ After authorization /start the bot again.'.format(last_user_id))
 						if user is None:
 							logs.store_new_user(last_user_id, last_user_name, last_user_surname, last_user_username)
 					else:
+						# Instantiate a command handler with the current user information
+						handler = CommandHandler(bot, tarallo, logs, last_chat_id)
+
 						# If this is unused it's alright, evey command sets it without concatenation the first time
 						# It's useful to keep around to prevent accidental concatenations and if we ever want to
 						# prepend something to every message...
@@ -488,34 +595,13 @@ After authorization /start the bot again.'.format(last_user_id))
 
 						if command[0] == "/start" or \
 							command[0] == "/start@weeelab_bot":
-							bot.send_message(last_chat_id, '\
-*WEEE Open Telegram bot*.\nThe goal of this bot is to obtain information \
-about who is currently in the lab, who has done what, compute some stats and, \
-in general, simplify the life of our members and to avoid waste of paper \
-as well. \nAll data is read from a weeelab log file, which is fetched from \
-an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
+							handler.start()
 
 						# --- INLAB ------------------------------------------------------------------------------------
 						if command[0] == "/inlab" or \
 							command[0] == "/inlab@weeelab_bot":
 
-							inlab = logs.get_log().get_entries_inlab()
-
-							if len(inlab) == 0:
-								msg = 'Nobody is in lab right now.'
-							elif len(inlab) == 1:
-								msg = 'There is one student in lab right now:\n'
-							else:
-								msg = 'There are {} students in lab right now:\n'.format(str(len(inlab)))
-
-							for username in inlab:
-								user_id = logs.try_get_id(username)
-								if user_id is None:
-									msg += '\n- {})'.format(logs.try_get_name_and_surname(username))
-								else:
-									msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, logs.try_get_name_and_surname(username))
-
-							bot.send_message(last_chat_id, msg)
+							handler.inlab()
 
 						# --- HISTORY ----------------------------------------------------------------------------------
 						elif command[0] == "/history" or \
@@ -652,55 +738,16 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 						# --- TOP --------------------------------------------------------------------------------------
 						elif command[0] == "/top" or \
 							command[0] == "/top@weeelab_bot":
-							if user["level"] == 1:
-								# Downloads them only if needed
-								logs.get_old_logs()
-								# TODO: usual optimizations are possible
-								logs.get_log()
-
-								# TODO: add something like "/top 04 2018" that returns top list for April 2018
-								if len(command) > 1 and command[1] == "all":
-									msg = 'Top User List!\n'
-									rank = logs.count_time_all()
-								else:
-									msg = 'Top Monthly User List!\n'
-									rank = logs.count_time_month()
-								# sort the dict by value in descending order (and convert dict to list of tuples)
-								rank = sorted(rank.items(), key=lambda x: x[1], reverse=True)
-
-								n = 0
-								for (rival, time) in rank:
-									entry = logs.get_entry_from_username(rival)
-									if entry is not None:
-										n += 1
-										time_hh, time_mm = logs.mm_to_hh_mm(time)
-										if entry["level"] == 1 or entry["level"] == 2:
-											msg += f'{n}) [{time_hh}:{time_mm}] <b>{logs.try_get_name_and_surname(rival)}</b>\n'
-										else:
-											msg += f'{n}) [{time_hh}:{time_mm}] {logs.try_get_name_and_surname(rival)}\n'
-
-								msg += f'\nLast log update: {logs.log_last_update}'
-								bot.send_message(last_chat_id, msg)
+							if len(command) > 1:
+								handler.top(user_level, command[1])
 							else:
-								bot.send_message(last_chat_id, 'Sorry! You are not allowed to use this function! \nOnly admins can')
+								handler.top(user_level)
 
 						# --- HELP -------------------------------------------------------------------------------------
 						elif command[0] == "/help" or \
 							command[0] == "/help@weeelab_bot":
-							help_message = "Available commands and options:\n\n\
-/inlab - Show the people in lab\n\
-/log - Show log of the day\n\
-/log <i>n</i> - Show last <i>n</i> days worth of logs\n\
-/log <i>all</i> - Show entire log from this month\n\
-/stat - Show hours you've spent in lab\n\
-/history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
-/history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
-							if user["level"] == 1:
-								help_message += "\n<b>only for admin users</b>\n\
-/stat <i>name.surname</i> - Show hours spent in lab by this user\n\
-/top - Show a list of top users by hours spent this month\n\
-/top all - Show a list of top users by hours spent\n"
-							bot.send_message(last_chat_id, help_message)
+							handler.help(user["level"])
+
 						else:
 							bot\
 								.send_message(last_chat_id, bot.unknown_command_message + "\n\nType /help for list of commands")
