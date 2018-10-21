@@ -473,7 +473,7 @@ def main():
 
 					if user is None or user["level"] == 0:
 						bot.send_message(
-							last_chat_id, 'Sorry {} You are not allowed to use this bot \
+							last_chat_id, 'Sorry <b>{}</b> You are not allowed to use this bot \
 \nPlease contact us via email (weeeopen@polito.it), visit our \
 <a href="https://www.facebook.com/weeeopenpolito/">WEEE Open FB page</a> or the site \
 <a href="http://weeeopen.polito.it/">WEEE Open</a> for more info.\
@@ -509,7 +509,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								msg = 'There are {} students in lab right now:\n'.format(str(len(inlab)))
 
 							for username in inlab:
-								msg += '\n- <b>{}</b> (<a href="tg://user?id={}">Inline</a>)'.format(logs.try_get_name_and_surname(username), logs.try_get_id(username))
+								msg += '\n- <b>{}</b> (<a href="tg://user?id={}">Message</a>)'.format(logs.try_get_name_and_surname(username), logs.try_get_id(username))
 
 							bot.send_message(last_chat_id, msg)
 
