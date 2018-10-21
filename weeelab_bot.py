@@ -428,7 +428,8 @@ class CommandHandler():
 	Aggregates all the possible commands within one class.
 	'''
 
-	def __init__(self, bot, tarallo, logs, last_chat_id):
+	def __init__(self, user, bot, tarallo, logs, last_chat_id):
+		self.user = user
 		self.bot = bot
 		self.tarallo = tarallo
 		self.logs = logs
@@ -513,11 +514,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		msg = msg + 'Latest log update: <b>{}</b>'.format(self.logs.log_last_update)
 		self.send_message(msg)
 
-	def stat(self, username, user_level, cmd_target_user=None):
+	def stat(self, cmd_target_user=None):
 		if cmd_target_user is None:
 			# User asking its own /stat
-			target_username = username
-		elif user_level == 1:
+			target_username = self.user['username']
+		elif self.user['level'] == 1:
 			# User asking somebody else's stats
 			# TODO: allow normal users to do /stat by specifying their own username. Pointless but more consistent.
 			target_username = str(cmd_target_user)
@@ -595,13 +596,13 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 			fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.last_status)}).'
 			self.send_message(fail_msg)
 
-	def top(self, user_level, cmd_filter=None):
+	def top(self, cmd_filter=None):
 		'''
 		Called with /top <filter>.
 		Currently, the only accepted filter is "all", and besides that,
 		it returns the monthly filter
 		'''
-		if user_level == 1:
+		if self.user['level'] == 1:
 			# Downloads them only if needed
 			self.logs.get_old_logs()
 			# TODO: usual optimizations are possible
@@ -633,7 +634,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		else:
 			self.send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
 
-	def help(self, user_level):
+	def help(self):
 		help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
 /log - Show log of the day\n\
@@ -643,7 +644,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
 
-		if user_level == 1:
+		if self.user['level'] == 1:
 			help_message += "\n<b>only for admin users</b>\n\
 /stat <i>name.surname</i> - Show hours spent in lab by this user\n\
 /top - Show a list of top users by hours spent this month\n\
@@ -709,7 +710,7 @@ After authorization /start the bot again.'.format(last_user_id))
 							logs.store_new_user(last_user_id, last_user_name, last_user_surname, last_user_username)
 					else:
 						# Instantiate a command handler with the current user information
-						handler = CommandHandler(bot, tarallo, logs, last_chat_id)
+						handler = CommandHandler(user, bot, tarallo, logs, last_chat_id)
 
 						if command[0] == "/start" or \
 							command[0] == "/start@weeelab_bot":
@@ -745,22 +746,22 @@ After authorization /start the bot again.'.format(last_user_id))
 							command[0] == "/stat@weeelab_bot":
 
 							if len(command) > 1:
-								handler.stat(user["username"], user["level"], command[1])
+								handler.stat(command[1])
 							else:
-								handler.stat(user["username"], user["level"])
+								handler.stat()
 
 						# --- TOP --------------------------------------------------------------------------------------
 						elif command[0] == "/top" or \
 							command[0] == "/top@weeelab_bot":
 							if len(command) > 1:
-								handler.top(user["level"], command[1])
+								handler.top(command[1])
 							else:
-								handler.top(user["level"])
+								handler.top()
 
 						# --- HELP -------------------------------------------------------------------------------------
 						elif command[0] == "/help" or \
 							command[0] == "/help@weeelab_bot":
-							handler.help(user["level"])
+							handler.help()
 
 						else:
 							bot\
