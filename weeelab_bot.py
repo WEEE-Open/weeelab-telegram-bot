@@ -513,7 +513,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								if user_id is None:
 									msg += '\n- {})'.format(logs.try_get_name_and_surname(username))
 								else:
-									msg += '\n- <a href="tg://user?id={}">{}</a>)'.format(user_id, logs.try_get_name_and_surname(username))
+									msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, logs.try_get_name_and_surname(username))
 
 							bot.send_message(last_chat_id, msg)
 
