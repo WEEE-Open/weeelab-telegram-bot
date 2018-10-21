@@ -472,6 +472,47 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 		self.send_message(msg)
 
+	def log(self, cmd_days_to_filter=None):
+		'''
+		Called with /log
+		'''
+
+		# TODO: this also downloads the file for each request. Maybe don't do it every time.
+		self.logs.get_log()
+
+		if cmd_days_to_filter != None and cmd_days_to_filter.isdigit():
+			# Command is "/log [number]"
+			days_to_print = int(cmd_days_to_filter)
+		elif cmd_days_to_filter == "all":
+			# This won't work. Will never work. There's a length limit on messages.
+			# Whatever, this variant had been missing for months and nobody even noticed...
+			days_to_print = 31
+		else:
+			days_to_print = 1
+
+		days = {}
+		# reversed() doesn't create a copy
+		for line in reversed(self.logs.log):
+			this_day = line.day()
+			if this_day not in days:
+				if len(days) >= days_to_print:
+					break
+				days[this_day] = []
+
+			print_name = self.logs.try_get_name_and_surname(line.username)
+
+			if line.inlab:
+				days[this_day].append(f'<i>{print_name}</i> is in lab\n')
+			else:
+				days[this_day].append(f'<i>{print_name}</i>: {line.text}\n')
+
+		msg = ''
+		for this_day in days:
+			msg += '<b>{day}</b>\n{rows}\n'.format(day=this_day, rows=''.join(days[this_day]))
+
+		msg = msg + 'Latest log update: <b>{}</b>'.format(self.logs.log_last_update)
+		self.send_message(msg)
+
 	def top(self, user_level, cmd_filter=None):
 		'''
 		Called with /top <filter>.
@@ -663,41 +704,10 @@ After authorization /start the bot again.'.format(last_user_id))
 						elif command[0] == "/log" or \
 							command[0] == "/log@weeelab_bot":
 
-							# TODO: this also downloads the file for each request. Maybe don't do it every time.
-							logs.get_log()
-
-							if len(command) > 1 and command[1].isdigit():
-								# Command is "/log [number]"
-								days_to_print = int(command[1])
-							elif len(command) > 1 and command[1] == "all":
-								# This won't work. Will never work. There's a length limit on messages.
-								# Whatever, this variant had been missing for months and nobody even noticed...
-								days_to_print = 31
+							if len(command) > 1:
+								handler.log(command[1])
 							else:
-								days_to_print = 1
-
-							days = {}
-							# reversed() doesn't create a copy
-							for line in reversed(logs.log):
-								this_day = line.day()
-								if this_day not in days:
-									if len(days) >= days_to_print:
-										break
-									days[this_day] = []
-
-								print_name = logs.try_get_name_and_surname(line.username)
-
-								if line.inlab:
-									days[this_day].append(f'<i>{print_name}</i> is in lab\n')
-								else:
-									days[this_day].append(f'<i>{print_name}</i>: {line.text}\n')
-
-							msg = ''
-							for this_day in days:
-								msg += '<b>{day}</b>\n{rows}\n'.format(day=this_day, rows=''.join(days[this_day]))
-
-							msg = msg + 'Latest log update: <b>{}</b>'.format(logs.log_last_update)
-							bot.send_message(last_chat_id, msg)
+								handler.log()
 
 						# --- STAT -------------------------------------------------------------------------------------
 						elif command[0] == "/stat" or \
