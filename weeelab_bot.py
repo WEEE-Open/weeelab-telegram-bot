@@ -435,7 +435,7 @@ class CommandHandler():
 		self.logs = logs
 		self.last_chat_id = last_chat_id
 
-	def send_message(self, message):
+	def _send_message(self, message):
 		self.bot.send_message(self.last_chat_id, message)
 
 	def start(self):
@@ -443,7 +443,7 @@ class CommandHandler():
 		Called with /start
 		'''
 
-		self.send_message('\
+		self._send_message('\
 *WEEE Open Telegram bot*.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
@@ -471,7 +471,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 			else:
 				msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, self.logs.try_get_name_and_surname(username))
 
-		self.send_message(msg)
+		self._send_message(msg)
 
 	def log(self, cmd_days_to_filter=None):
 		'''
@@ -512,7 +512,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 			msg += '<b>{day}</b>\n{rows}\n'.format(day=this_day, rows=''.join(days[this_day]))
 
 		msg = msg + 'Latest log update: <b>{}</b>'.format(self.logs.log_last_update)
-		self.send_message(msg)
+		self._send_message(msg)
 
 	def stat(self, cmd_target_user=None):
 		if cmd_target_user is None:
@@ -524,11 +524,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 			target_username = str(cmd_target_user)
 			if self.logs.get_entry_from_username(target_username) is None:
 				target_username = None
-				self.send_message('No statistics for the given user. Have you typed it correctly?')
+				self._send_message('No statistics for the given user. Have you typed it correctly?')
 		else:
 			# Asked for somebody else's stats but not an admin
 			target_username = None
-			self.send_message('Sorry! You are not allowed	to see stat of other users!\nOnly admins can!')
+			self._send_message('Sorry! You are not allowed	to see stat of other users!\nOnly admins can!')
 
 		# Do we know what to search?
 		if target_username is not None:
@@ -545,7 +545,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 				f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
 				f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
 				f'\n\nLast log update: {self.logs.log_last_update}'
-			self.send_message(msg)
+			self._send_message(msg)
 
 	def history(self, item, cmd_limit=None):
 		if cmd_limit is None:
@@ -560,7 +560,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 			if self.tarallo.login(BOT_USER, BOT_PSW):
 				history = self.tarallo.get_history(item, limit)
 				if history is None:
-					self.send_message(f'Item {item} not found.')
+					self._send_message(f'Item {item} not found.')
 				else:
 					msg = f'<b>History of item {item}</b>\n\n'
 					entries = 0
@@ -585,16 +585,16 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 						entries += 1
 						msg += f'{h_time} by <i>{self.logs.try_get_name_and_surname(h_user)}</i>\n\n'
 						if entries >= 6:
-							self.send_message(msg)
+							self._send_message(msg)
 							msg = ''
 							entries = 0
 					if entries != 0:
-						self.send_message(msg)
+						self._send_message(msg)
 			else:
-				self.send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+				self._send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
 		except RuntimeError:
 			fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.last_status)}).'
-			self.send_message(fail_msg)
+			self._send_message(fail_msg)
 
 	def top(self, cmd_filter=None):
 		'''
@@ -630,9 +630,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 						msg += f'{n}) [{time_hh}:{time_mm}] {self.logs.try_get_name_and_surname(rival)}\n'
 
 			msg += f'\nLast log update: {self.logs.log_last_update}'
-			self.send_message(msg)
+			self._send_message(msg)
 		else:
-			self.send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
+			self._send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
 
 	def help(self):
 		help_message = "Available commands and options:\n\n\
@@ -649,7 +649,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 /stat <i>name.surname</i> - Show hours spent in lab by this user\n\
 /top - Show a list of top users by hours spent this month\n\
 /top all - Show a list of top users by hours spent\n"
-		self.send_message(help_message)
+		self._send_message(help_message)
 
 
 def main():
