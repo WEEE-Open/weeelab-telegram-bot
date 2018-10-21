@@ -354,6 +354,14 @@ class WeeelabLogs:
 			return self.get_name_and_surname(entry)
 		else:
 			return username
+		
+	def try_get_id(self, username: str):
+		
+		entry = self.get_entry_from_username(username)
+		if entry:
+			return entry["telegramID"]
+		else:
+			return None
 
 	@staticmethod
 	def get_name_and_surname(user_entry: dict):
@@ -501,7 +509,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 								msg = 'There are {} students in lab right now:\n'.format(str(len(inlab)))
 
 							for username in inlab:
-								msg += '\n- <b>{}</b>'.format(logs.try_get_name_and_surname(username))
+								msg += '\n- <b>{}</b> (<a href="tg://user?id={}"></a>)'.format(logs.try_get_name_and_surname(username), logs.try_get_id(username))
 
 							bot.send_message(last_chat_id, msg)
 
