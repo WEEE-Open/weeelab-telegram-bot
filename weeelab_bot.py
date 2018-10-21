@@ -546,6 +546,55 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 				f'\n\nLast log update: {self.logs.log_last_update}'
 			self.send_message(msg)
 
+	def history(self, item, cmd_limit=None):
+		if cmd_limit is None:
+			limit = 6
+		else:
+			limit = int(cmd_limit)
+			if limit < 1:
+				limit = 1
+			elif limit > 50:
+				limit = 50
+		try:
+			if self.tarallo.login(BOT_USER, BOT_PSW):
+				history = self.tarallo.get_history(item, limit)
+				if history is None:
+					self.send_message(f'Item {item} not found.')
+				else:
+					msg = f'<b>History of item {item}</b>\n\n'
+					entries = 0
+					for index in range(0, len(history)):
+						change = history[index]['change']
+						h_user = history[index]['user']
+						h_location = history[index]['other']
+						h_time = datetime.datetime.fromtimestamp(
+							int(history[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
+						if change == 'M':
+							msg += f'➡️ Moved to <b>{h_location}</b>\n'
+						elif change == 'U':
+							msg += '🛠️ Updated features\n'
+						elif change == 'C':
+							msg += '📋 Created\n'
+						elif change == 'R':
+							msg += f'✏️ Renamed from <b>{h_location}</b>\n'
+						elif change == 'D':
+							msg += '❌ Deleted\n'
+						else:
+							msg += f'Unknown change {change}'
+						entries += 1
+						msg += f'{h_time} by <i>{self.logs.try_get_name_and_surname(h_user)}</i>\n\n'
+						if entries >= 6:
+							self.send_message(msg)
+							msg = ''
+							entries = 0
+					if entries != 0:
+						self.send_message(msg)
+			else:
+				self.send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+		except RuntimeError:
+			fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.last_status)}).'
+			self.send_message(fail_msg)
+
 	def top(self, user_level, cmd_filter=None):
 		'''
 		Called with /top <filter>.
@@ -662,11 +711,6 @@ After authorization /start the bot again.'.format(last_user_id))
 						# Instantiate a command handler with the current user information
 						handler = CommandHandler(bot, tarallo, logs, last_chat_id)
 
-						# If this is unused it's alright, evey command sets it without concatenation the first time
-						# It's useful to keep around to prevent accidental concatenations and if we ever want to
-						# prepend something to every message...
-						msg = ''
-
 						if command[0] == "/start" or \
 							command[0] == "/start@weeelab_bot":
 							handler.start()
@@ -682,55 +726,10 @@ After authorization /start the bot again.'.format(last_user_id))
 							if len(command) < 2:
 								bot.send_message(
 									last_chat_id, 'Sorry insert the item to search')
+							elif len(command) < 3:
+								handler.history(command[1])
 							else:
-								item = command[1]
-								if len(command) < 3:
-									limit = 6
-								else:
-									limit = int(command[2])
-									if limit < 1:
-										limit = 1
-									elif limit > 50:
-										limit = 50
-								try:
-									if tarallo.login(BOT_USER, BOT_PSW):
-										history = tarallo.get_history(item, limit)
-										if history is None:
-											bot.send_message(last_chat_id, f'Item {item} not found.')
-										else:
-											msg = f'<b>History of item {item}</b>\n\n'
-											entries = 0
-											for index in range(0, len(history)):
-												change = history[index]['change']
-												h_user = history[index]['user']
-												h_location = history[index]['other']
-												h_time = datetime.datetime.fromtimestamp(
-													int(history[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
-												if change == 'M':
-													msg += f'➡️ Moved to <b>{h_location}</b>\n'
-												elif change == 'U':
-													msg += '🛠️ Updated features\n'
-												elif change == 'C':
-													msg += '📋 Created\n'
-												elif change == 'R':
-													msg += f'✏️ Renamed from <b>{h_location}</b>\n'
-												elif change == 'D':
-													msg += '❌ Deleted\n'
-												else:
-													msg += f'Unknown change {change}'
-												entries += 1
-												msg += f'{h_time} by <i>{logs.try_get_name_and_surname(h_user)}</i>\n\n'
-												if entries >= 6:
-													bot.send_message(last_chat_id, msg)
-													msg = ''
-													entries = 0
-											if entries != 0:
-												bot.send_message(last_chat_id, msg)
-									else:
-										bot.send_message(last_chat_id, 'Sorry, cannot authenticate with T.A.R.A.L.L.O.')
-								except RuntimeError:
-									fail_msg = f'Sorry, an error has occurred (HTTP status: {str(tarallo.last_status)}).'
-									bot.send_message(last_chat_id, fail_msg)
+								handler.history(command[1], command[2])
 
 						# --- LOG --------------------------------------------------------------------------------------
 						elif command[0] == "/log" or \
