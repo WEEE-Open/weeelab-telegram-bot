@@ -776,12 +776,12 @@ After authorization /start the bot again.'.format(last_user_id))
 						else:
 							bot\
 								.send_message(last_chat_id, bot.unknown_command_message + "\n\nType /help for list of commands")
-				else:
-					if "channel_post" in last_update:
-						chat_id = last_update['channel_post']['chat']['id']
-						print(bot.leave_chat(chat_id))
+
 					
 			except:  # catch the exception if raised
+				if "channel_post" in last_update:
+					chat_id = last_update['channel_post']['chat']['id']
+					print(bot.leave_chat(chat_id))
 				print("ERROR!")
 				print(last_update)
 				print(traceback.format_exc())
