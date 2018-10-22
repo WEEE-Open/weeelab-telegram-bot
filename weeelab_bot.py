@@ -88,6 +88,16 @@ class BotHandler:
 			return get_result[-1]  # return the last message in json format
 		else:
 			return -1
+		
+	def leave_chat(self, chat_id):
+		"""
+		method to send text messages [ Telegram API -> leaveChat ]
+		On success, the leave Chat returns True.
+		"""
+		params = {
+			'chat_id': chat_id,
+		}
+		return requests.post(self.api_url + 'leaveChat', params)	
 
 	@property
 	def unknown_command_message(self):
@@ -766,6 +776,11 @@ After authorization /start the bot again.'.format(last_user_id))
 						else:
 							bot\
 								.send_message(last_chat_id, bot.unknown_command_message + "\n\nType /help for list of commands")
+				else:
+					if "channel_post" in last_update:
+					chat_id = last_update['channel_post']['chat']['id']
+					print(bot.leave_chat(chat_id))
+					
 			except:  # catch the exception if raised
 				print("ERROR!")
 				print(last_update)
