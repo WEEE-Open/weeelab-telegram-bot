@@ -653,7 +653,6 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 /inlab - Show the people in lab\n\
 /log - Show log of the day\n\
 /log <i>n</i> - Show last <i>n</i> days worth of logs\n\
-/log <i>all</i> - Show entire log from this month\n\
 /stat - Show hours you've spent in lab\n\
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
