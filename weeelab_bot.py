@@ -56,11 +56,15 @@ class BotHandler:
 		[Telegram API -> getUpdates ]
 		"""
 		params = {'offset': self.offset, 'timeout': timeout}
-		result = requests.get(self.api_url + 'getUpdates', params).json()['result']	 # return an array of json
-		if len(result) > 0:
-			self.offset = result[-1]['update_id'] + 1
+		try:
+			result = requests.get(self.api_url + 'getUpdates', params).json()['result']	 # return an array of json			
+			if len(result) > 0:
+				self.offset = result[-1]['update_id'] + 1
+			return result
+		except:
+			return None
 
-		return result
+		
 
 	def send_message(self, chat_id, text, parse_mode='HTML', disable_web_page_preview=True, reply_markup=None):
 		"""
