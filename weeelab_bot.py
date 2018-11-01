@@ -57,14 +57,12 @@ class BotHandler:
 		"""
 		params = {'offset': self.offset, 'timeout': timeout}
 		try:
-			result = requests.get(self.api_url + 'getUpdates', params).json()['result']	 # return an array of json			
+			result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
 			if len(result) > 0:
 				self.offset = result[-1]['update_id'] + 1
 			return result
 		except:
 			return None
-
-		
 
 	def send_message(self, chat_id, text, parse_mode='HTML', disable_web_page_preview=True, reply_markup=None):
 		"""
@@ -85,14 +83,14 @@ class BotHandler:
 		method to get last message if there is.
 		in case of error return an error code used in the main function
 		"""
-		get_result = self.get_updates()	 # recall the function to get updates
+		get_result = self.get_updates()  # recall the function to get updates
 		if not get_result:
 			return -1
 		elif len(get_result) > 0:  # check if there are new messages
 			return get_result[-1]  # return the last message in json format
 		else:
 			return -1
-		
+
 	def leave_chat(self, chat_id):
 		"""
 		method to send text messages [ Telegram API -> leaveChat ]
@@ -101,7 +99,7 @@ class BotHandler:
 		params = {
 			'chat_id': chat_id,
 		}
-		return requests.post(self.api_url + 'leaveChat', params)	
+		return requests.post(self.api_url + 'leaveChat', params)
 
 	@property
 	def unknown_command_message(self):
@@ -340,7 +338,7 @@ class WeeelabLogs:
 				return user
 		return None
 
-	def store_new_user(self, tid, name, surname, username):
+	def store_new_user(self, tid, name: str, surname: str, username: str):
 		new_users_file = self.oc.get_file_contents(USER_BOT_PATH)
 		new_users = new_users_file.decode('utf-8')
 
@@ -350,7 +348,13 @@ class WeeelabLogs:
 			# Store a new user name and id in a file on owncloud server,
 			# encoding in utf.8
 			try:
-				new_users = new_users + "{} {} (@{}): {}\n".format(name, surname, username, tid)
+				if surname != '':
+					surname = f" {surname}"
+				if username == '':
+					username = " (no username)"
+				else:
+					username = f" (@{username})"
+				new_users = new_users + "{}{}{}: {}\n".format(name, surname, username, tid)
 				self.oc.put_file_contents(USER_BOT_PATH, new_users.encode('utf-8'))
 			except (AttributeError, UnicodeEncodeError):
 				print("ERROR writing user.txt")
@@ -368,9 +372,9 @@ class WeeelabLogs:
 			return self.get_name_and_surname(entry)
 		else:
 			return username
-		
+
 	def try_get_id(self, username: str):
-		
+
 		entry = self.get_entry_from_username(username)
 		if entry:
 			return entry["telegramID"]
@@ -437,25 +441,28 @@ class WeeelabLine:
 def escape_all(string):
 	return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
 
-class CommandHandler():
-	'''
-	Aggregates all the possible commands within one class.
-	'''
 
-	def __init__(self, user, bot, tarallo, logs, last_chat_id):
+class CommandHandler:
+	"""
+	Aggregates all the possible commands within one class.
+	"""
+
+	def __init__(self, user, bot, tarallo, logs, last_update):
 		self.user = user
 		self.bot = bot
 		self.tarallo = tarallo
 		self.logs = logs
-		self.last_chat_id = last_chat_id
+		self.last_chat_id = last_update['message']['chat']['id']
+		self.last_user_id = last_update['message']['from']['id']
+		self.last_update = last_update
 
 	def _send_message(self, message):
 		self.bot.send_message(self.last_chat_id, message)
 
 	def start(self):
-		'''
+		"""
 		Called with /start
-		'''
+		"""
 
 		self._send_message('\
 *WEEE Open Telegram bot*.\nThe goal of this bot is to obtain information \
@@ -465,9 +472,9 @@ as well. \nAll data is read from a weeelab log file, which is fetched from \
 an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 	def inlab(self):
-		'''
+		"""
 		Called with /inlab
-		'''
+		"""
 
 		inlab = self.logs.get_log().get_entries_inlab()
 
@@ -488,14 +495,14 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		self._send_message(msg)
 
 	def log(self, cmd_days_to_filter=None):
-		'''
+		"""
 		Called with /log
-		'''
+		"""
 
 		# TODO: this also downloads the file for each request. Maybe don't do it every time.
 		self.logs.get_log()
 
-		if cmd_days_to_filter != None and cmd_days_to_filter.isdigit():
+		if cmd_days_to_filter is not None and cmd_days_to_filter.isdigit():
 			# Command is "/log [number]"
 			days_to_print = int(cmd_days_to_filter)
 		elif cmd_days_to_filter == "all":
@@ -611,11 +618,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 			self._send_message(fail_msg)
 
 	def top(self, cmd_filter=None):
-		'''
+		"""
 		Called with /top <filter>.
 		Currently, the only accepted filter is "all", and besides that,
 		it returns the monthly filter
-		'''
+		"""
 		if self.user['level'] == 1:
 			# Downloads them only if needed
 			self.logs.get_old_logs()
@@ -648,6 +655,40 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		else:
 			self._send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
 
+	def not_allowed(self):
+		"""
+		Called when user is not allowed to use the bot (banned, no telegram ID in user.json, etc...)
+		"""
+
+		msg = 'Sorry, you are not allowed to use this bot.\n\
+		Visit our <a href="https://www.facebook.com/weeeopenpolito/">WEEE Open FB page</a> or the site \
+		<a href="http://weeeopen.polito.it/">WEEE Open</a> for more info.\n\n\
+		Your user ID is:<b>{}</b>\n\
+		After authorization /start the bot again.'.format(self.last_user_id)
+
+		self._send_message(msg)
+
+	def store_id(self):
+		first_name = self.last_update['message']['from']['first_name']
+
+		if 'username' in self.last_update['message']['from']:
+			username = self.last_update['message']['from']['username']
+		else:
+			username = ""
+
+		if 'last_name' in self.last_update['message']['from']:
+			last_name = self.last_update['message']['from']['last_name']
+		else:
+			last_name = ""
+
+		self.logs.store_new_user(self.last_user_id, first_name, last_name, username)
+
+	def unknown(self):
+		"""
+		Called when an unknown command is received
+		"""
+		self._send_message(self.bot.unknown_command_message + "\n\nType /help for list of commands")
+
 	def help(self):
 		help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
@@ -678,33 +719,13 @@ def main():
 		# call the function to check if there are new messages
 		last_update = bot.get_last_update()
 
-		# TODO: remove all this stuff man mano
-		hours_sum = datetime.timedelta(hours=0, minutes=0)
-		# Initialize hours sum variable, type datetime
-		# Variables for /top command
-		top_list_print = 'Top User List!\n'
-		position = 0
-		number_top_list = 50
-
 		if last_update != -1:
 			try:
 				command = last_update['message']['text'].split()
 
-				last_chat_id = last_update['message']['chat']['id']
 				last_user_id = last_update['message']['from']['id']
-				last_user_name = last_update['message']['from']['first_name']
-
-				if 'username' in last_update['message']['from']:
-					last_user_username = last_update['message']['from']['username']
-				else:
-					last_user_username = "no username"
-				if 'surname' in last_update['message']['from']:
-					last_user_surname = last_update['message']['from']['surname']
-				else:
-					last_user_surname = ""
-
 				message_type = last_update['message']['chat']['type']
-				print(last_update['message'])
+				print(last_update['message'])  # Extremely advanced debug techniques
 
 				# Don't respond to messages in group chats
 				if message_type == "private":
@@ -712,75 +733,54 @@ def main():
 					logs.get_users()
 					user = logs.get_entry_from_tid(last_user_id)
 
-					if user is None or user["level"] == 0:
-						bot.send_message(
-							last_chat_id, 'Sorry, you are not allowed to use this bot.\n\
-Visit our <a href="https://www.facebook.com/weeeopenpolito/">WEEE Open FB page</a> or the site \
-<a href="http://weeeopen.polito.it/">WEEE Open</a> for more info.\n\n\
-Your user ID is:<b>{}</b>\n\
-After authorization /start the bot again.'.format(last_user_id))
-						if user is None:
-							logs.store_new_user(last_user_id, last_user_name, last_user_surname, last_user_username)
-					else:
-						# Instantiate a command handler with the current user information
-						handler = CommandHandler(user, bot, tarallo, logs, last_chat_id)
+					# Instantiate a command handler with the current user information
+					handler = CommandHandler(user, bot, tarallo, logs, last_update)
 
-						if command[0] == "/start" or \
-							command[0] == "/start@weeelab_bot":
+					if user is None or user["level"] == 0:
+						handler.not_allowed()
+						if user is None:
+							handler.store_id()
+					else:
+						if command[0] == "/start" or command[0] == "/start@weeelab_bot":
 							handler.start()
 
-						# --- INLAB ------------------------------------------------------------------------------------
-						if command[0] == "/inlab" or \
-							command[0] == "/inlab@weeelab_bot":
+						if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
 							handler.inlab()
 
-						# --- HISTORY ----------------------------------------------------------------------------------
-						elif command[0] == "/history" or \
-							command[0] == "/history@weeelab_bot":
+						elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
 							if len(command) < 2:
-								bot.send_message(
-									last_chat_id, 'Sorry insert the item to search')
+								bot.send_message(handler.last_chat_id, 'Sorry insert the item to search')
 							elif len(command) < 3:
 								handler.history(command[1])
 							else:
 								handler.history(command[1], command[2])
 
-						# --- LOG --------------------------------------------------------------------------------------
-						elif command[0] == "/log" or \
-							command[0] == "/log@weeelab_bot":
+						elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
 
 							if len(command) > 1:
 								handler.log(command[1])
 							else:
 								handler.log()
 
-						# --- STAT -------------------------------------------------------------------------------------
-						elif command[0] == "/stat" or \
-							command[0] == "/stat@weeelab_bot":
+						elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
 
 							if len(command) > 1:
 								handler.stat(command[1])
 							else:
 								handler.stat()
 
-						# --- TOP --------------------------------------------------------------------------------------
-						elif command[0] == "/top" or \
-							command[0] == "/top@weeelab_bot":
+						elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
 							if len(command) > 1:
 								handler.top(command[1])
 							else:
 								handler.top()
 
-						# --- HELP -------------------------------------------------------------------------------------
-						elif command[0] == "/help" or \
-							command[0] == "/help@weeelab_bot":
+						elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
 							handler.help()
 
 						else:
-							bot\
-								.send_message(last_chat_id, bot.unknown_command_message + "\n\nType /help for list of commands")
+							handler.unknown()
 
-					
 			except:  # catch the exception if raised
 				if "channel_post" in last_update:
 					chat_id = last_update['channel_post']['chat']['id']
