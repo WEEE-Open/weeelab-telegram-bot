@@ -14,7 +14,7 @@ All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log fil
 
 Deployment of this bot has been tested only on Heroku: just connect the repo.
 
-For local installation, get `python2` and run `pip install -r requirements.txt` to install dependencies.
+TODO: run it locally somehow.
 
 `weeelab_bot.py` is the main script, and it requires some environment variables (imported from `variables.py`) to 
 run:
@@ -27,16 +27,20 @@ run:
 * `USER_PATH`: Path of the file with authorized users in OwnCloud (/folder/file.json)
 
 ## Command syntax
+
 `/start` the bot and type `/[COMMAND] [OPTION]`.  
 
-Available commands:
+Available commands and options:
 
-* `inlab` : Show the people in lab
-* `log`   : Show the complete OC_PATH file (only for admin user, by default lines of the day)
-  * `[number]`   : Show the `[number]` most recent lines of `OC_PATH` file.
-  * `all`      : Show all lines of OC_PATH file.
-* `stat`   :  Show hours spent in lab by the user.
-* `top`   :  Show a list of top users in lab (only for admin, default top 50)
-* `history [item]` : Show history of an item from T.A.R.A.L.L.O.
-  * `all`      : Show the top users from the beginning.
-* `help`  :  Show all the commands and a short explanations.
+- `/inlab` - Show the people in lab
+- `/log` - Show log of the day
+- `/log n` - Show last n days worth of logs
+- `/log all` - Show last 31 days worth of logs
+- `/stat` - Show hours you've spent in lab
+- `/history item` - Show history for an item, straight outta T.A.R.A.L.L.O.
+- `/history item n` - Show n history entries
+
+Only for admin users
+- `/stat name.surname` - Show hours spent in lab by this user
+- `/top` - Show a list of top users by hours spent this month
+- `/top all` - Show a list of top users by hours spent
