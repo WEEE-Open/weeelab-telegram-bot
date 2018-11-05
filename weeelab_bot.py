@@ -661,10 +661,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		"""
 
 		msg = 'Sorry, you are not allowed to use this bot.\n\
-Visit our <a href="https://www.facebook.com/weeeopenpolito/">WEEE Open FB page</a> or the site \
-<a href="http://weeeopen.polito.it/">WEEE Open</a> for more info.\n\n\
-Your user ID is: <b>{}</b>\n\
-After authorization /start the bot again.'.format(self.last_user_id)
+If you\'re a member of <a href="http://weeeopen.polito.it/">WEEE Open</a>, \
+ask the administrators to authorize your account and /start the bot again.\n\n\
+Your user ID is: <b>{}</b>'.format(self.last_user_id)
 
 		self._send_message(msg)
 
