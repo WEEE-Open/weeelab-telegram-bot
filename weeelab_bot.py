@@ -494,6 +494,12 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
 		self._send_message(msg)
 
+	def citofona(self):
+		"""
+		Called with /citofona
+		"""
+		pass
+
 	def log(self, cmd_days_to_filter=None):
 		"""
 		Called with /log
