@@ -162,6 +162,7 @@ class WeeelabLogs:
 		self.log = []
 		self.log_last_update = None
 		self.users = None
+		self.error = None
 		self.oc = oc
 
 		# Logs from past months (no lines from current month)
@@ -237,8 +238,14 @@ class WeeelabLogs:
 		self.old_logs_year = year
 
 	def get_users(self):
-		self.users = None
-		self.users = json.loads(self.oc.get_file_contents(USER_PATH).decode('utf-8'))["users"]
+		try:
+			self.users = json.loads(self.oc.get_file_contents(USER_PATH).decode('utf-8'))["users"]
+		except json.decoder.JSONDecodeError as e:
+			self.error = str(e)
+			if self.users is None:
+				raise RuntimeError("Error getting/parsing users file and no previous versione available")
+			return self
+		self.error = None
 
 		return self
 
@@ -661,15 +668,18 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 		else:
 			self._send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
 
-	def not_allowed(self):
+	def not_allowed(self, user_json_error):
 		"""
 		Called when user is not allowed to use the bot (banned, no telegram ID in user.json, etc...)
 		"""
 
-		msg = 'Sorry, you are not allowed to use this bot.\n\
+		msg = f'Sorry, you are not allowed to use this bot.\n\
 If you\'re a member of <a href="http://weeeopen.polito.it/">WEEE Open</a>, \
 ask the administrators to authorize your account and /start the bot again.\n\n\
-Your user ID is: <b>{}</b>'.format(self.last_user_id)
+Your user ID is: <b>{self.last_user_id}</b>'
+
+		if user_json_error is not None:
+			msg += f"\n\nWarning: error in users file, {user_json_error}.\nMaybe you\'re authorized but the file is broken?"
 
 		self._send_message(msg)
 
@@ -742,7 +752,7 @@ def main():
 					handler = CommandHandler(user, bot, tarallo, logs, last_update)
 
 					if user is None or user["level"] == 0:
-						handler.not_allowed()
+						handler.not_allowed(logs.error)
 						if user is None:
 							handler.store_id()
 					else:
