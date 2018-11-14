@@ -673,7 +673,7 @@ ask the administrators to authorize your account and /start the bot again.\n\n\
 Your user ID is: <b>{self.last_user_id}</b>'
 
 		if user_json_error is not None:
-			msg += "\n\nWarning: error in users file, {user_json_error}.\nMaybe you\'re authorized but the file is broken?"
+			msg += f"\n\nWarning: error in users file, {user_json_error}.\nMaybe you\'re authorized but the file is broken?"
 
 		self._send_message(msg)
 
