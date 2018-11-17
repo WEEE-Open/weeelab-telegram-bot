@@ -129,7 +129,7 @@ class TaralloSession:
 				return True
 
 			# Attempting to log in would be pointless, there's some other error
-			if whoami.status_code != 403:
+			if whoami.status_code != 401:
 				return False
 
 		body = dict()
