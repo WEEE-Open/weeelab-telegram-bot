@@ -586,7 +586,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             else:
                 msg = "Data already present."
         else:
-            user = self.tolab.search_user(telegramID, sellf.tolab.tolab_file_users)
+            user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
             for user_data in user["tolab"]:
                 if user_data == str(tolab_date):
                     user["tolab"].remove(str(tolab_date))
