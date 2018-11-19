@@ -493,8 +493,7 @@ class ToLab:
         changed = False
         keep = []
         for entry in self.tolab_file:
-            date = entry["tolab"]
-            if date < expires:
+            if entry["tolab"] < expires:
                 changed = True
             else:
                 keep.append(entry)
@@ -506,11 +505,12 @@ class ToLab:
         return len(keep)
 
     def save(self, entries: list):
-        serializable = entries.copy()
-        for entry in serializable:
-            # Save it in local timezone format, because who cares
-            entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
-        self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
+        pass
+        #serializable = entries.copy()
+        #for entry in serializable:
+        #    # Save it in local timezone format, because who cares
+        #    entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
+        #self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
 
 
 def escape_all(string):
