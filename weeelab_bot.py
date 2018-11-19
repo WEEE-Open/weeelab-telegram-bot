@@ -545,7 +545,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         for user in self.tolab.tolab_file_users:
             namesurname = user["name"] + ' ' + user["surname"]
             tolab_msg = ''
-            for tolab_user in user["tolab"]
+            for tolab_user in user["tolab"]:
                 date_user = datetime.datetime.strptime(tolab_user, '%Y-%m-%d %H:%M:%S.%f')
                 tolab_msg += str(date_user.hour) + ':' +str(date_user.minute) + ' '
             msg += '\n- <a href="tg://user?id={}">{}</a> : at {}'.format(user["telegramID"], namesurname, tolab_user)
