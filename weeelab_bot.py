@@ -26,7 +26,8 @@ from datetime import timedelta
 import json
 import re  # "Parse" logs
 import traceback  # Print stack traces in logs
-import collections
+import pytz
+
 
 class BotHandler:
     """
@@ -56,6 +57,7 @@ class BotHandler:
         [Telegram API -> getUpdates ]
         """
         params = {'offset': self.offset, 'timeout': timeout}
+        # noinspection PyBroadException
         try:
             result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
             if len(result) > 0:
@@ -444,38 +446,71 @@ class WeeelabLine:
         parts = self.duration.split(':')
         return int(parts[0]) * 60 + int(parts[1])
 
+
 class ToLab:
     def __init__(self, oc):
         self.oc = oc
+        self.local_tz = pytz.timezone("Europe/Rome")
         self.tolab_file = json.loads(oc.get_file_contents(TOLAB_PATH).decode('utf-8'))
+        for entry in self.tolab_file:
+            entry["tolab"] = datetime.datetime.now(self.local_tz).strptime(entry["tolab"], "%Y-%m-%d %H:%M:%S")
 
-    def search_user(self, telegramID, tolab_file_users):
-        for user in tolab_file_users:
-            if user["telegramID"] == telegramID:
-                return user
-        return None
+    def _delete_user(self, telegram_id):
+        keep = []
+        for entry in self.tolab_file:
+            if entry["telegramID"] != telegram_id:
+                keep.append(entry)
+        self.tolab_file = keep
 
-    def create_user(self, name, surname, telegramID):
-        user = collections.OrderedDict()
-        user["name"]=name
-        user["surname"]=surname
-        user["telegramID"]=telegramID
-        user["tolab"]=[]
+    def _create_entry(self, username: str, telegram_id: int, when: str):
+        user = dict()
+        user["username"] = username
+        user["telegramID"] = telegram_id
+        # Assume that the time refers to today
+        today = datetime.datetime.now(self.local_tz).strftime("%Y-%m-%d")
+        going = datetime.datetime.now(self.local_tz).strptime(f"{today} {when}", "%Y-%m-%d %H:%M:%S")
+
+        # If it already passed, user probably meant "tomorrow"
+        if datetime.datetime.now(self.local_tz) > going:
+            going += datetime.timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
+
+        user["tolab"] = going.strftime("%Y-%m-%d %H:%M:%S")  # Save it in local timezone format, because who cares
         return user
 
+    def delete_entry(self, telegram_id: int):
+        self._delete_user(telegram_id)
+        self.save(self.tolab_file)
+
+    def set_entry(self, username: str, telegram_id: int, when: str):
+        self._delete_user(telegram_id)
+        self.tolab_file.append(self._create_entry(username, telegram_id, when))
+        self.save(self.tolab_file)
+
     def check_date(self):
-        self.tolab_file_users = self.tolab_file["users"]
-        now = datetime.datetime.today()-datetime.timedelta(minutes=30) + datetime.timedelta(hours=1)
-        for user in self.tolab_file_users:
-            for user_date in user["tolab"]:
-                if str(now) > user_date:
-                    user["tolab"].remove(user_date)
-    
-            if len(user["tolab"])==0:
-                self.tolab_file_users.remove(user)
-        
-        self.tolab_file['users'] = self.tolab_file_users
-        self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab_file ,indent=4).encode('utf-8'))
+        # Remove entries older than 30 minutes
+        expires = datetime.datetime.now(self.local_tz) - datetime.timedelta(minutes=30)
+
+        changed = False
+        keep = []
+        for entry in self.tolab_file:
+            date = entry["tolab"]
+            if date < expires:
+                changed = True
+            else:
+                keep.append(entry)
+
+        if changed:
+            self.tolab_file = keep
+            self.save(keep)
+
+        return len(keep)
+
+    def save(self, entries):
+        serializable = dict(entries)
+        for entry in serializable:
+            entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M:%S")
+        self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
+
 
 def escape_all(string):
     return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
@@ -486,7 +521,7 @@ class CommandHandler:
     Aggregates all the possible commands within one class.
     """
 
-    def __init__(self, user, bot, tarallo, logs, last_update, tolab):
+    def __init__(self, user, bot, tarallo: TaralloSession, logs: WeeelabLogs, last_update, tolab: ToLab):
         self.user = user
         self.bot = bot
         self.tarallo = tarallo
@@ -494,7 +529,7 @@ class CommandHandler:
         self.last_chat_id = last_update['message']['chat']['id']
         self.last_user_id = last_update['message']['from']['id']
         self.last_update = last_update
-        self.tolab = tolab
+        self.tolab_db = tolab
 
     def _send_message(self, message):
         self.bot.send_message(self.last_chat_id, message)
@@ -511,6 +546,14 @@ in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
 an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
+    def format_user_in_list(self, username: str, other=''):
+        user_id = self.logs.try_get_id(username)
+        display_name = self.logs.try_get_name_and_surname(username)
+        if user_id is None:
+            return f'\n- {display_name}{other}'
+        else:
+            return f'\n- <a href="tg://user?id={user_id}">{display_name}</a>{other}'
+
     def inlab(self):
         """
         Called with /inlab
@@ -523,91 +566,64 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         elif len(inlab) == 1:
             msg = 'There is one student in lab right now:\n'
         else:
-            msg = 'There are {} students in lab right now:\n'.format(str(len(inlab)))
+            msg = f'There are {str(len(inlab))} students in lab right now:\n'
 
         for username in inlab:
-            user_id = self.logs.try_get_id(username)
-            if user_id is None:
-                msg += '\n- {})'.format(self.logs.try_get_name_and_surname(username))
+            msg += self.format_user_in_list(username)
+
+        going = self.tolab_db.check_date()
+        if going > 0:
+            today = datetime.datetime.now(self.tolab_db.local_tz).date()
+            if going == 1:
+                msg += '\nThere is one student that is going to lab:\n'
             else:
-                msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, self.logs.try_get_name_and_surname(username))
-        msg += '\n'
-        self.tolab.check_date()
-        if len(self.tolab.tolab_file_users) == 0:
-            msg += '\nNobody is going to lab.'
-        elif len(self.tolab.tolab_file_users) == 1:
-            msg += '\nThere is one student that is going to lab:\n'
-        else:
-            msg += '\nThere are {} students that are going to lab:\n'.format(str(len(self.tolab.tolab_file_users)))
-    
-        for user in self.tolab.tolab_file_users:
-            namesurname = user["name"] + ' ' + user["surname"]
-            tolab_msg = ''
-            for tolab_user in user["tolab"]:
-                date_user = datetime.datetime.strptime(tolab_user, '%Y-%m-%d %H:%M:%S')
-                tolab_msg += str(date_user.hour).zfill(2) + ':' + str(date_user.minute).zfill(2) + ' '
-            msg += '\n- <a href="tg://user?id={}">{}</a> at {}'.format(user["telegramID"], namesurname, tolab_msg)
+                msg += f'\nThere are {str(going)} students that are going to lab:\n'
+
+            for user in self.tolab_db.tolab_file:
+                username = user["username"]
+                going_day = user["tolab"].date()
+                hh = str(user["tolab"].hour).zfill(2)
+                mm = str(user["tolab"].minute).zfill(2)
+                if today == going_day:
+                    msg += self.format_user_in_list(username, f" today at {hh}:{mm}")
+                elif today + datetime.timedelta(days=1) == going_day:
+                    msg += self.format_user_in_list(username, f" tomorrow at {hh}:{mm}")
+                else:
+                    msg += self.format_user_in_list(username, f" on {str(going_day)} at {hh}:{mm}")
 
         self._send_message(msg)
-    
-    def tolab_function(self, action, data, telegramID):
-        """
-        Called with /tolab
-        """
+
+    def tolab(self, time: str, telegram_id):
+        valid = False
+        if time == "no":
+            valid = True
+        elif len(time) == 5 and time[0].isdigit() and time[1].isdigit() and time[3].isdigit() and time[4].isdigit():
+            if time[2] == '.':
+                time = ':'.join(time.split('.'))
+            if time[2] == ':':
+                valid = True
+        if not valid:
+            self._send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
+            return
+        # noinspection PyBroadException
         try:
-            user_database = self.logs.get_entry_from_tid(telegramID)
-            name = user_database["name"]
-            surname = user_database["surname"]
-            self.tolab.check_date()
-            self.tolab.tolab_file_users = self.tolab.tolab_file["users"]
-            [hour, minute] = data.split(":")
-            now = datetime.datetime.today() + datetime.timedelta(hours=1)
-            if now.hour>int(hour) or (now.hour==int(hour) and now.minute>int(minute)):
-                day = now.day + 1
+            if time == "no":
+                self.tolab_db.delete_entry(telegram_id)
+                # TODO: add random messages (changing constantly like the "unknown command" ones), like "but why?", "hope you have fun elsewhere", etc...
+                self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
-                day = now.day
-            tolab_date = datetime.datetime.strptime(data, '%H:%M').replace(year=now.year,month=now.month,day=day)
-
-            user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
-            data_found = False
-            if action == "add":
-                if user is None:
-                    user = self.tolab.create_user(name, surname, telegramID)
-                    self.tolab.tolab_file_users.append(user)
-                else:
-                    for user_data in user["tolab"]:
-                        if user_data == str(tolab_date):
-                            data_found = True
-                            break
-                if data_found == False:
-                    user["tolab"].append(str(tolab_date))
-                    msg="Data correctly added."
-                else:
-                    msg = "Data already present."
-            else:
-                user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
-                for user_data in user["tolab"]:
-                    if user_data == str(tolab_date):
-                        user["tolab"].remove(str(tolab_date))
-                        msg = "Data correctly removed."
-        
-            self._send_message(msg)
-
-            if len(user["tolab"])==0:
-                self.tolab.tolab_file_users.remove(user)
-
-            self.tolab.tolab_file['users'] = self.tolab.tolab_file_users
-            print(json.dumps(self.tolab.tolab_file ,indent=4))
-            self.tolab.check_date()
-        except:
-            print("Error.")
-            self._send_message("An error occurs. Retry. (Example: /tolab add 9:00)")
+                user = self.logs.get_entry_from_tid(telegram_id)
+                self.tolab_db.set_entry(user["username"], telegram_id, time)
+                self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+        except Exception as e:
+            self._send_message(f"An error occurred: {str(e)}")
 
 
     def citofona(self):
         """
         Called with /citofona
         """
+        # TODO: implement this somehow...
         pass
 
     def log(self, cmd_days_to_filter=None):
@@ -679,9 +695,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             total_mins_hh, total_mins_mm = self.logs.mm_to_hh_mm(total_mins)
 
             msg = f'Stat for {self.logs.try_get_name_and_surname(target_username)}:' \
-                f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
-                f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
-                f'\n\nLast log update: {self.logs.log_last_update}'
+                  f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
+                  f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
+                  f'\n\nLast log update: {self.logs.log_last_update}'
             self._send_message(msg)
 
     def history(self, item, cmd_limit=None):
@@ -782,7 +798,8 @@ ask the administrators to authorize your account and /start the bot again.\n\n\
 Your user ID is: <b>{self.last_user_id}</b>'
 
         if user_json_error is not None:
-            msg += f"\n\nWarning: error in users file, {user_json_error}.\nMaybe you\'re authorized but the file is broken?"
+            msg += f"\n\nWarning: error in users file, {user_json_error}.\nMaybe you\'re authorized but the file is " \
+                   f"broken? "
 
         self._send_message(msg)
 
@@ -839,6 +856,7 @@ def main():
         last_update = bot.get_last_update()
 
         if last_update != -1:
+            # noinspection PyBroadException
             try:
                 command = last_update['message']['text'].split()
 
@@ -848,7 +866,8 @@ def main():
 
                 # Don't respond to messages in group chats
                 if message_type == "private":
-                    # TODO: get_users downloads users.json from the cloud. For performance this could be done only once in a while
+                    # TODO: get_users downloads users.json from the cloud. For performance this could be done only
+                    # once in a while
                     logs.get_users()
                     user = logs.get_entry_from_tid(last_user_id)
 
@@ -893,10 +912,10 @@ def main():
                                 handler.top(command[1])
                             else:
                                 handler.top()
-                        
+
                         elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
                             if len(command) > 1:
-                                handler.tolab_function(command[1], command[2], last_user_id)
+                                handler.tolab(command[1], last_user_id)
 
                         elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                             handler.help()
