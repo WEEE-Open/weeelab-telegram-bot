@@ -468,7 +468,7 @@ class ToLab:
         user["telegramID"] = telegram_id
         # Assume that the time refers to today
         today = datetime.datetime.now(self.local_tz).strftime("%Y-%m-%d")
-        going = datetime.datetime.now(self.local_tz).strptime(f"{today} {when}", "%Y-%m-%d %H:%M")
+        going = datetime.datetime.strptime(f"{today} {when}", "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
 
         # If it already passed, user probably meant "tomorrow"
         if datetime.datetime.now(self.local_tz) > going:
