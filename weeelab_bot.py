@@ -451,7 +451,7 @@ class ToLab:
 
     def search_user(self, telegramID, tolab_file_users):
         for user in tolab_file_users:
-            if user["telegramID"] == str(telegramID):
+            if user["telegramID"] == telegramID:
                 return user
         return None
 
@@ -547,7 +547,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             tolab_msg = ''
             for tolab_user in user["tolab"]:
                 date_user = datetime.datetime.strptime(tolab_user, '%Y-%m-%d %H:%M:%S')
-                tolab_msg += str(date_user.hour) + ':' + str(date_user.minute) + ' '
+                tolab_msg += str(date_user.hour) + ':' + str(date_user.minute).zfill(2) + ' '
             msg += '\n- <a href="tg://user?id={}">{}</a> : at {}'.format(user["telegramID"], namesurname, tolab_msg)
 
         self._send_message(msg)
@@ -560,7 +560,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         name = user_database["name"]
         surname = user_database["surname"]
         self.tolab.check_date()
-        tolab_file_users = self.tolab.tolab_file["users"]
+        self.tolab.tolab_file_users = self.tolab.tolab_file["users"]
         [hour, minute] = data.split(":")
         now = datetime.datetime.today() + datetime.timedelta(hours=1)
         if now.hour>int(hour) or (now.hour==int(hour) and now.minute>int(minute)):
@@ -569,7 +569,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             day = now.day
         tolab_date = datetime.datetime.strptime(data, '%H:%M').replace(year=now.year,month=now.month,day=day)
 
-        user = self.tolab.search_user(telegramID, tolab_file_users)
+        user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
         data_found = False
         if action == "add":
             if user is None:
@@ -586,7 +586,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             else:
                 msg = "Data already present."
         else:
-            user = self.tolab.search_user(telegramID, tolab_file_users)
+            user = self.tolab.search_user(telegramID, sellf.tolab.tolab_file_users)
             for user_data in user["tolab"]:
                 if user_data == str(tolab_date):
                     user["tolab"].remove(str(tolab_date))
