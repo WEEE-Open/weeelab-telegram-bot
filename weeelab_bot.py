@@ -448,6 +448,7 @@ class ToLab:
     def __init__(self, oc):
         self.oc = oc
         self.tolab_file = json.loads(oc.get_file_contents(TOLAB_PATH).decode('utf-8'))
+        self.tolab_file_users = self.tolab_file["users"]
 
     def search_user(self, telegramID, tolab_file_users):
         for user in tolab_file_users:
@@ -464,7 +465,7 @@ class ToLab:
         return user
 
     def check_date(self):
-        self.tolab_file_users = self.tolab_file["users"]
+        tolab_file_users = self.tolab_file_users
         now = datetime.datetime.today()-datetime.timedelta(minutes=30)
         for user in self.tolab_file_users:
             for user_date in user["tolab"]:
