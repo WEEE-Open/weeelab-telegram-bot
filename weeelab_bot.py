@@ -538,7 +538,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         elif len(self.tolab.tolab_file_users) == 1:
             msg += '\nThere is one student that is going to lab:\n'
         else:
-            msg += '\nThere are {} students that are going to lab:\n'.format(str(len(self.tolab.tolab_file)))
+            msg += '\nThere are {} students that are going to lab:\n'.format(str(len(self.tolab.tolab_file_users)))
     
         for user in self.tolab.tolab_file_users:
             namesurname = user["name"] + ' ' + user["surname"]
