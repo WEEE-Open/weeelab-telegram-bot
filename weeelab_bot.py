@@ -465,7 +465,7 @@ class ToLab:
 
     def check_date(self):
         self.tolab_file_users = self.tolab_file["users"]
-        now = datetime.datetime.today()-datetime.timedelta(minutes=30)
+        now = datetime.datetime.today()-datetime.timedelta(minutes=30) + datetime.timedelta(hours=1)
         for user in self.tolab_file_users:
             for user_date in user["tolab"]:
                 print(str(now))
@@ -563,7 +563,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         self.tolab.check_date(self.tolab.oc, tolab_file)
         tolab_file_users = self.tolab.tolab_file["users"]
         [hour, minute] = data.split(":")
-        now = datetime.datetime.today()
+        now = datetime.datetime.today() + datetime.timedelta(hours=1)
         if now.hour>int(hour) or (now.hour==int(hour) and now.minute>int(minute)):
             day = now.day + 1
         else:
