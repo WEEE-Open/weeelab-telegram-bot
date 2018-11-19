@@ -465,6 +465,7 @@ class ToLab:
         return user
 
     def check_date(self):
+        print(self.tolab_file)
         tolab_file_users = self.tolab_file["users"]
         now = datetime.datetime.today()-datetime.timedelta(minutes=30)
         for user in self.tolab_file_users:
@@ -536,7 +537,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         
         self.tolab.check_date()
         if len(self.tolab.tolab_file_users) == 0:
-            msg += '\nNobody is going to lab.'
+            msg += '\n\nNobody is going to lab.'
         elif len(self.tolab.tolab_file_users) == 1:
             msg += '\nThere is one student that is going to lab:\n'
         else:
@@ -547,7 +548,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             tolab_msg = ''
             for tolab_user in user["tolab"]:
                 date_user = datetime.datetime.strptime(tolab_user, '%Y-%m-%d %H:%M:%S')
-                tolab_msg += str(date_user.hour) + ':' +str(date_user.minute) + ' '
+                tolab_msg += str(date_user.hour) + ':' + str(date_user.minute) + ' '
             msg += '\n- <a href="tg://user?id={}">{}</a> : at {}'.format(user["telegramID"], namesurname, tolab_msg)
 
         self._send_message(msg)
