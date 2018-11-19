@@ -576,9 +576,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         if going > 0:
             today = datetime.datetime.now(self.tolab_db.local_tz).date()
             if going == 1:
-                msg += '\nThere is one student that is going to lab:\n'
+                msg += '\n\nThere is one student that is going to lab:\n'
             else:
-                msg += f'\nThere are {str(going)} students that are going to lab:\n'
+                msg += f'\n\nThere are {str(going)} students that are going to lab:\n'
 
             for user in self.tolab_db.tolab_file:
                 username = user["username"]
