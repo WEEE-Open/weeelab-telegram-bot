@@ -468,6 +468,8 @@ class ToLab:
         now = datetime.datetime.today()-datetime.timedelta(minutes=30)
         for user in self.tolab_file_users:
             for user_date in user["tolab"]:
+                print(str(now))
+                print(user_date)
                 if str(now) > user_date:
                     user["tolab"].remove(user_date)
                     print("Debug: " + json.dumps(self.tolab_file_users ,indent=4))
