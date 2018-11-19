@@ -574,7 +574,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         if action == "add":
             if user is None:
                 user = self.tolab.create_user(name, surname, telegramID)
-                tolab_file_users.append(user)
+                self.tolab.tolab_file_users.append(user)
             else:
                 for user_data in user["tolab"]:
                     if user_data == str(tolab_date):
@@ -595,12 +595,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         self._send_message(msg)
 
         if len(user["tolab"])==0:
-            tolab_file_users.remove(user)
+            self.tolab.tolab_file_users.remove(user)
 
-        self.tolab.tolab_file['users'] = tolab_file_users
-        self.tolab.tolab_file = json.dumps(self.tolab.tolab_file ,indent=4)
-        print(self.tolab.tolab_file)
-        oc.put_file_contents(TOLAB_PATH, self.tolab.tolab_file.encode('utf-8'))
+        self.tolab.tolab_file['users'] = self.tolab.tolab_file_users
+        print(json.dumps(self.tolab.tolab_file ,indent=4))
+        self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab.tolab_file ,indent=4).encode('utf-8'))
 
 
     def citofona(self):
