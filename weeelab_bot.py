@@ -477,9 +477,8 @@ class ToLab:
             self.tolab_file_users.remove(user)
         
         self.tolab_file['users'] = tolab_file_users
-        self.tolab_file = json.dumps(self.tolab_file ,indent=4)
-        print(self.tolab_file)
-        self.oc.put_file_contents(TOLAB_PATH, self.tolab_file.encode('utf-8'))
+        print(json.dumps(self.tolab_file ,indent=4))
+        self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab_file ,indent=4).encode('utf-8'))
 
 def escape_all(string):
     return string.replace('_', '\\_').replace('*', '\\*').replace('`', '\\``').replace('[', '\\[')
@@ -535,10 +534,10 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                 msg += '\n- {})'.format(self.logs.try_get_name_and_surname(username))
             else:
                 msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, self.logs.try_get_name_and_surname(username))
-        
+        msg += '\n'
         self.tolab.check_date()
         if len(self.tolab.tolab_file_users) == 0:
-            msg += '\n\nNobody is going to lab.'
+            msg += '\nNobody is going to lab.'
         elif len(self.tolab.tolab_file_users) == 1:
             msg += '\nThere is one student that is going to lab:\n'
         else:
