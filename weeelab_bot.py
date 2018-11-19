@@ -554,51 +554,54 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         """
         Called with /tolab
         """
-        user_database = self.logs.get_entry_from_tid(telegramID)
-        name = user_database["name"]
-        surname = user_database["surname"]
-        self.tolab.check_date()
-        self.tolab.tolab_file_users = self.tolab.tolab_file["users"]
-        [hour, minute] = data.split(":")
-        now = datetime.datetime.today() + datetime.timedelta(hours=1)
-        if now.hour>int(hour) or (now.hour==int(hour) and now.minute>int(minute)):
-            day = now.day + 1
-        else:
-            day = now.day
-        tolab_date = datetime.datetime.strptime(data, '%H:%M').replace(year=now.year,month=now.month,day=day)
-
-        user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
-        data_found = False
-        if action == "add":
-            if user is None:
-                user = self.tolab.create_user(name, surname, telegramID)
-                self.tolab.tolab_file_users.append(user)
+        try:
+            user_database = self.logs.get_entry_from_tid(telegramID)
+            name = user_database["name"]
+            surname = user_database["surname"]
+            self.tolab.check_date()
+            self.tolab.tolab_file_users = self.tolab.tolab_file["users"]
+            [hour, minute] = data.split(":")
+            now = datetime.datetime.today() + datetime.timedelta(hours=1)
+            if now.hour>int(hour) or (now.hour==int(hour) and now.minute>int(minute)):
+                day = now.day + 1
             else:
+                day = now.day
+            tolab_date = datetime.datetime.strptime(data, '%H:%M').replace(year=now.year,month=now.month,day=day)
+
+            user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
+            data_found = False
+            if action == "add":
+                if user is None:
+                    user = self.tolab.create_user(name, surname, telegramID)
+                    self.tolab.tolab_file_users.append(user)
+                else:
+                    for user_data in user["tolab"]:
+                        if user_data == str(tolab_date):
+                            data_found = True
+                            break
+                if data_found == False:
+                    user["tolab"].append(str(tolab_date))
+                    msg="Data correctly added."
+                else:
+                    msg = "Data already present."
+            else:
+                user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
                 for user_data in user["tolab"]:
                     if user_data == str(tolab_date):
-                        data_found = True
-                        break
-            if data_found == False:
-                user["tolab"].append(str(tolab_date))
-                msg="Data correctly added."
-            else:
-                msg = "Data already present."
-        else:
-            user = self.tolab.search_user(telegramID, self.tolab.tolab_file_users)
-            for user_data in user["tolab"]:
-                if user_data == str(tolab_date):
-                    user["tolab"].remove(str(tolab_date))
-                    msg = "Data correctly removed."
+                        user["tolab"].remove(str(tolab_date))
+                        msg = "Data correctly removed."
         
-        self._send_message(msg)
+            self._send_message(msg)
 
-        if len(user["tolab"])==0:
-            self.tolab.tolab_file_users.remove(user)
+            if len(user["tolab"])==0:
+                self.tolab.tolab_file_users.remove(user)
 
-        self.tolab.tolab_file['users'] = self.tolab.tolab_file_users
-        print(json.dumps(self.tolab.tolab_file ,indent=4))
-        #self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab.tolab_file ,indent=4).encode('utf-8'))
-        self.tolab.check_date()
+            self.tolab.tolab_file['users'] = self.tolab.tolab_file_users
+            print(json.dumps(self.tolab.tolab_file ,indent=4))
+            self.tolab.check_date()
+        except:
+            print("Error.")
+            self._send_message("An error occurs. Retry. (Example: /tolab add 9:00")
 
 
     def citofona(self):
