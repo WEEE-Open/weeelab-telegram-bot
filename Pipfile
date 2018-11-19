@@ -1,16 +1,18 @@
 [[source]]
+name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-name = "pypi"
-
-[packages]
-pyocclient = ">=0.4"
-requests = ">=2.14.2"
 
 [dev-packages]
 
-[requires]
-python_version = "3.6"
+[packages]
+certifi = "==2018.10.15"
+chardet = "==3.0.4"
+idna = "==2.7"
+pyocclient = "==0.4"
+requests = "==2.20.1"
+six = "==1.11.0"
+urllib3 = "==1.24.1"
 
-[scripts]
-bot = "python weeelab_bot.py"
+[requires]
+python_version = "3.5"
