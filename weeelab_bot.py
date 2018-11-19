@@ -472,7 +472,6 @@ class ToLab:
                 print(user_date)
                 if str(now) > user_date:
                     user["tolab"].remove(user_date)
-                    print("Debug: " + json.dumps(self.tolab_file_users ,indent=4))
     
             if len(user["tolab"])==0:
                 self.tolab_file_users.remove(user)
@@ -553,7 +552,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
         self._send_message(msg)
     
-    def tolab(self, action, data, telegramID):
+    def tolab_function(self, action, data, telegramID):
         """
         Called with /tolab
         """
@@ -896,7 +895,7 @@ def main():
                         
                         elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
                             if len(command) > 1:
-                                handler.tolab(command[1], command[2], last_user_id)
+                                handler.tolab_function(command[1], command[2], last_user_id)
 
                         elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                             handler.help()
