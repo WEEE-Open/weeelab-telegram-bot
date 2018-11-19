@@ -545,7 +545,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             tolab_msg = ''
             for tolab_user in user["tolab"]:
                 date_user = datetime.datetime.strptime(tolab_user, '%Y-%m-%d %H:%M:%S')
-                tolab_msg += str(date_user.hour) + ':' + str(date_user.minute).zfill(2) + ' '
+                tolab_msg += str(date_user.hour).zfill(2) + ':' + str(date_user.minute).zfill(2) + ' '
             msg += '\n- <a href="tg://user?id={}">{}</a> at {}'.format(user["telegramID"], namesurname, tolab_msg)
 
         self._send_message(msg)
@@ -601,7 +601,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             self.tolab.check_date()
         except:
             print("Error.")
-            self._send_message("An error occurs. Retry. (Example: /tolab add 9:00")
+            self._send_message("An error occurs. Retry. (Example: /tolab add 9:00)")
 
 
     def citofona(self):
