@@ -599,7 +599,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
         self.tolab.tolab_file['users'] = self.tolab.tolab_file_users
         print(json.dumps(self.tolab.tolab_file ,indent=4))
-        self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab.tolab_file ,indent=4).encode('utf-8'))
+        #self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab.tolab_file ,indent=4).encode('utf-8'))
+        self.tolab.check_date()
 
 
     def citofona(self):
