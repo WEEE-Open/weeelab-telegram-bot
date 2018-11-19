@@ -5,3 +5,4 @@ pyocclient==0.4
 requests==2.20.1
 six==1.11.0
 urllib3==1.24.1
+pytz>=2018.7
