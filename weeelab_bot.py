@@ -474,7 +474,7 @@ class ToLab:
         if datetime.datetime.now(self.local_tz) > going:
             going += datetime.timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
 
-        user["tolab"] = going.strftime("%Y-%m-%d %H:%M")  # Save it in local timezone format, because who cares
+        user["tolab"] = going
         return user
 
     def delete_entry(self, telegram_id: int):
@@ -508,6 +508,7 @@ class ToLab:
     def save(self, entries: list):
         serializable = entries.copy()
         for entry in serializable:
+            # Save it in local timezone format, because who cares
             entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
         self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
 
