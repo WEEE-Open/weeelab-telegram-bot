@@ -466,7 +466,7 @@ class ToLab:
 
     def check_date(self):
         print("debug: " + json.dumps(self.tolab_file ,indent=4))
-        tolab_file_users = self.tolab_file["users"]
+        self.tolab_file_users = self.tolab_file["users"]
         now = datetime.datetime.today()-datetime.timedelta(minutes=30)
         for user in self.tolab_file_users:
             for user_date in user["tolab"]:
@@ -476,7 +476,7 @@ class ToLab:
         if len(user["tolab"])==0:
             self.tolab_file_users.remove(user)
         
-        self.tolab_file['users'] = tolab_file_users
+        self.tolab_file['users'] = self.tolab_file_users
         self.tolab_file = json.dumps(self.tolab_file ,indent=4)
         print(self.tolab_file)
         self.oc.put_file_contents(TOLAB_PATH, self.tolab_file.encode('utf-8'))
