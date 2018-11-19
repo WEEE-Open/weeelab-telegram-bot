@@ -1,3 +1,4 @@
+pytz>=2018.7
 certifi==2018.10.15
 chardet==3.0.4
 idna==2.7
@@ -5,5 +6,3 @@ pyocclient==0.4
 requests==2.20.1
 six==1.11.0
 urllib3==1.24.1
-pytz==2018.7
-# Heroku please read and update this goddamn file can you see it it's updated please update it rather than ignoring it KTHXBAI
