@@ -538,13 +538,17 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         if len(self.tolab.tolab_file_users) == 0:
             msg += '\nNobody is going to lab.'
         elif len(self.tolab.tolab_file_users) == 1:
-            msg = '\nThere is one student that is going to lab:\n'
+            msg += '\nThere is one student that is going to lab:\n'
         else:
-            msg = '\nThere are {} students that are going to lab:\n'.format(str(len(self.tolab.tolab_file)))
+            msg += '\nThere are {} students that are going to lab:\n'.format(str(len(self.tolab.tolab_file)))
     
         for user in self.tolab.tolab_file_users:
             namesurname = user["name"] + ' ' + user["surname"]
-            msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user["telegramID"], namesurname)
+            tolab_msg = ''
+            for tolab_user in user["tolab"]
+                date_user = datetime.datetime.strptime(tolab_user, '%Y-%m-%d %H:%M:%S.%f')
+                tolab_msg += str(date_user.hour) + ':' +str(date_user.minute) + ' '
+            msg += '\n- <a href="tg://user?id={}">{}</a> : at {}'.format(user["telegramID"], namesurname, tolab_user)
 
         self._send_message(msg)
     
