@@ -533,7 +533,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             else:
                 msg += '\n- <a href="tg://user?id={}">{}</a>'.format(user_id, self.logs.try_get_name_and_surname(username))
         
-        self.tolab.check_date(self.tolab.oc, self.tolab.tolab_file)
+        self.tolab.check_date()
         if len(self.tolab.tolab_file_users) == 0:
             msg += '\nNobody is going to lab.'
         elif len(self.tolab.tolab_file_users) == 1:
