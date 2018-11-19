@@ -465,7 +465,7 @@ class ToLab:
         return user
 
     def check_date(self):
-        tolab_file_users = self.tolab_file_users
+        tolab_file_users = self.tolab_file["users"]
         now = datetime.datetime.today()-datetime.timedelta(minutes=30)
         for user in self.tolab_file_users:
             for user_date in user["tolab"]:
