@@ -465,7 +465,7 @@ class ToLab:
         return user
 
     def check_date(self):
-        print(self.tolab_file)
+        print("debug: " + self.tolab_file)
         tolab_file_users = self.tolab_file["users"]
         now = datetime.datetime.today()-datetime.timedelta(minutes=30)
         for user in self.tolab_file_users:
@@ -475,6 +475,7 @@ class ToLab:
     
         if len(user["tolab"])==0:
             self.tolab_file_users.remove(user)
+        
         self.tolab_file['users'] = tolab_file_users
         self.tolab_file = json.dumps(self.tolab_file ,indent=4)
         print(self.tolab_file)
