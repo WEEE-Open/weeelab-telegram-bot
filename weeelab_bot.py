@@ -559,7 +559,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         user_database = self.logs.get_entry_from_tid(telegramID)
         name = user_database["name"]
         surname = user_database["surname"]
-        self.tolab.check_date(self.tolab.oc, tolab_file)
+        self.tolab.check_date(self.tolab.oc, self.tolab.tolab_file)
         tolab_file_users = self.tolab.tolab_file["users"]
         [hour, minute] = data.split(":")
         now = datetime.datetime.today() + datetime.timedelta(hours=1)
