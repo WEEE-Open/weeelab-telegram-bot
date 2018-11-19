@@ -494,6 +494,8 @@ class ToLab:
         keep = []
         for entry in self.tolab_file:
             date = entry["tolab"]
+            print(f"date: {str(date.tzinfo)}")
+            print(f"expires: {str(expires.tzinfo)}")
             if date < expires:
                 changed = True
             else:
@@ -609,7 +611,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         try:
             if time == "no":
                 self.tolab_db.delete_entry(telegram_id)
-                # TODO: add random messages (changing constantly like the "unknown command" ones), like "but why?", "hope you have fun elsewhere", etc...
+                # TODO: add random messages (changing constantly like the "unknown command" ones),
+                # like "but why?", "hope you have fun elsewhere", etc...
                 self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
                 user = self.logs.get_entry_from_tid(telegram_id)
@@ -617,7 +620,6 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                 self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
         except Exception as e:
             self._send_message(f"An error occurred: {str(e)}")
-
 
     def citofona(self):
         """
