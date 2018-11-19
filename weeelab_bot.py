@@ -453,7 +453,7 @@ class ToLab:
         self.local_tz = pytz.timezone("Europe/Rome")
         self.tolab_file = json.loads(oc.get_file_contents(TOLAB_PATH).decode('utf-8'))
         for entry in self.tolab_file:
-            entry["tolab"] = datetime.datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=self.local_tz)
+            entry["tolab"] = datetime.datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
 
     def _delete_user(self, telegram_id):
         keep = []
@@ -468,13 +468,13 @@ class ToLab:
         user["telegramID"] = telegram_id
         # Assume that the time refers to today
         today = datetime.datetime.now(self.local_tz).strftime("%Y-%m-%d")
-        going = datetime.datetime.now(self.local_tz).strptime(f"{today} {when}", "%Y-%m-%d %H:%M:%S")
+        going = datetime.datetime.now(self.local_tz).strptime(f"{today} {when}", "%Y-%m-%d %H:%M")
 
         # If it already passed, user probably meant "tomorrow"
         if datetime.datetime.now(self.local_tz) > going:
             going += datetime.timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
 
-        user["tolab"] = going.strftime("%Y-%m-%d %H:%M:%S")  # Save it in local timezone format, because who cares
+        user["tolab"] = going.strftime("%Y-%m-%d %H:%M")  # Save it in local timezone format, because who cares
         return user
 
     def delete_entry(self, telegram_id: int):
@@ -508,7 +508,7 @@ class ToLab:
     def save(self, entries):
         serializable = dict(entries)
         for entry in serializable:
-            entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M:%S")
+            entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
         self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
 
 
@@ -722,7 +722,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                         h_user = history[index]['user']
                         h_location = history[index]['other']
                         h_time = datetime.datetime.fromtimestamp(
-                            int(history[index]['time'])).strftime('%d-%m-%Y %H:%M:%S')
+                            int(history[index]['time'])).strftime('%d-%m-%Y %H:%M')
                         if change == 'M':
                             msg += f'➡️ Moved to <b>{h_location}</b>\n'
                         elif change == 'U':
