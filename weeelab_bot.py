@@ -453,7 +453,7 @@ class ToLab:
         self.local_tz = pytz.timezone("Europe/Rome")
         self.tolab_file = json.loads(oc.get_file_contents(TOLAB_PATH).decode('utf-8'))
         for entry in self.tolab_file:
-            entry["tolab"] = datetime.datetime.now(self.local_tz).strptime(entry["tolab"], "%Y-%m-%d %H:%M:%S")
+            entry["tolab"] = datetime.datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=self.local_tz)
 
     def _delete_user(self, telegram_id):
         keep = []
@@ -494,8 +494,6 @@ class ToLab:
         keep = []
         for entry in self.tolab_file:
             date = entry["tolab"]
-            print(f"date: {str(date.tzinfo)}")
-            print(f"expires: {str(expires.tzinfo)}")
             if date < expires:
                 changed = True
             else:
