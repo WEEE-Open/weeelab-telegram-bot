@@ -448,7 +448,6 @@ class ToLab:
     def __init__(self, oc):
         self.oc = oc
         self.tolab_file = json.loads(oc.get_file_contents(TOLAB_PATH).decode('utf-8'))
-        self.tolab_file_users = self.tolab_file["users"]
 
     def search_user(self, telegramID, tolab_file_users):
         for user in tolab_file_users:
@@ -477,7 +476,6 @@ class ToLab:
                 self.tolab_file_users.remove(user)
         
         self.tolab_file['users'] = self.tolab_file_users
-        print(json.dumps(self.tolab_file ,indent=4))
         self.oc.put_file_contents(TOLAB_PATH, json.dumps(self.tolab_file ,indent=4).encode('utf-8'))
 
 def escape_all(string):
