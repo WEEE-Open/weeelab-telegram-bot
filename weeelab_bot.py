@@ -471,6 +471,7 @@ class ToLab:
             for user_date in user["tolab"]:
                 if str(now) > user_date:
                     self.tolab_file_users.user["tolab"].remove(user_date)
+                    print("Debug: " + json.dumps(self.tolab_file_users ,indent=4))
     
             if len(user["tolab"])==0:
                 self.tolab_file_users.remove(user)
