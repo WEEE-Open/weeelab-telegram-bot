@@ -618,6 +618,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                 self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
         except Exception as e:
             self._send_message(f"An error occurred: {str(e)}")
+            print(traceback.format_exc())
 
     def citofona(self):
         """
