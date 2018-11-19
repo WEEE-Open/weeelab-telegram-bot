@@ -505,8 +505,8 @@ class ToLab:
 
         return len(keep)
 
-    def save(self, entries):
-        serializable = dict(entries)
+    def save(self, entries: list):
+        serializable = entries.copy()
         for entry in serializable:
             entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
         self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
