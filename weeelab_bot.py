@@ -505,12 +505,13 @@ class ToLab:
         return len(keep)
 
     def save(self, entries: list):
-        pass
-        #serializable = entries.copy()
-        #for entry in serializable:
-        #    # Save it in local timezone format, because who cares
-        #    entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
-        #self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
+        serializable = []
+        for entry in entries:
+            serializable.append(entry.copy())
+        for entry in serializable:
+            # Save it in local timezone format, because who cares
+            entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
+        self.oc.put_file_contents(TOLAB_PATH, json.dumps(serializable, indent=4).encode('utf-8'))
 
 
 def escape_all(string):
