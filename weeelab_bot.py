@@ -542,7 +542,7 @@ class CommandHandler:
         """
 
         self._send_message('\
-*WEEE Open Telegram bot*.\nThe goal of this bot is to obtain information \
+<b>WEEE Open Telegram bot</b>.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
@@ -835,6 +835,13 @@ Your user ID is: <b>{self.last_user_id}</b>'
         """
         self._send_message(self.bot.unknown_command_message + "\n\nType /help for list of commands")
 
+    def tolab_help(self):
+        help_message = "Use /tolab and the time to tell the bot when you'll go to the lab.\n\n\
+For example type <code>/tolab 10:30</code> if you're going at 10:30.\n\
+If it's later than the specified time, the bot will consider it for tomorrow.\n\n\
+You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
+        self._send_message(help_message)
+
     def help(self):
         help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
@@ -927,6 +934,8 @@ def main():
                         elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
                             if len(command) > 1:
                                 handler.tolab(command[1], last_user_id)
+                            else:
+                                handler.tolab_help()
 
                         elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                             handler.help()
