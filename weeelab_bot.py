@@ -885,7 +885,7 @@ def main():
                         if command[0] == "/start" or command[0] == "/start@weeelab_bot":
                             handler.start()
 
-                        if command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
+                        elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
                             handler.inlab()
 
                         elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
