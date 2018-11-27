@@ -583,6 +583,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             else:
                 msg += f'\n\nThere are {str(number_of_people_going)} students that are going to lab:'
 
+            user_themself_tolab = False
             for user in self.tolab_db.tolab_file:
                 username = user["username"]
                 going_day = user["tolab"].date()
@@ -594,7 +595,10 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     msg += self.format_user_in_list(username, f" tomorrow at {hh}:{mm}")
                 else:
                     msg += self.format_user_in_list(username, f" on {str(going_day)} at {hh}:{mm}")
-            msg += '\nAre you going, too? Tell everyone with /tolab.'
+                if username == self.user['username']:
+                    user_themself_tolab = True
+            if not user_themself_tolab:
+                msg += '\nAre you going, too? Tell everyone with /tolab.'
         else:
             if right_now.hour > 19:
                 msg += '\n\nAre you going to go the lab tomorrow? Tell everyone with /tolab.'
