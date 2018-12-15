@@ -486,14 +486,28 @@ class ToLab:
         self.tolab_file.append(self._create_entry(username, telegram_id, when))
         self.save(self.tolab_file)
 
-    def check_date(self):
-        # Remove entries older than 30 minutes
-        expires = datetime.datetime.now(self.local_tz) - datetime.timedelta(minutes=30)
+    def check_date(self, people_inlab: set):
+        """
+        Remove /tolab entries older than 30 minutes or for people that are in lab
+
+        :param people_inlab: set of usernames of people /inlab
+        :return:
+        """
+        now = datetime.datetime.now(self.local_tz)
+        expires = now - datetime.timedelta(minutes=30)
 
         changed = False
         keep = []
         for entry in self.tolab_file:
             if entry["tolab"] < expires:
+                # Older than 30 minutes, remove
+                changed = True
+            elif entry["tolab"] < now and entry["username"] in people_inlab:
+                # Was in /tolab list for some time ago and is in lab right now, remove
+                # e.g. /tolab 10:00, student actually goes to lab at 10:00, this method is called at 10:03:
+                # entry < now and student is in lab, so we can remove the entry.
+                # e.g. /tolab 16.00, student is in lab, this method is called at 10:00: entry is not removed, they may
+                # leave and come back later.
                 changed = True
             else:
                 keep.append(entry)
@@ -576,7 +590,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             people_inlab.add(username)
 
         user_themself_inlab = self.user['username'] in people_inlab
-        number_of_people_going = self.tolab_db.check_date()
+        number_of_people_going = self.tolab_db.check_date(people_inlab)
         right_now = datetime.datetime.now(self.tolab_db.local_tz)
 
         if number_of_people_going > 0:
