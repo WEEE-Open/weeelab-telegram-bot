@@ -245,7 +245,7 @@ class WeeelabLogs:
         except json.decoder.JSONDecodeError as e:
             self.error = str(e)
             if self.users is None:
-                raise RuntimeError("Error getting/parsing users file and no previous versione available")
+                raise RuntimeError("Error getting/parsing users file and no previous version available")
             return self
         self.error = None
 
@@ -863,6 +863,16 @@ If it's later than the specified time, the bot will consider it for tomorrow.\n\
 You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
         self._send_message(help_message)
 
+    def status(self):
+        if self.user['level'] != 1:
+            self.unknown()
+            return
+        if self.logs.error is None:
+            message = "Everything is working correctly, or everything is broken and I don't even know."
+        else:
+            message = f"There's an error in users file, go and fix it: {self.logs.error}"
+        self._send_message(message)
+
     def help(self):
         help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
@@ -960,6 +970,9 @@ def main():
 
                         elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                             handler.help()
+
+                        elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
+                            handler.status()
 
                         else:
                             handler.unknown()
