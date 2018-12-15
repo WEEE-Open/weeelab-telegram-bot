@@ -562,6 +562,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         """
 
         inlab = self.logs.get_log().get_entries_inlab()
+        people_inlab = set()
 
         if len(inlab) == 0:
             msg = 'Nobody is in lab right now.'
@@ -572,7 +573,9 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
         for username in inlab:
             msg += self.format_user_in_list(username)
+            people_inlab.add(username)
 
+        user_themself_inlab = self.user['username'] in people_inlab
         number_of_people_going = self.tolab_db.check_date()
         right_now = datetime.datetime.now(self.tolab_db.local_tz)
 
@@ -597,12 +600,12 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     msg += self.format_user_in_list(username, f" on {str(going_day)} at {hh}:{mm}")
                 if username == self.user['username']:
                     user_themself_tolab = True
-            if not user_themself_tolab:
+            if not user_themself_tolab and not user_themself_inlab:
                 msg += '\nAre you going, too? Tell everyone with /tolab.'
         else:
             if right_now.hour > 19:
                 msg += '\n\nAre you going to go the lab tomorrow? Tell everyone with /tolab.'
-            else:
+            elif not user_themself_inlab:
                 msg += '\n\nAre you going to go the lab later? Tell everyone with /tolab.'
 
         self._send_message(msg)
