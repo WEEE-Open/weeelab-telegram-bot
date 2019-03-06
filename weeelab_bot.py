@@ -46,8 +46,10 @@ class BotHandler:
         self.unknown_command_messages = [
             "Sorry, I didn't understand that",
             "I don't know that command, but do you know /history? It's pretty cool",
+            "I don't know that command, but do you know /tolab? It's pretty cool",
             "What? I don't understand :(",
-            "Unknown command"
+            "Unknown command. But do you know /history? It's pretty cool",
+            "Bad command or file name"
         ]
 
     def get_updates(self, timeout=30):
