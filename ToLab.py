@@ -35,7 +35,7 @@ class ToLab:
             going += timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
 
         entry["tolab"] = going
-        days = (going - now).days
+        days = (going.date() - now.date()).days
         return entry, days
 
     def delete_entry(self, telegram_id: int):
