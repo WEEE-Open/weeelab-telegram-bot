@@ -205,17 +205,36 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
         self._send_message(msg)
 
-    def tolab(self, time: str, telegram_id):
-        valid = False
+    def tolab(self, telegram_id, time: str, day: str = None):
+        time_valid = False
         if time == "no":
-            valid = True
+            time_valid = True
         elif len(time) == 5 and time[0].isdigit() and time[1].isdigit() and time[3].isdigit() and time[4].isdigit():
             if time[2] == '.':
                 time = ':'.join(time.split('.'))
             if time[2] == ':':
-                valid = True
-        if not valid:
+                time_valid = True
+        if not time_valid:
             self._send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
+            return
+
+        # TODO: this accepts "/tolab no +2" and rejects "/tolab no foo", while it should... ignore the second part?
+        # Or something else. I don't really know.
+        day_valid = False
+        if day is None:
+            day = 0
+            day_valid = True
+        else:
+            if day.startswith('+') and day[1:].isdigit():
+                day = int(day[1:])
+                day_valid = not day == 0
+            # try:
+            #     day = datetime.strptime(day, "%Y-%m-%d")
+            #     day_valid = True
+            # except ValueError:
+            #     pass
+        if not day_valid:
+            self._send_message("Use correct day format, e.g. +1 for tomorrow, +2 for the day after tomorrow and so on")
             return
         # noinspection PyBroadException
         try:
@@ -226,8 +245,14 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                 self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
                 user = self.logs.get_entry_from_tid(telegram_id)
-                self.tolab_db.set_entry(user["username"], telegram_id, time)
-                self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+                days = self.tolab_db.set_entry(user["username"], telegram_id, time, day)
+                if days <= 0:
+                    self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+                elif days == 1:
+                    self._send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
+                else:
+                    self._send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
+                    \nMark it down on your calendar!")
         except Exception as e:
             self._send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
@@ -544,8 +569,10 @@ def main():
                                 handler.top()
 
                         elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
-                            if len(command) > 1:
-                                handler.tolab(command[1], last_user_id)
+                            if len(command) == 2:
+                                handler.tolab(last_user_id, command[1])
+                            elif len(command) >= 3:
+                                handler.tolab(last_user_id, command[1], command[2])
                             else:
                                 handler.tolab_help()
 

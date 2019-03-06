@@ -1,4 +1,4 @@
-import datetime
+from _datetime import datetime, timedelta
 import json
 
 import pytz
@@ -11,7 +11,7 @@ class ToLab:
         self.tolab_path = tolab_path
         self.tolab_file = json.loads(oc.get_file_contents(self.tolab_path).decode('utf-8'))
         for entry in self.tolab_file:
-            entry["tolab"] = datetime.datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
+            entry["tolab"] = datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
 
     def _delete_user(self, telegram_id):
         keep = []
@@ -20,29 +20,34 @@ class ToLab:
                 keep.append(entry)
         self.tolab_file = keep
 
-    def _create_entry(self, username: str, telegram_id: int, when: str):
-        user = dict()
-        user["username"] = username
-        user["telegramID"] = telegram_id
+    def _create_entry(self, username: str, telegram_id: int, when: str, day: int):
+        entry = dict()
+        entry["username"] = username
+        entry["telegramID"] = telegram_id
+        now = datetime.now(self.local_tz)
         # Assume that the time refers to today
-        today = datetime.datetime.now(self.local_tz).strftime("%Y-%m-%d")
-        going = datetime.datetime.strptime(f"{today} {when}", "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
+        theday = now + timedelta(days=day)
+        theday = theday.strftime('%Y-%m-%d')
+        going = datetime.strptime(f"{theday} {when}", "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
 
         # If it already passed, user probably meant "tomorrow"
-        if datetime.datetime.now(self.local_tz) > going:
-            going += datetime.timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
+        if now > going:
+            going += timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
 
-        user["tolab"] = going
-        return user
+        entry["tolab"] = going
+        days = (going - now).days
+        return entry, days
 
     def delete_entry(self, telegram_id: int):
         self._delete_user(telegram_id)
         self.save(self.tolab_file)
 
-    def set_entry(self, username: str, telegram_id: int, when: str):
+    def set_entry(self, username: str, telegram_id: int, when: str, day: int) -> int:
         self._delete_user(telegram_id)
-        self.tolab_file.append(self._create_entry(username, telegram_id, when))
+        entry, days = self._create_entry(username, telegram_id, when, day)
+        self.tolab_file.append(entry)
         self.save(self.tolab_file)
+        return days
 
     def check_tolab(self, people_inlab: set):
         """
@@ -52,8 +57,8 @@ class ToLab:
         :param people_inlab: set of usernames of people /inlab
         :return:
         """
-        now = datetime.datetime.now(self.local_tz)
-        expires = now - datetime.timedelta(minutes=30)
+        now = datetime.now(self.local_tz)
+        expires = now - timedelta(minutes=30)
 
         changed = False
         keep = []
@@ -83,5 +88,5 @@ class ToLab:
             serializable.append(entry.copy())
         for entry in serializable:
             # Save it in local timezone format, because who cares
-            entry["tolab"] = datetime.datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
+            entry["tolab"] = datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
         self.oc.put_file_contents(self.tolab_path, json.dumps(serializable, indent=4).encode('utf-8'))
