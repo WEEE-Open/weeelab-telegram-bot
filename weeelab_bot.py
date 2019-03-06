@@ -465,7 +465,8 @@ Your user ID is: <b>{self.last_user_id}</b>'
     def tolab_help(self):
         help_message = "Use /tolab and the time to tell the bot when you'll go to the lab.\n\n\
 For example type <code>/tolab 10:30</code> if you're going at 10:30.\n\
-If it's later than the specified time, the bot will consider it for tomorrow.\n\n\
+You can also set the day: <code>/tolab 10:30 +1</code> for tomorrow, <code>+2</code> for the day after tomorrow and so\
+on. If you don't set a day, I will consider the time for today or tomorrow, the one which makes more sense.\n\
 You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
         self._send_message(help_message)
 
