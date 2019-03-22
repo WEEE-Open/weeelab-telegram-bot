@@ -20,7 +20,7 @@ class ToLab:
                 keep.append(entry)
         self.tolab_file = keep
 
-    def _create_entry(self, username: str, telegram_id: int, when: str, day: int):
+    def _create_entry(self, username: str, telegram_id: int, time: str, day: int):
         entry = dict()
         entry["username"] = username
         entry["telegramID"] = telegram_id
@@ -28,7 +28,7 @@ class ToLab:
         # Assume that the time refers to today
         theday = now + timedelta(days=day)
         theday = theday.strftime('%Y-%m-%d')
-        going = datetime.strptime(f"{theday} {when}", "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
+        going = datetime.strptime(f"{theday} {time}", "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
 
         # If it already passed, user probably meant "tomorrow"
         if now > going:
@@ -42,9 +42,9 @@ class ToLab:
         self._delete_user(telegram_id)
         self.save(self.tolab_file)
 
-    def set_entry(self, username: str, telegram_id: int, when: str, day: int) -> int:
+    def set_entry(self, username: str, telegram_id: int, time: str, day: int) -> int:
         self._delete_user(telegram_id)
-        entry, days = self._create_entry(username, telegram_id, when, day)
+        entry, days = self._create_entry(username, telegram_id, time, day)
         self.tolab_file.append(entry)
         self.save(self.tolab_file)
         return days

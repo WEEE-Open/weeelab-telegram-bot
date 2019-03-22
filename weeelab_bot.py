@@ -208,42 +208,25 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         self._send_message(msg)
 
     def tolab(self, telegram_id, time: str, day: str = None):
-        time_valid = False
-        if time == "no":
-            time_valid = True
-        elif len(time) == 5 and time[0].isdigit() and time[1].isdigit() and time[3].isdigit() and time[4].isdigit():
-            if time[2] == '.':
-                time = ':'.join(time.split('.'))
-            if time[2] == ':':
-                time_valid = True
-        if not time_valid:
+        try:
+            time = self._tolab_parse_time(time)
+        except ValueError:
             self._send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
             return
 
-        # TODO: this accepts "/tolab no +2" and rejects "/tolab no foo", while it should... ignore the second part?
-        # Or something else. I don't really know.
-        day_valid = False
-        if day is None:
-            day = 0
-            day_valid = True
-        else:
-            if day.startswith('+') and day[1:].isdigit():
-                day = int(day[1:])
-                day_valid = not day == 0
-            # try:
-            #     day = datetime.strptime(day, "%Y-%m-%d")
-            #     day_valid = True
-            # except ValueError:
-            #     pass
-        if not day_valid:
-            self._send_message("Use correct day format, e.g. +1 for tomorrow, +2 for the day after tomorrow and so on")
-            return
+        if time is not None:
+            try:
+                day = self._tolab_parse_day(day)
+            except ValueError:
+                self._send_message("Use correct day format: +1 for tomorrow, +2 for the day after tomorrow and so on")
+                return
+
         # noinspection PyBroadException
         try:
-            if time == "no":
+            if time is None:
                 self.tolab_db.delete_entry(telegram_id)
                 # TODO: add random messages (changing constantly like the "unknown command" ones),
-                # like "but why?", "hope you have fun elsewhere", etc...
+                # like "but why?", "I'm sorry to hear that", "hope you have fun elsewhere", etc...
                 self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
                 user = self.logs.get_entry_from_tid(telegram_id)
@@ -254,16 +237,61 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     self._send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
                 else:
                     self._send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
-                    \nMark it down on your calendar!")
+\nMark it down on your calendar!")
         except Exception as e:
             self._send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
+
+    @staticmethod
+    def _tolab_parse_time(time: str):
+        """
+        Parse time and coerce it into a standard format
+
+        :param time: Time string, provided by the user
+        :return: Time in HH:mm format, or None if "no"
+        """
+        if time == "no":
+            return None
+        elif len(time) == 1 and time.isdigit():
+            return f"0{time}:00"
+        elif len(time) == 2 and time.isdigit() and 0 <= int(time) <= 23:
+            return f"{time}:00"
+        elif len(time) == 4 and time[0].isdigit() and time[2:4].isdigit() and 0 <= int(time[2:4]) <= 59:
+            if time[1] == '.':
+                return ':'.join(time.split('.'))
+            elif time[1] == ':':
+                return time
+        elif len(time) == 5 and time[0:2].isdigit() and time[3:4].isdigit():
+            if time[2] == '.':
+                time = ':'.join(time.split('.'))
+            if time[2] == ':':
+                if 0 <= int(time[0:2]) <= 23 and 0 <= int(time[3:5]) <= 59:
+                    return time
+
+        raise ValueError
+
+    @staticmethod
+    def _tolab_parse_day(day: str):
+        """
+        Convert day offset to an integer
+
+        :param day: Day as specified by the user
+        :return: Days, 0 if None
+        """
+        if day is None:
+            return 0
+        else:
+            if day.startswith('+') and day[1:].isdigit():
+                day = int(day[1:])
+                if not day == 0:
+                    return day
+        raise ValueError
 
     def citofona(self):
         """
         Called with /citofona
         """
-        # TODO: implement this somehow...
+        # TODO: merge the other bot HERE
         pass
 
     def log(self, cmd_days_to_filter=None):
@@ -321,7 +349,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         else:
             # Asked for somebody else's stats but not an admin
             target_username = None
-            self._send_message('Sorry! You are not allowed  to see stat of other users!\nOnly admins can!')
+            self._send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
 
         # Do we know what to search?
         if target_username is not None:
