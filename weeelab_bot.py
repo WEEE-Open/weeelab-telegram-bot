@@ -112,7 +112,7 @@ class BotHandler:
 
 
 def escape_all(string):
-    return string.replace('<', '&lt;').replace('>', '&gt;')
+    return string.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;')
 
 
 class CommandHandler:
