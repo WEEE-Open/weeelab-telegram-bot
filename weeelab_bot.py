@@ -326,7 +326,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             if line.inlab:
                 days[this_day].append(f'<i>{print_name}</i> is in lab\n')
             else:
-                days[this_day].append(f'<i>{print_name}</i>: {line.text}\n')
+                days[this_day].append(f'<i>{print_name}</i>: {escape_all(line.text)}\n')
 
         msg = ''
         for this_day in days:
