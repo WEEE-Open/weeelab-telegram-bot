@@ -1,4 +1,4 @@
-import os # system library needed to read the environment variables
+import os  # system library needed to read the environment variables
 
 # get environment variables
 OC_URL = os.environ.get('OC_URL')  # url of the OwnCloud server

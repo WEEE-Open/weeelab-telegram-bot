@@ -6,14 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-certifi = "==2018.10.15"
-chardet = "==3.0.4"
-idna = "==2.7"
-pyocclient = "==0.4"
-requests = "==2.20.1"
-six = "==1.11.0"
-urllib3 = "==1.24.1"
-pytz = ">=2018.7"
+requests = "*"
+pyocclient = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.6"
