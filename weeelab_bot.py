@@ -401,6 +401,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                             msg += f'✏️ Renamed from <b>{h_location}</b>\n'
                         elif change == 'D':
                             msg += '❌ Deleted\n'
+                        elif change == 'L':
+                            msg += '🔍 Lost\n'
                         else:
                             msg += f'Unknown change {change}'
                         entries += 1
