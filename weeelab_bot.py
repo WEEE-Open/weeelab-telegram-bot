@@ -390,7 +390,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                         h_user = history[index]['user']
                         h_location = history[index]['other']
                         h_time = datetime.datetime.fromtimestamp(
-                            int(history[index]['time'])).strftime('%d-%m-%Y %H:%M')
+                            history[index]['time']).strftime('%d-%m-%Y %H:%M')
                         if change == 'M':
                             msg += f'➡️ Moved to <b>{h_location}</b>\n'
                         elif change == 'U':
