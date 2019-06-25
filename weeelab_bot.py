@@ -26,6 +26,7 @@ import requests  # send HTTP requests to Telegram server
 import owncloud
 import datetime
 import traceback  # Print stack traces in logs
+import simpleaudio
 
 
 class BotHandler:
@@ -205,6 +206,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             elif not user_themself_inlab:
                 msg += '\n\nAre you going to go the lab later? Tell everyone with /tolab.'
 
+        if len(inlab) > 0 and not user_themself_inlab:
+            msg += "\nUse /ring for the bell, if you are at door 3."
         self._send_message(msg)
 
     def tolab(self, telegram_id, time: str, day: str = None):
@@ -287,12 +290,20 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     return day
         raise ValueError
 
-    def citofona(self):
+    def ring(self, campanello, wave_obj):
         """
-        Called with /citofona
+        Called with /ring
         """
-        # TODO: merge the other bot HERE
-        pass
+        inlab = self.logs.get_log().get_entries_inlab()
+        if len(inlab) <= 0:
+            self._send_message("Nobody is in lab right now, I cannot ring the bell.")
+            return
+
+        # global campanello
+        if campanello is not None and campanello.is_playing():
+            campanello.stop()
+        campanello = wave_obj.play()
+        self._send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
     def log(self, cmd_days_to_filter=None):
         """
@@ -538,6 +549,8 @@ def main():
     tarallo = TaralloSession(TARALLO)
     logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_PATH, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
+    campanello = None
+    wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
 
     while True:
         # call the function to check if there are new messages
@@ -608,6 +621,9 @@ def main():
                                 handler.tolab(last_user_id, command[1], command[2])
                             else:
                                 handler.tolab_help()
+
+                        elif command[0] == "/ring":
+                            handler.ring(campanello, wave_obj)
 
                         elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                             handler.help()
