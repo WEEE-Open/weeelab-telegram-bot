@@ -86,7 +86,7 @@ class BotHandler:
         method to get last message if there is.
         in case of error return an error code used in the main function
         """
-        get_result = self.get_updates()  # recall the function to get updates
+        get_result = self.get_updates(120)  # recall the function to get updates
         if not get_result:
             return -1
         elif len(get_result) > 0:  # check if there are new messages
