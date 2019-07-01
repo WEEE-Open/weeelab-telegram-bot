@@ -529,6 +529,7 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
 /log - Show log of the day\n\
 /log <i>n</i> - Show last <i>n</i> days worth of logs\n\
 /stat - Show hours you've spent in lab\n\
+/ring - ring the bell at the door\n\
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
 
