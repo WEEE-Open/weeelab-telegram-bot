@@ -1,6 +1,6 @@
 # weeelab-telegram-bot
 [![License](http://img.shields.io/:license-GPL3.0-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
-![Version](https://img.shields.io/badge/version-1.0-yellow.svg)
+![Version](https://img.shields.io/badge/version-1-blue.svg)
 
 WEEE-Open Telegram bot.
 
@@ -12,12 +12,7 @@ All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log fil
 
 ## Installation
 
-Deployment of this bot has been tested only on Heroku: just connect the repo.
-
-TODO: run it locally somehow.
-
-`weeelab_bot.py` is the main script, and it requires some environment variables (imported from `variables.py`) to 
-run:
+`weeelab_bot.py` is the main script, and it requires some environment variables:
 * `OC_URL`: Url of the owncloud server
 * `OC_USER`: OwnCloud username
 * `OC_PWD`: OwnCloud password
@@ -36,6 +31,7 @@ Available commands and options:
 - `/log` - Show log of the day
 - `/log n` - Show last n days worth of logs
 - `/log all` - Show last 31 days worth of logs
+. `/ring` - Ring the bell
 - `/stat` - Show hours you've spent in lab
 - `/history item` - Show history for an item, straight outta T.A.R.A.L.L.O.
 - `/history item n` - Show n history entries
