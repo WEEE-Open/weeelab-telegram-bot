@@ -9,6 +9,10 @@ verify_ssl = true
 requests = "*"
 pyocclient = "*"
 pytz = "*"
+simpleaudio = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
+
+[scripts]
+bot = "python weeelab_bot.py"

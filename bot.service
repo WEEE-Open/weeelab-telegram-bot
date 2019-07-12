@@ -1,0 +1,27 @@
+[Unit]
+Description=the Telegram bot
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+User=bot
+Environment="OC_URL=https://cloud.example.com/"
+Environment="OC_USER=bot"
+Environment="OC_PWD=f00b4r"
+Environment="LOG_BASE=Weeelab/"
+Environment="LOG_PATH=Weeelab/log.txt"
+Environment="TOLAB_PATH=Weeelab/tolab.json"
+Environment="USER_BOT_PATH=Weeelab/user.txt"
+Environment="USER_PATH=Weeelab/users.json"
+Environment="TARALLO=https://tarallo.com"
+Environment="BOT_USER=bot"
+Environment="BOT_PSW=f00b4r2"
+Environment="TOKEN_BOT=1234:f00f00f00f00f00f00f00f00f00f00f00"
+WorkingDirectory=/home/bot/weeelab-telegram-bot
+ExecStart=/usr/bin/pipenv run bot
+Restart=on-failure
+IPAccounting=yes
+
+[Install]
+WantedBy=multi-user.target
