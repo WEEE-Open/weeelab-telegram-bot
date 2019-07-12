@@ -52,19 +52,24 @@ class BotHandler:
             "Bad command or file name"
         ]
 
-    def get_updates(self, timeout=30):
+    def get_updates(self, timeout=120):
         """
         method to receive incoming updates using long polling
         [Telegram API -> getUpdates ]
         """
         params = {'offset': self.offset, 'timeout': timeout}
+        requests_timeout = timeout + 5
         # noinspection PyBroadException
         try:
-            result = requests.get(self.api_url + 'getUpdates', params).json()['result']  # return an array of json
+            result = requests.get(self.api_url + 'getUpdates', params, timeout=requests_timeout).json()['result']
             if len(result) > 0:
                 self.offset = result[-1]['update_id'] + 1
             return result
-        except:
+        except requests.exceptions.Timeout:
+            print(f"Polling timed out after f{requests_timeout} seconds")
+            return None
+        except Exception as e:
+            print("Failed to get updates: " + str(e))
             return None
 
     def send_message(self, chat_id, text, parse_mode='HTML', disable_web_page_preview=True, reply_markup=None):
