@@ -67,7 +67,7 @@ class BotHandler:
                 self.offset = result[-1]['update_id'] + 1
             return result
         except requests.exceptions.Timeout:
-            print(f"Polling timed out after f{requests_timeout} seconds")
+            print(f"Polling timed out after f{str(requests_timeout)} seconds")
             return None
         except Exception as e:
             print("Failed to get updates: " + str(e))
@@ -569,7 +569,7 @@ def main():
 
                 last_user_id = last_update['message']['from']['id']
                 message_type = last_update['message']['chat']['type']
-                print(last_update['message'])  # Extremely advanced debug techniques
+                # print(last_update['message'])  # Extremely advanced debug techniques
 
                 # Don't respond to messages in group chats
                 if message_type == "private":
