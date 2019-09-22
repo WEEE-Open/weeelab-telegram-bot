@@ -299,7 +299,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     return day
         raise ValueError
 
-    def ring(self, campanello, wave_obj):
+    def ring(self, wave_obj):
         """
         Called with /ring
         """
@@ -308,10 +308,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             self._send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
-        # global campanello
-        if campanello is not None and campanello.is_playing():
-            campanello.stop()
-        campanello = wave_obj.play()
+        wave_obj.play()
         self._send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
     def log(self, cmd_days_to_filter=None):
@@ -559,7 +556,6 @@ def main():
     tarallo = TaralloSession(TARALLO)
     logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_PATH, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
-    campanello = None
     wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
 
     while True:
@@ -633,7 +629,7 @@ def main():
                                 handler.tolab_help()
 
                         elif command[0] == "/ring":
-                            handler.ring(campanello, wave_obj)
+                            handler.ring(wave_obj)
 
                         elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                             handler.help()
