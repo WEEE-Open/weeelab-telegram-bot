@@ -45,12 +45,16 @@ class BotHandler:
         # These are returned when a user sends an unknown command.
         self.unknown_command_messages_last = -1
         self.unknown_command_messages = [
-            "Sorry, I didn't understand that",
+            "Sorry, I didn't understand that.\nWanna try /history? That one I do understand",
+            "Sorry, I didn't understand that.\nWanna try /tolab? That one I do understand",
             "I don't know that command, but do you know /history? It's pretty cool",
             "I don't know that command, but do you know /tolab? It's pretty cool",
-            "What? I don't understand :(",
+            "What? I don't understand :(\nBut I do understand /history",
+            "What? I don't understand :(\nBut I do understand /tolab",
             "Unknown command. But do you know /history? It's pretty cool",
-            "Bad command or file name"
+            "Unknown command. But do you know /tolab? It's pretty cool",
+            "Bad command or file name.\nDo you know what's good? /history",
+            "Bad command or file name.\nDo you know what's good? /tolab",
         ]
 
     def get_updates(self, timeout=120):
