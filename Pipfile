@@ -10,6 +10,7 @@ requests = "*"
 pyocclient = "*"
 pytz = "*"
 simpleaudio = "*"
+python-ldap = "*"
 
 [requires]
 python_version = "3.7"
