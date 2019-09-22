@@ -17,6 +17,7 @@ Author: WEEE Open Team
 """
 
 # Modules
+from LdapWrapper import Users, People
 from TaralloSession import TaralloSession
 from ToLab import ToLab
 from Weeelablib import WeeelabLogs
@@ -562,91 +563,93 @@ def main():
         # call the function to check if there are new messages
         last_update = bot.get_last_update()
 
-        if last_update != -1:
-            # noinspection PyBroadException
-            try:
-                command = last_update['message']['text'].split()
+        if last_update == -1:
+            print("last_update = 1")
+            continue
+        # noinspection PyBroadException
+        try:
+            command = last_update['message']['text'].split()
 
-                last_user_id = last_update['message']['from']['id']
-                message_type = last_update['message']['chat']['type']
-                # print(last_update['message'])  # Extremely advanced debug techniques
+            last_user_id = last_update['message']['from']['id']
+            message_type = last_update['message']['chat']['type']
+            # print(last_update['message'])  # Extremely advanced debug techniques
 
-                # Don't respond to messages in group chats
-                if message_type == "private":
-                    # TODO: get_users downloads users.json from the cloud. For performance this could be done only
-                    # once in a while
-                    logs.get_users()
-                    user = logs.get_entry_from_tid(last_user_id)
+            # Don't respond to messages in group chats
+            if message_type != "private":
+                continue
 
-                    # Instantiate a command handler with the current user information
-                    handler = CommandHandler(user, bot, tarallo, logs, last_update, tolab)
+            logs.get_users()
+            user = logs.get_entry_from_tid(last_user_id)
 
-                    if user is None or user["level"] == 0:
-                        handler.not_allowed(logs.error)
-                        if user is None:
-                            handler.store_id()
+            # Instantiate a command handler with the current user information
+            handler = CommandHandler(user, bot, tarallo, logs, last_update, tolab)
+
+            if user is None or user["level"] == 0:
+                handler.not_allowed(logs.error)
+                if user is None:
+                    handler.store_id()
+            else:
+                if command[0] == "/start" or command[0] == "/start@weeelab_bot":
+                    handler.start()
+
+                elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
+                    handler.inlab()
+
+                elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
+                    if len(command) < 2:
+                        bot.send_message(handler.last_chat_id, 'Sorry insert the item to search')
+                    elif len(command) < 3:
+                        handler.history(command[1])
                     else:
-                        if command[0] == "/start" or command[0] == "/start@weeelab_bot":
-                            handler.start()
+                        handler.history(command[1], command[2])
 
-                        elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
-                            handler.inlab()
+                elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
 
-                        elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
-                            if len(command) < 2:
-                                bot.send_message(handler.last_chat_id, 'Sorry insert the item to search')
-                            elif len(command) < 3:
-                                handler.history(command[1])
-                            else:
-                                handler.history(command[1], command[2])
+                    if len(command) > 1:
+                        handler.log(command[1])
+                    else:
+                        handler.log()
 
-                        elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
+                elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
 
-                            if len(command) > 1:
-                                handler.log(command[1])
-                            else:
-                                handler.log()
+                    if len(command) > 1:
+                        handler.stat(command[1])
+                    else:
+                        handler.stat()
 
-                        elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
+                elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                    if len(command) > 1:
+                        handler.top(command[1])
+                    else:
+                        handler.top()
 
-                            if len(command) > 1:
-                                handler.stat(command[1])
-                            else:
-                                handler.stat()
+                elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
+                    if len(command) == 2:
+                        handler.tolab(last_user_id, command[1])
+                    elif len(command) >= 3:
+                        handler.tolab(last_user_id, command[1], command[2])
+                    else:
+                        handler.tolab_help()
 
-                        elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
-                            if len(command) > 1:
-                                handler.top(command[1])
-                            else:
-                                handler.top()
+                elif command[0] == "/ring":
+                    handler.ring(wave_obj)
 
-                        elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
-                            if len(command) == 2:
-                                handler.tolab(last_user_id, command[1])
-                            elif len(command) >= 3:
-                                handler.tolab(last_user_id, command[1], command[2])
-                            else:
-                                handler.tolab_help()
+                elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
+                    handler.help()
 
-                        elif command[0] == "/ring":
-                            handler.ring(wave_obj)
+                elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
+                    handler.status()
 
-                        elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
-                            handler.help()
+                else:
+                    handler.unknown()
 
-                        elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
-                            handler.status()
-
-                        else:
-                            handler.unknown()
-
-            except:  # catch the exception if raised
-                if "channel_post" in last_update:
-                    chat_id = last_update['channel_post']['chat']['id']
-                    print(bot.leave_chat(chat_id).text)
-                print("ERROR!")
-                print(last_update)
-                print(traceback.format_exc())
+        except:  # catch the exception if raised
+            if "channel_post" in last_update:
+                chat_id = last_update['channel_post']['chat']['id']
+                print(bot.leave_chat(chat_id).text)
+            print("ERROR!")
+            print(last_update)
+            print(traceback.format_exc())
 
 
 # call the main() until a keyboard interrupt is called
