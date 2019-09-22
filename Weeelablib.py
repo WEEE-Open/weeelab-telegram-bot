@@ -10,7 +10,6 @@ class WeeelabLogs:
     def __init__(self, oc: owncloud, log_path: str, log_base: str, user_path: str, user_bot_path: str):
         self.log = []
         self.log_last_update = None
-        self.users = None
         self.error = None
         self.oc = oc
 
@@ -174,18 +173,6 @@ class WeeelabLogs:
                 inlab.append(line.username)
 
         return inlab
-
-    def get_entry_from_tid(self, user_id: str):
-        """
-        Search user data from a Telegram ID
-
-        :param user_id: Telegram user ID
-        :return: The entry from users.json or None
-        """
-        for user in self.users:
-            if user["telegramID"] == str(user_id):
-                return user
-        return None
 
     def get_entry_from_username(self, username: str):
         """

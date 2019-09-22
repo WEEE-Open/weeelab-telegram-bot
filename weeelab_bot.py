@@ -17,7 +17,8 @@ Author: WEEE Open Team
 """
 
 # Modules
-from LdapWrapper import Users, People
+from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
+    AccountNotFoundError
 from TaralloSession import TaralloSession
 from ToLab import ToLab
 from Weeelablib import WeeelabLogs
@@ -475,7 +476,11 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         else:
             self._send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
 
-    def not_allowed(self, user_json_error):
+    def exception(self, exception: str):
+        msg = f"I tried to do that, but an exception occurred: {exception}"
+        self._send_message(msg)
+
+    def not_allowed(self):
         """
         Called when user is not allowed to use the bot (banned, no telegram ID in user.json, etc...)
         """
@@ -484,11 +489,6 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 If you\'re a member of <a href="http://weeeopen.polito.it/">WEEE Open</a>, \
 ask the administrators to authorize your account and /start the bot again.\n\n\
 Your user ID is: <b>{self.last_user_id}</b>'
-
-        if user_json_error is not None:
-            msg += f"\n\nWarning: error in users file, {user_json_error}.\nMaybe you\'re authorized but the file is " \
-                   f"broken? "
-
         self._send_message(msg)
 
     def store_id(self):
@@ -558,19 +558,23 @@ def main():
     logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_PATH, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
     wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
+    users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
+    people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
+    conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
 
     while True:
         # call the function to check if there are new messages
         last_update = bot.get_last_update()
 
         if last_update == -1:
-            print("last_update = 1")
+            print("last_update = -1")
             continue
         # noinspection PyBroadException
         try:
             command = last_update['message']['text'].split()
 
             last_user_id = last_update['message']['from']['id']
+            last_user_nickname = last_update['message']['from']['username'] if 'username' in last_update['message']['from'] else None
             message_type = last_update['message']['chat']['type']
             # print(last_update['message'])  # Extremely advanced debug techniques
 
@@ -578,14 +582,23 @@ def main():
             if message_type != "private":
                 continue
 
-            logs.get_users()
-            user = logs.get_entry_from_tid(last_user_id)
-
+            user = None
             # Instantiate a command handler with the current user information
             handler = CommandHandler(user, bot, tarallo, logs, last_update, tolab)
 
+            logs.get_users()
+            try:
+                user = users.get(last_user_id, last_user_nickname, conn)
+            except (LdapConnectionError, DuplicateEntryError) as e:
+                handler.exception(e.__class__.__name__)
+            except AccountLockedError:
+                pass  # TODO
+            except AccountNotFoundError:
+                # TODO: if message is a link, then...
+                pass  # TODO
+
             if user is None or user["level"] == 0:
-                handler.not_allowed(logs.error)
+                handler.not_allowed()
                 if user is None:
                     handler.store_id()
             else:
