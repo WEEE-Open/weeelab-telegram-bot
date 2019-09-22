@@ -17,3 +17,11 @@ TOKEN_BOT = os.environ.get('TOKEN_BOT')  # Telegram token for the bot API
 BOT_USER = os.environ.get('BOT_USER')  # user tarallo
 BOT_PSW = os.environ.get('BOT_PSW')  # password tarallo
 TARALLO = os.environ.get('TARALLO')  # Url tarallo
+
+LDAP_SERVER = os.environ.get('LDAP_SERVER')
+LDAP_USER = os.environ.get('LDAP_USER')
+LDAP_PASS = os.environ.get('LDAP_PASS')
+LDAP_SUFFIX = os.environ.get('LDAP_SUFFIX')
+LDAP_PEOPLE = os.environ.get('LDAP_PEOPLE')
+LDAP_INVITES = os.environ.get('LDAP_INVITES')
+LDAP_ADMIN_GROUPS = os.environ.get('LDAP_ADMIN_GROUPS').split('|')
