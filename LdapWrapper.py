@@ -1,6 +1,6 @@
 from time import time
 from dataclasses import dataclass
-from typing import Optional, Iterable, List
+from typing import Optional, Iterable, List, Dict
 import ldap
 
 
@@ -11,14 +11,22 @@ class LdapConnection:
         self.server = server
 
     def __enter__(self):
+        print("Connecting to LDAP")
         self.conn = ldap.initialize(f"ldap://{self.server}:389")
         self.conn.protocol_version = ldap.VERSION3
         self.conn.start_tls_s()
         self.conn.simple_bind_s(self.bind_dn, self.password)
+        if self.conn is None:
+            raise LdapConnectionError
         return self.conn
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        print("Disconnecting from LDAP")
         self.conn.unbind_s()
+
+
+class LdapConnectionError(BaseException):
+    pass
 
 
 class DuplicateEntryError(BaseException):
@@ -35,27 +43,35 @@ class AccountNotFoundError(BaseException):
 
 class Users:
     def __init__(self, admin_groups: List[str], tree: str):
-        self.__users = {}
+        self.__users: Dict[int, User] = {}
         self.admin_groups = admin_groups
         self.tree = tree
 
-    def get(self, tgid, nickname: Optional[str], conn):
+    def get(self, tgid, nickname: Optional[str], conn: LdapConnection):
         if not isinstance(tgid, int):
             raise IndexError(f"{tgid} is not an int")
 
         user = None
+        # Try to get cached user
         if tgid in self.__users:
             user = self.__users[tgid]
-            try:
-                if user.need_update():
-                    user.update(conn, self.admin_groups, True, nickname)
-            except (AccountNotFoundError, AccountLockedError, DuplicateEntryError):
-                del self.__users[tgid]
-                user = None
+            if not user.need_update():
+                return user
 
-        if user is None:
-            user = User.search(tgid, nickname, self.admin_groups, conn, self.tree)
-            self.__users[tgid] = user
+        with conn as c:
+            # Got it but it's stale?
+            if user is not None:
+                try:
+                    if user.need_update():
+                        user.update(c, self.admin_groups, True, nickname)
+                except (AccountNotFoundError, AccountLockedError, DuplicateEntryError):
+                    del self.__users[tgid]
+                    user = None
+
+            # Deleted stale user or didn't get it?
+            if user is None:
+                user = User.search(tgid, nickname, self.admin_groups, c, self.tree)
+                self.__users[tgid] = user
 
         return user
 
@@ -76,10 +92,11 @@ class People:
         self.tree = tree
         self.admin_groups = admin_groups
 
-    def get(self, uid: str, conn):
+    def get(self, uid: str, conn: LdapConnection):
         if time() - self.last_update > 3600:
-            print("Sync people")
-            self.__sync(conn)
+            with conn as c:
+                print("Sync people from LDAP")
+                self.__sync(c)
         uid = uid.lower()
         if uid in self.__people:
             return self.__people[uid]
