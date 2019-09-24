@@ -41,11 +41,18 @@ class AccountNotFoundError(BaseException):
     pass
 
 
+class AccountNotCompletedError(BaseException):
+    def __init__(self, invite_code: str, *args):
+        super().__init__(*args)
+        self.invite_code = invite_code
+
+
 class Users:
-    def __init__(self, admin_groups: List[str], tree: str):
+    def __init__(self, admin_groups: List[str], tree: str, invite_tree: str):
         self.__users: Dict[int, User] = {}
         self.admin_groups = admin_groups
         self.tree = tree
+        self.invite_tree = invite_tree
 
     def get(self, tgid, nickname: Optional[str], conn: LdapConnection):
         if not isinstance(tgid, int):
@@ -70,7 +77,7 @@ class Users:
 
             # Deleted stale user or didn't get it?
             if user is None:
-                user = User.search(tgid, nickname, self.admin_groups, c, self.tree)
+                user = User.search(tgid, nickname, self.admin_groups, c, self.tree, self.invite_tree)
                 self.__users[tgid] = user
 
         return user
@@ -158,6 +165,7 @@ class User:
             'nsaccountlock'
         ))
         if len(result) == 0:
+            # TODO: search for invite code, raise AccountNotCompleteError
             raise AccountNotFoundError()
         if len(result) > 1:
             raise DuplicateEntryError(f"DN {self.dn} associated to {len(result)} entries (how!?)")
@@ -180,7 +188,7 @@ class User:
         self.__set_update_time()
 
     @staticmethod
-    def search(tgid: int, tgnick: Optional[str], admin_groups, conn, tree: str):
+    def search(tgid: int, tgnick: Optional[str], admin_groups, conn, tree: str, invite_tree: str):
         print(f"Search {tgid}")
         result = conn.search_s(tree, ldap.SCOPE_SUBTREE, f"(&(objectClass=weeeOpenPerson)(telegramId={tgid}))", (
             'uid',
@@ -193,7 +201,11 @@ class User:
             'nsaccountlock'
         ))
         if len(result) == 0:
-            raise AccountNotFoundError()
+            invite = User.__get_invite_from_tgid(tgid, invite_tree, conn)
+            if invite is None:
+                raise AccountNotFoundError()
+            else:
+                raise AccountNotCompletedError(invite)
         if len(result) > 1:
             raise DuplicateEntryError(f"Telegram ID {tgid} associated to {len(result)} entries")
 
@@ -210,6 +222,17 @@ class User:
             User.__update_nickname(dn, tgnick, conn)
         # self.__set_update_time() done in __post_init___
         return User(dn, tgid, attributes['uid'][0].decode(), attributes['cn'][0].decode(), attributes['givenname'][0].decode(), attributes['sn'][0].decode(), isadmin, tgnick)
+
+    @staticmethod
+    def __get_invite_from_tgid(tgid: int, invite_tree: str, conn):
+        result = conn.search_s(invite_tree, ldap.SCOPE_SUBTREE, f"(&(inviteCode=*)(telegramId={tgid}))", ('*',))
+        if len(result) == 0:
+            return None
+        if len(result) > 1:
+            raise DuplicateEntryError(f"Telegram ID {tgid} associated to {len(result)} invites")
+        dn, attributes = User.__extract_the_only_result(result)
+        del result
+        return attributes['inviteCode'][0].decode()
 
     @staticmethod
     def __get_stored_nickname(attributes):

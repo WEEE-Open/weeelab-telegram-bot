@@ -18,7 +18,7 @@ Author: WEEE Open Team
 
 # Modules
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
-    AccountNotFoundError
+    AccountNotFoundError, AccountNotCompletedError
 from TaralloSession import TaralloSession
 from ToLab import ToLab
 from Weeelablib import WeeelabLogs
@@ -480,6 +480,16 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         msg = f"I tried to do that, but an exception occurred: {exception}"
         self._send_message(msg)
 
+    def account_locked(self):
+        self._send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
+                           "If you're a new team member, that will happen after the test on safety.")
+
+    def give_invite_link(self, invite_code: str):
+        self._send_message("Oh, hi, long time no see! We switched to a new account management system, "
+                           "so you will need to complete your registration here before we can talk again:\n"
+                           f"{INVITE_LINK}{invite_code}\n"
+                           "Once you're done, ask an administrator to enable your account. Have a nice day!")
+
     def not_allowed(self):
         """
         Called when user is not allowed to use the bot (banned, no telegram ID in user.json, etc...)
@@ -487,7 +497,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
         msg = f'Sorry, you are not allowed to use this bot.\n\
 If you\'re a member of <a href="http://weeeopen.polito.it/">WEEE Open</a>, \
-ask the administrators to authorize your account and /start the bot again.\n\n\
+add your user ID from the account management panel.\n\n\
 Your user ID is: <b>{self.last_user_id}</b>'
         self._send_message(msg)
 
@@ -558,9 +568,12 @@ def main():
     logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_PATH, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
     wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
-    users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
+    users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE, LDAP_TREE_INVITES)
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
+
+    # TODO: change method signature to accept these parameters later
+    handler = CommandHandler(user, bot, tarallo, logs, last_update, tolab)
 
     while True:
         # call the function to check if there are new messages
@@ -582,79 +595,71 @@ def main():
             if message_type != "private":
                 continue
 
-            user = None
-            # Instantiate a command handler with the current user information
-            handler = CommandHandler(user, bot, tarallo, logs, last_update, tolab)
-
-            logs.get_users()
             try:
                 user = users.get(last_user_id, last_user_nickname, conn)
             except (LdapConnectionError, DuplicateEntryError) as e:
                 handler.exception(e.__class__.__name__)
             except AccountLockedError:
-                pass  # TODO
+                handler.account_locked()
             except AccountNotFoundError:
-                # TODO: if message is a link, then...
-                pass  # TODO
-
-            if user is None or user["level"] == 0:
+                handler.store_id()
                 handler.not_allowed()
-                if user is None:
-                    handler.store_id()
-            else:
-                if command[0] == "/start" or command[0] == "/start@weeelab_bot":
-                    handler.start()
+            except AccountNotCompletedError as e:
+                handler.give_invite_link(e.invite_code)
 
-                elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
-                    handler.inlab()
+            if command[0] == "/start" or command[0] == "/start@weeelab_bot":
+                handler.start()
 
-                elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
-                    if len(command) < 2:
-                        bot.send_message(handler.last_chat_id, 'Sorry insert the item to search')
-                    elif len(command) < 3:
-                        handler.history(command[1])
-                    else:
-                        handler.history(command[1], command[2])
+            elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
+                handler.inlab()
 
-                elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
-
-                    if len(command) > 1:
-                        handler.log(command[1])
-                    else:
-                        handler.log()
-
-                elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
-
-                    if len(command) > 1:
-                        handler.stat(command[1])
-                    else:
-                        handler.stat()
-
-                elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
-                    if len(command) > 1:
-                        handler.top(command[1])
-                    else:
-                        handler.top()
-
-                elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
-                    if len(command) == 2:
-                        handler.tolab(last_user_id, command[1])
-                    elif len(command) >= 3:
-                        handler.tolab(last_user_id, command[1], command[2])
-                    else:
-                        handler.tolab_help()
-
-                elif command[0] == "/ring":
-                    handler.ring(wave_obj)
-
-                elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
-                    handler.help()
-
-                elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
-                    handler.status()
-
+            elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
+                if len(command) < 2:
+                    bot.send_message(handler.last_chat_id, 'Sorry insert the item to search')
+                elif len(command) < 3:
+                    handler.history(command[1])
                 else:
-                    handler.unknown()
+                    handler.history(command[1], command[2])
+
+            elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
+
+                if len(command) > 1:
+                    handler.log(command[1])
+                else:
+                    handler.log()
+
+            elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
+
+                if len(command) > 1:
+                    handler.stat(command[1])
+                else:
+                    handler.stat()
+
+            elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                if len(command) > 1:
+                    handler.top(command[1])
+                else:
+                    handler.top()
+
+            elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
+                if len(command) == 2:
+                    handler.tolab(last_user_id, command[1])
+                elif len(command) >= 3:
+                    handler.tolab(last_user_id, command[1], command[2])
+                else:
+                    handler.tolab_help()
+
+            elif command[0] == "/ring":
+                handler.ring(wave_obj)
+
+            elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
+                handler.help()
+
+            elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
+                handler.status()
+
+            else:
+                handler.unknown()
 
         except:  # catch the exception if raised
             if "channel_post" in last_update:

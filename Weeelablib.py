@@ -90,18 +90,6 @@ class WeeelabLogs:
         self.old_logs_month = month
         self.old_logs_year = year
 
-    def get_users(self):
-        try:
-            self.users = json.loads(self.oc.get_file_contents(self.user_path).decode('utf-8'))["users"]
-        except json.decoder.JSONDecodeError as e:
-            self.error = str(e)
-            if self.users is None:
-                raise RuntimeError("Error getting/parsing users file and no previous version available")
-            return self
-        self.error = None
-
-        return self
-
     def count_time_user(self, username):
         """
         Count time spent in lab for this user

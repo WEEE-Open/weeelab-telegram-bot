@@ -18,10 +18,12 @@ BOT_USER = os.environ.get('BOT_USER')  # user tarallo
 BOT_PSW = os.environ.get('BOT_PSW')  # password tarallo
 TARALLO = os.environ.get('TARALLO')  # Url tarallo
 
-LDAP_SERVER = os.environ.get('LDAP_SERVER')
-LDAP_USER = os.environ.get('LDAP_USER')
-LDAP_PASS = os.environ.get('LDAP_PASS')
-LDAP_SUFFIX = os.environ.get('LDAP_SUFFIX')
+LDAP_SERVER = os.environ.get('LDAP_SERVER')  # ldap.example.com
+LDAP_USER = os.environ.get('LDAP_USER')  # cn=whatever,ou=whatever
+LDAP_PASS = os.environ.get('LDAP_PASS')  # foo
+LDAP_SUFFIX = os.environ.get('LDAP_SUFFIX')  # dc=weeeopen,dc=it
 LDAP_TREE_PEOPLE = os.environ.get('LDAP_TREE_PEOPLE')
 LDAP_TREE_INVITES = os.environ.get('LDAP_TREE_INVITES')
-LDAP_ADMIN_GROUPS = os.environ.get('LDAP_ADMIN_GROUPS').split('|')
+LDAP_ADMIN_GROUPS = os.environ.get('LDAP_ADMIN_GROUPS').split('|')  # ou=Group,dc=weeeopen,dc=it|ou=OtherGroup,dc=weeeopen,dc=it
+
+INVITE_LINK = os.environ.get('INVITE_LINK')  # https://example.com/register.php?invite= (invite code will be appended, no spaces in invite code)
