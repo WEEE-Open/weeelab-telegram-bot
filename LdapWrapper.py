@@ -99,7 +99,7 @@ class People:
         self.tree = tree
         self.admin_groups = admin_groups
 
-    def get(self, uid: str, conn: LdapConnection):
+    def get(self, uid: str, conn: LdapConnection) -> Optional[Person]:
         if time() - self.last_update > 3600:
             with conn as c:
                 print("Sync people from LDAP")
@@ -165,7 +165,6 @@ class User:
             'nsaccountlock'
         ))
         if len(result) == 0:
-            # TODO: search for invite code, raise AccountNotCompleteError
             raise AccountNotFoundError()
         if len(result) > 1:
             raise DuplicateEntryError(f"DN {self.dn} associated to {len(result)} entries (how!?)")

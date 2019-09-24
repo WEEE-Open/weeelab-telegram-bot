@@ -1,5 +1,4 @@
 import datetime
-import json
 import re
 # noinspection PyUnresolvedReferences
 import owncloud
@@ -162,18 +161,6 @@ class WeeelabLogs:
 
         return inlab
 
-    def get_entry_from_username(self, username: str):
-        """
-        Search user data from a username
-
-        :param username: Normalized, unique, official username
-        :return: The entry from users.json or None
-        """
-        for user in self.users:
-            if username == user["username"]:
-                return user
-        return None
-
     def store_new_user(self, tid, name: str, surname: str, username: str):
         new_users_file = self.oc.get_file_contents(self.user_bot_path)
         new_users = new_users_file.decode('utf-8')
@@ -195,27 +182,6 @@ class WeeelabLogs:
             except (AttributeError, UnicodeEncodeError):
                 print("ERROR writing user.txt")
                 pass
-
-    def try_get_name_and_surname(self, username: str):
-        """
-        Get full name and surname from username, or return provided username if not found
-
-        :param username: Normalized, unique, official username
-        :return: Name and surname, or name only, or username only, or something usable
-        """
-        entry = self.get_entry_from_username(username)
-        if entry:
-            return self.get_name_and_surname(entry)
-        else:
-            return username
-
-    def try_get_id(self, username: str):
-
-        entry = self.get_entry_from_username(username)
-        if entry:
-            return entry["telegramID"]
-        else:
-            return None
 
     @staticmethod
     def get_name_and_surname(user_entry: dict):

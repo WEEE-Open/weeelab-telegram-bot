@@ -17,8 +17,10 @@ Author: WEEE Open Team
 """
 
 # Modules
+from typing import Optional
+
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
-    AccountNotFoundError, AccountNotCompletedError
+    AccountNotFoundError, AccountNotCompletedError, User, Person
 from TaralloSession import TaralloSession
 from ToLab import ToLab
 from Weeelablib import WeeelabLogs
@@ -132,38 +134,86 @@ class CommandHandler:
     Aggregates all the possible commands within one class.
     """
 
-    def __init__(self, user, bot, tarallo: TaralloSession, logs: WeeelabLogs, last_update, tolab: ToLab):
-        self.user = user
+    def __init__(self,
+                 bot,
+                 tarallo: TaralloSession,
+                 logs: WeeelabLogs,
+                 tolab: ToLab,
+                 users: Users,
+                 people: People,
+                 conn: LdapConnection):
         self.bot = bot
         self.tarallo = tarallo
         self.logs = logs
-        self.last_chat_id = last_update['message']['chat']['id']
-        self.last_user_id = last_update['message']['from']['id']
-        self.last_update = last_update
         self.tolab_db = tolab
+        self.users = users
+        self.people = people
+        self.conn = conn
+
+        self.user: Optional[User] = None
+        self.__last_chat_id = None
+        self.__last_user_id = None
+        self.__last_update = None
+
+    def from_message(self, last_update):
+        self.__last_update = last_update
+        self.__last_chat_id = last_update['message']['chat']['id']
+        self.__last_user_id = last_update['message']['from']['id']
+        last_user_nickname = last_update['message']['from']['username'] if 'username' in last_update['message'][
+            'from'] else None
+
+        self.user = None
+        try:
+            self.user = self.users.get(self.__last_user_id, last_user_nickname, self.conn)
+        except (LdapConnectionError, DuplicateEntryError) as e:
+            self.exception(e.__class__.__name__)
+        except AccountLockedError:
+            self._send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
+                               "If you're a new team member, that will happen after the test on safety.")
+        except AccountNotFoundError:
+            self.store_id()
+            msg = "Sorry, you are not allowed to use this bot.\n\n"
+            "If you\'re a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, "
+            "add your user ID from the account management panel.\n"
+            f"Your user ID is: <b>{self.__last_user_id}</b>"
+            self._send_message(msg)
+        except AccountNotCompletedError as e:
+            self._send_message("Oh, hi, long time no see! We switched to a new account management system, "
+                               "so you will need to complete your registration here before we can talk again:\n"
+                               f"{INVITE_LINK}{e.invite_code}\n"
+                               "Once you're done, ask an administrator to enable your account. Have a nice day!")
 
     def _send_message(self, message):
-        self.bot.send_message(self.last_chat_id, message)
+        self.bot.send_message(self.__last_chat_id, message)
 
     def start(self):
         """
         Called with /start
         """
 
+        # TODO: can we simplify this?
         self._send_message('\
 <b>WEEE Open Telegram bot</b>.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
 as well. \nAll data is read from a weeelab log file, which is fetched from \
-an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
+a NextCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
     def format_user_in_list(self, username: str, other=''):
-        user_id = self.logs.try_get_id(username)
-        display_name = self.logs.try_get_name_and_surname(username)
+        person = self.people.get(username, self.conn)
+        user_id = None if person is None or person.tgid is None else person.tgid  # This is unreadable. Deal with it.
+        display_name = CommandHandler.try_get_display_name(username, person)
         if user_id is None:
             return f'\n- {display_name}{other}'
         else:
             return f'\n- <a href="tg://user?id={user_id}">{display_name}</a>{other}'
+
+    @staticmethod
+    def try_get_display_name(username: str, person: Optional[Person]):
+        if person is None or person.cn is None:
+            return username
+        else:
+            return person.cn
 
     def inlab(self):
         """
@@ -184,7 +234,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             msg += self.format_user_in_list(username)
             people_inlab.add(username)
 
-        user_themself_inlab = self.user['username'] in people_inlab
+        user_themself_inlab = self.user.uid in people_inlab
         number_of_people_going = self.tolab_db.check_tolab(people_inlab)
         right_now = datetime.datetime.now(self.tolab_db.local_tz)
 
@@ -207,7 +257,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     msg += self.format_user_in_list(username, f" tomorrow at {hh}:{mm}")
                 else:
                     msg += self.format_user_in_list(username, f" on {str(going_day)} at {hh}:{mm}")
-                if username == self.user['username']:
+                if username == self.user.uid:
                     user_themself_tolab = True
             if not user_themself_tolab and not user_themself_inlab:
                 msg += '\nAre you going, too? Tell everyone with /tolab.'
@@ -221,7 +271,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             msg += "\nUse /ring for the bell, if you are at door 3."
         self._send_message(msg)
 
-    def tolab(self, telegram_id, time: str, day: str = None):
+    def tolab(self, time: str, day: str = None):
         try:
             time = self._tolab_parse_time(time)
         except ValueError:
@@ -238,13 +288,13 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         # noinspection PyBroadException
         try:
             if time is None:
-                self.tolab_db.delete_entry(telegram_id)
+                # Delete previous entry via Telegram ID
+                self.tolab_db.delete_entry(self.user.tgid)
                 # TODO: add random messages (changing constantly like the "unknown command" ones),
                 # like "but why?", "I'm sorry to hear that", "hope you have fun elsewhere", etc...
                 self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
-                user = self.logs.get_entry_from_tid(telegram_id)
-                days = self.tolab_db.set_entry(user["username"], telegram_id, time, day)
+                days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
                     self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
                 elif days == 1:
@@ -340,7 +390,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                     break
                 days[this_day] = []
 
-            print_name = self.logs.try_get_name_and_surname(line.username)
+            print_name = CommandHandler.try_get_display_name(line.username, self.people.get(line.username, self.conn))
 
             if line.inlab:
                 days[this_day].append(f'<i>{print_name}</i> is in lab\n')
@@ -357,18 +407,23 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
     def stat(self, cmd_target_user=None):
         if cmd_target_user is None:
             # User asking its own /stat
-            target_username = self.user['username']
-        elif self.user['level'] == 1:
-            # User asking somebody else's stats
-            # TODO: allow normal users to do /stat by specifying their own username. Pointless but more consistent.
-            target_username = str(cmd_target_user)
-            if self.logs.get_entry_from_username(target_username) is None:
-                target_username = None
-                self._send_message('No statistics for the given user. Have you typed it correctly?')
+            target_username = self.user.uid
         else:
-            # Asked for somebody else's stats but not an admin
-            target_username = None
-            self._send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
+            # Asking for somebody else
+            target_username = str(cmd_target_user)
+            if target_username.lower() != self.user.uid.lower():
+                # *Really* somebody else
+                if self.user.isadmin:
+                    # Are you an admin? Then go on!
+                    person = self.people.get(target_username, self.conn)
+                    if person is None:
+                        target_username = None
+                        self._send_message('No statistics for the given user. Have you typed it correctly?')
+                    else:
+                        target_username = person.uid
+                else:
+                    target_username = None
+                    self._send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
 
         # Do we know what to search?
         if target_username is not None:
@@ -381,11 +436,15 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
             month_mins_hh, month_mins_mm = self.logs.mm_to_hh_mm(month_mins)
             total_mins_hh, total_mins_mm = self.logs.mm_to_hh_mm(total_mins)
 
-            msg = f'Stat for {self.logs.try_get_name_and_surname(target_username)}:' \
+            name = CommandHandler.try_get_display_name(target_username, self.people.get(target_username, self.conn))
+            msg = f'Stat for {name}:' \
                   f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
                   f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
                   f'\n\nLast log update: {self.logs.log_last_update}'
             self._send_message(msg)
+
+    def history_error(self):
+        self._send_message('Insert item the item to search, e.g. /history R100')
 
     def history(self, item, cmd_limit=None):
         if cmd_limit is None:
@@ -425,7 +484,8 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
                         else:
                             msg += f'Unknown change {change}'
                         entries += 1
-                        msg += f'{h_time} by <i>{self.logs.try_get_name_and_surname(h_user)}</i>\n\n'
+                        display_user = CommandHandler.try_get_display_name(h_user, self.people.get(h_user, self.conn))
+                        msg += f'{h_time} by <i>{display_user}</i>\n\n'
                         if entries >= 6:
                             self._send_message(msg)
                             msg = ''
@@ -444,7 +504,7 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         Currently, the only accepted filter is "all", and besides that,
         it returns the monthly filter
         """
-        if self.user['level'] == 1:
+        if self.user.isadmin:
             # Downloads them only if needed
             self.logs.get_old_logs()
             # TODO: usual optimizations are possible
@@ -462,14 +522,15 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
 
             n = 0
             for (rival, time) in rank:
-                entry = self.logs.get_entry_from_username(rival)
+                entry = self.people.get(rival, self.conn)
                 if entry is not None:
                     n += 1
                     time_hh, time_mm = self.logs.mm_to_hh_mm(time)
-                    if entry["level"] == 1 or entry["level"] == 2:
-                        msg += f'{n}) [{time_hh}:{time_mm}] <b>{self.logs.try_get_name_and_surname(rival)}</b>\n'
+                    display_user = CommandHandler.try_get_display_name(rival, self.people.get(rival, self.conn))
+                    if entry.isadmin:
+                        msg += f'{n}) [{time_hh}:{time_mm}] <b>{display_user}</b>\n'
                     else:
-                        msg += f'{n}) [{time_hh}:{time_mm}] {self.logs.try_get_name_and_surname(rival)}\n'
+                        msg += f'{n}) [{time_hh}:{time_mm}] {display_user}\n'
 
             msg += f'\nLast log update: {self.logs.log_last_update}'
             self._send_message(msg)
@@ -480,41 +541,20 @@ an OwnCloud shared folder.\nFor a list of the commands allowed send /help.', )
         msg = f"I tried to do that, but an exception occurred: {exception}"
         self._send_message(msg)
 
-    def account_locked(self):
-        self._send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
-                           "If you're a new team member, that will happen after the test on safety.")
-
-    def give_invite_link(self, invite_code: str):
-        self._send_message("Oh, hi, long time no see! We switched to a new account management system, "
-                           "so you will need to complete your registration here before we can talk again:\n"
-                           f"{INVITE_LINK}{invite_code}\n"
-                           "Once you're done, ask an administrator to enable your account. Have a nice day!")
-
-    def not_allowed(self):
-        """
-        Called when user is not allowed to use the bot (banned, no telegram ID in user.json, etc...)
-        """
-
-        msg = f'Sorry, you are not allowed to use this bot.\n\
-If you\'re a member of <a href="http://weeeopen.polito.it/">WEEE Open</a>, \
-add your user ID from the account management panel.\n\n\
-Your user ID is: <b>{self.last_user_id}</b>'
-        self._send_message(msg)
-
     def store_id(self):
-        first_name = self.last_update['message']['from']['first_name']
+        first_name = self.__last_update['message']['from']['first_name']
 
-        if 'username' in self.last_update['message']['from']:
-            username = self.last_update['message']['from']['username']
+        if 'username' in self.__last_update['message']['from']:
+            username = self.__last_update['message']['from']['username']
         else:
             username = ""
 
-        if 'last_name' in self.last_update['message']['from']:
-            last_name = self.last_update['message']['from']['last_name']
+        if 'last_name' in self.__last_update['message']['from']:
+            last_name = self.__last_update['message']['from']['last_name']
         else:
             last_name = ""
 
-        self.logs.store_new_user(self.last_user_id, first_name, last_name, username)
+        self.logs.store_new_user(self.__last_user_id, first_name, last_name, username)
 
     def unknown(self):
         """
@@ -530,16 +570,6 @@ on. If you don't set a day, I will consider the time for today or tomorrow, the 
 You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
         self._send_message(help_message)
 
-    def status(self):
-        if self.user['level'] != 1:
-            self.unknown()
-            return
-        if self.logs.error is None:
-            message = "Everything is working correctly, or everything is broken and I don't even know."
-        else:
-            message = f"There's an error in users file, go and fix it: {self.logs.error}"
-        self._send_message(message)
-
     def help(self):
         help_message = "Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
@@ -550,7 +580,7 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
 
-        if self.user['level'] == 1:
+        if self.user.isadmin:
             help_message += "\n<b>only for admin users</b>\n\
 /stat <i>name.surname</i> - Show hours spent in lab by this user\n\
 /top - Show a list of top users by hours spent this month\n\
@@ -572,8 +602,7 @@ def main():
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
 
-    # TODO: change method signature to accept these parameters later
-    handler = CommandHandler(user, bot, tarallo, logs, last_update, tolab)
+    handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn)
 
     while True:
         # call the function to check if there are new messages
@@ -585,9 +614,6 @@ def main():
         # noinspection PyBroadException
         try:
             command = last_update['message']['text'].split()
-
-            last_user_id = last_update['message']['from']['id']
-            last_user_nickname = last_update['message']['from']['username'] if 'username' in last_update['message']['from'] else None
             message_type = last_update['message']['chat']['type']
             # print(last_update['message'])  # Extremely advanced debug techniques
 
@@ -595,17 +621,7 @@ def main():
             if message_type != "private":
                 continue
 
-            try:
-                user = users.get(last_user_id, last_user_nickname, conn)
-            except (LdapConnectionError, DuplicateEntryError) as e:
-                handler.exception(e.__class__.__name__)
-            except AccountLockedError:
-                handler.account_locked()
-            except AccountNotFoundError:
-                handler.store_id()
-                handler.not_allowed()
-            except AccountNotCompletedError as e:
-                handler.give_invite_link(e.invite_code)
+            handler.from_message(last_update)
 
             if command[0] == "/start" or command[0] == "/start@weeelab_bot":
                 handler.start()
@@ -615,7 +631,7 @@ def main():
 
             elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
                 if len(command) < 2:
-                    bot.send_message(handler.last_chat_id, 'Sorry insert the item to search')
+                    handler.history_error()
                 elif len(command) < 3:
                     handler.history(command[1])
                 else:
@@ -643,9 +659,9 @@ def main():
 
             elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
                 if len(command) == 2:
-                    handler.tolab(last_user_id, command[1])
+                    handler.tolab(command[1])
                 elif len(command) >= 3:
-                    handler.tolab(last_user_id, command[1], command[2])
+                    handler.tolab(command[1], command[2])
                 else:
                     handler.tolab_help()
 
@@ -654,9 +670,6 @@ def main():
 
             elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                 handler.help()
-
-            elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
-                handler.status()
 
             else:
                 handler.unknown()

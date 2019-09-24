@@ -13,14 +13,14 @@ class ToLab:
         for entry in self.tolab_file:
             entry["tolab"] = datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
 
-    def _delete_user(self, telegram_id):
+    def __delete_user(self, telegram_id):
         keep = []
         for entry in self.tolab_file:
             if entry["telegramID"] != telegram_id:
                 keep.append(entry)
         self.tolab_file = keep
 
-    def _create_entry(self, username: str, telegram_id: int, time: str, day: int):
+    def __create_entry(self, username: str, telegram_id: int, time: str, day: int):
         entry = dict()
         entry["username"] = username
         entry["telegramID"] = telegram_id
@@ -39,12 +39,12 @@ class ToLab:
         return entry, days
 
     def delete_entry(self, telegram_id: int):
-        self._delete_user(telegram_id)
+        self.__delete_user(telegram_id)
         self.save(self.tolab_file)
 
     def set_entry(self, username: str, telegram_id: int, time: str, day: int) -> int:
-        self._delete_user(telegram_id)
-        entry, days = self._create_entry(username, telegram_id, time, day)
+        self.__delete_user(telegram_id)
+        entry, days = self.__create_entry(username, telegram_id, time, day)
         self.tolab_file.append(entry)
         self.save(self.tolab_file)
         return days
