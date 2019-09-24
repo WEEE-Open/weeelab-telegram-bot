@@ -8,11 +8,16 @@ The goal of this bot is to obtain information about who is currently in the lab,
 who has done what, compute some stats and, in general, simplify the life of our members...  
 And to avoid waste of paper as well.  
 
-All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log file, which is fetched from an OwnCloud shared folder.  
+Data comes from
+
+* a [weeelab](https://github.com/WEEE-Open/weeelab) log file, which is fetched from a NextCloud shared folder.
+* the [tarallo](https://github.com/WEEE-Open/tarallo) inventory management system
+* a LDAP server
 
 ## Installation
 
-`weeelab_bot.py` is the main script, and it requires some environment variables:
+`weeelab_bot.py` is the main script, and it requires a lot of enviroment variables. A lot. Some of them:
+
 * `OC_URL`: Url of the owncloud server
 * `OC_USER`: OwnCloud username
 * `OC_PWD`: OwnCloud password
@@ -20,6 +25,8 @@ All data is read from a  [weeelab](https://github.com/WEEE-Open/weeelab) log fil
 * `LOG_PATH`: Path of the file to read in owncloud (/folder/file.txt)
 * `USER_BOTH_PATH`: Path of the file to store bot users in OwnCloud (/folder/file.txt)
 * `USER_PATH`: Path of the file with authorized users in OwnCloud (/folder/file.json)
+
+see `variables.py` for the others
 
 ## Command syntax
 
