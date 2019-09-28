@@ -540,8 +540,8 @@ as well.\nFor a list of the available commands type /help.', )
         people = self.people.delete_cache()
         logs = self.logs.delete_cache()
         self._send_message("All caches busted! 💥\n"
-                           f"Users: deleted {users} entries"
-                           f"People: deleted {people} entries"
+                           f"Users: deleted {users} entries\n"
+                           f"People: deleted {people} entries\n"
                            f"Logs: deleted {logs} lines")
 
     def exception(self, exception: str):
