@@ -38,7 +38,7 @@ Available commands and options:
 - `/log` - Show log of the day
 - `/log n` - Show last n days worth of logs
 - `/log all` - Show last 31 days worth of logs
-. `/ring` - Ring the bell
+- `/ring` - Ring the bell
 - `/stat` - Show hours you've spent in lab
 - `/history item` - Show history for an item, straight outta T.A.R.A.L.L.O.
 - `/history item n` - Show n history entries
