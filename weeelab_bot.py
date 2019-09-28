@@ -530,7 +530,19 @@ as well.\nFor a list of the available commands type /help.', )
             msg += f'\nLast log update: {self.logs.log_last_update}'
             self._send_message(msg)
         else:
-            self._send_message('Sorry! You are not allowed to use this function! \nOnly admins can')
+            self._send_message('Sorry, only admins can use this function!')
+
+    def delete_cache(self):
+        if not self.user.isadmin:
+            self._send_message('Sorry, only admins can use this function!')
+            return
+        users = self.users.delete_cache()
+        people = self.people.delete_cache()
+        logs = self.logs.delete_cache()
+        self._send_message("All caches busted! 💥\n"
+                           f"Users: deleted {users} entries"
+                           f"People: deleted {people} entries"
+                           f"Logs: deleted {logs} lines")
 
     def exception(self, exception: str):
         msg = f"I tried to do that, but an exception occurred: {exception}"
@@ -633,24 +645,10 @@ def main():
                     handler.history(command[1], command[2])
 
             elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
-
                 if len(command) > 1:
                     handler.log(command[1])
                 else:
                     handler.log()
-
-            elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
-
-                if len(command) > 1:
-                    handler.stat(command[1])
-                else:
-                    handler.stat()
-
-            elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
-                if len(command) > 1:
-                    handler.top(command[1])
-                else:
-                    handler.top()
 
             elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
                 if len(command) == 2:
@@ -663,6 +661,21 @@ def main():
             elif command[0] == "/ring":
                 handler.ring(wave_obj)
 
+            elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
+                if len(command) > 1:
+                    handler.stat(command[1])
+                else:
+                    handler.stat()
+
+            elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                if len(command) > 1:
+                    handler.top(command[1])
+                else:
+                    handler.top()
+
+            elif command[0] == "/deletecache" or command[0] == "/deletecache@weeelab_bot":
+                handler.delete_cache()
+
             elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                 handler.help()
 
@@ -673,9 +686,10 @@ def main():
             if "channel_post" in last_update:
                 chat_id = last_update['channel_post']['chat']['id']
                 print(bot.leave_chat(chat_id).text)
-            print("ERROR!")
-            print(last_update)
-            print(traceback.format_exc())
+            else:
+                print("ERROR!")
+                print(last_update)
+                print(traceback.format_exc())
 
 
 # call the main() until a keyboard interrupt is called

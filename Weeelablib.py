@@ -45,6 +45,19 @@ class WeeelabLogs:
 
         return self
 
+    def delete_cache(self) -> int:
+        lines = len(self.log) + len(self.old_log)
+
+        self.log = []
+        self.log_last_download = None
+        self.log_last_update = None
+        self.error = None
+        self.old_log = []
+        self.old_logs_month = 3
+        self.old_logs_year = 2017
+
+        return lines
+
     def get_old_logs(self):
         today = datetime.date.today()
         prev_month = today.month - 1

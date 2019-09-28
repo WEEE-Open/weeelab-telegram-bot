@@ -82,6 +82,11 @@ class Users:
 
         return user
 
+    def delete_cache(self) -> int:
+        busted = len(self.__users)
+        self.__users = {}
+        return busted
+
 
 @dataclass
 class Person:
@@ -109,6 +114,12 @@ class People:
             return self.__people[uid]
         else:
             return None
+
+    def delete_cache(self) -> int:
+        busted = len(self.__people)
+        self.__people = {}
+        self.last_update = 0
+        return busted
 
     def __sync(self, conn):
         result = conn.search_s(self.tree, ldap.SCOPE_SUBTREE, f"(objectClass=weeeOpenPerson)", (
