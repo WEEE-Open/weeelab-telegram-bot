@@ -27,7 +27,7 @@ class WeeelabLogs:
         self.local_tz = pytz.timezone("Europe/Rome")
 
     def get_log(self):
-        if self.log_last_download is not None and time() - self.log_last_download < 60:
+        if self.log_last_download is not None and time() - self.log_last_download < 30:
             return self
 
         self.log = []
