@@ -3,6 +3,7 @@ import re
 # noinspection PyUnresolvedReferences
 import owncloud
 from datetime import timedelta
+import pytz
 
 
 class WeeelabLogs:
@@ -23,6 +24,7 @@ class WeeelabLogs:
         # from the first one that actually exists (april 2017)
         self.old_logs_month = 3
         self.old_logs_year = 2017
+        self.local_tz = pytz.timezone("Europe/Rome")
 
     def get_log(self):
         self.log = []
@@ -32,10 +34,10 @@ class WeeelabLogs:
         for line in log_lines:
             self.log.append(WeeelabLine(line))
 
-        # store the data of the last update of the log file,
-        # the data is in UTC so we add 2 for eu/it local time
-        # TODO: this is sometimes +1 because ora legale, use a timezone library and compute correct time
-        self.log_last_update = self.oc.file_info(self.log_path).get_last_modified() + timedelta(hours=2)
+        # store the date of the last update of the log file,
+        # the data is in UTC so we convert it to local timezone
+        last_update_utc = self.oc.file_info(self.log_path).get_last_modified()
+        self.log_last_update = pytz.utc.localize(last_update_utc, is_dst=None).astimezone(self.local_tz)
 
         return self
 
