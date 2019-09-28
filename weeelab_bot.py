@@ -191,13 +191,11 @@ class CommandHandler:
         Called with /start
         """
 
-        # TODO: can we simplify this?
         self._send_message('\
 <b>WEEE Open Telegram bot</b>.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
-as well. \nAll data is read from a weeelab log file, which is fetched from \
-a NextCloud shared folder.\nFor a list of the commands allowed send /help.', )
+as well.\nFor a list of the available commands type /help.', )
 
     def format_user_in_list(self, username: str, other=''):
         person = self.people.get(username, self.conn)
