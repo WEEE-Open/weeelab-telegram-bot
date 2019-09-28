@@ -600,20 +600,25 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
         self._send_message(help_message)
 
     def help(self):
-        help_message = "Available commands and options:\n\n\
+        help_message = """
+Available commands and options:\n\n\
 /inlab - Show the people in lab\n\
 /log - Show log of the day\n\
 /log <i>n</i> - Show last <i>n</i> days worth of logs\n\
 /stat - Show hours you've spent in lab\n\
 /ring - ring the bell at the door\n\
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.\n\
-/history <i>item</i> <i>n</i> - Show <i>n</i> history entries\n"
+/history <i>item</i> <i>n</i> - Show <i>n</i> history entries
+"""
 
         if self.user.isadmin:
-            help_message += "\n<b>only for admin users</b>\n\
-/stat <i>name.surname</i> - Show hours spent in lab by this user\n\
-/top - Show a list of top users by hours spent this month\n\
-/top all - Show a list of top users by hours spent\n"
+            help_message += """
+\n<b>only for admin users</b>\n
+/stat <i>name.surname</i> - Show hours spent in lab by this user\n
+/top - Show a list of top users by hours spent this month\n
+/top all - Show a list of top users by hours spent\n
+/deletecache - Delete caches (reload logs and users)
+"""
         self._send_message(help_message)
 
 
