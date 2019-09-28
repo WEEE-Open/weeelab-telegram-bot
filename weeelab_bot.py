@@ -612,7 +612,7 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
         if self.user.isadmin:
             help_message += """
 \n<b>only for admin users</b>
-/stat <i>name.surname</i> - Show hours spent in lab by this user
+/stat <i>username</i> - Show hours spent in lab by this user
 /top - Show a list of top users by hours spent this month
 /top all - Show a list of top users by hours spent
 /deletecache - Delete caches (reload logs and users)"""
