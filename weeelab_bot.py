@@ -154,23 +154,28 @@ class CommandHandler:
         self.__last_chat_id = None
         self.__last_user_id = None
         self.__last_update = None
+        self.__last_user_nickname = None
 
-    def from_message(self, last_update):
+    def read_user_from_message(self, last_update):
         self.__last_update = last_update
         self.__last_chat_id = last_update['message']['chat']['id']
         self.__last_user_id = last_update['message']['from']['id']
-        last_user_nickname = last_update['message']['from']['username'] if 'username' in last_update['message'][
-            'from'] else None
+        self.__last_user_nickname = last_update['message']['from']['username']\
+            if 'username' in last_update['message']['from'] else None
 
         self.user = None
         try:
-            self.user = self.users.get(self.__last_user_id, last_user_nickname, self.conn)
+            self.user = self.users.get(self.__last_user_id, self.__last_user_nickname, self.conn)
+            return True
         except (LdapConnectionError, DuplicateEntryError) as e:
             self.exception(e.__class__.__name__)
         except AccountLockedError:
             self._send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
                                "If you're a new team member, that will happen after the test on safety.")
         except AccountNotFoundError:
+            responded = self.respond_to_invite_link(last_update['message']['text'])
+            if responded:
+                return
             self.store_id()
             msg = "Sorry, you are not allowed to use this bot.\n\n"
             "If you\'re a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, "
@@ -182,9 +187,26 @@ class CommandHandler:
                                "so you will need to complete your registration here before we can talk again:\n"
                                f"{INVITE_LINK}{e.invite_code}\n"
                                "Once you're done, ask an administrator to enable your account. Have a nice day!")
+        return False
 
     def _send_message(self, message):
         self.bot.send_message(self.__last_chat_id, message)
+
+    def respond_to_invite_link(self, message) -> bool:
+        message: str
+        if not message.startswith(INVITE_LINK):
+            return False
+        link = message.split(' ', 1)[0]
+        code = link[len(INVITE_LINK):]
+        try:
+            self.users.update_invite(code, self.__last_user_id, self.__last_user_nickname, self.conn)
+        except AccountNotFoundError:
+            self._send_message("I couldn't find your invite. Are you sure of that link?")
+            return True
+        self._send_message("Hey, I've filled some fields in the registration form for you, no need to say thanks.\n"
+                           f"Just go back to {link} and complete the registration.\n"
+                           "See you!")
+        return True
 
     def start(self):
         """
@@ -628,7 +650,9 @@ def main():
             if message_type != "private":
                 continue
 
-            handler.from_message(last_update)
+            authorized = handler.read_user_from_message(last_update)
+            if not authorized:
+                continue
 
             if command[0] == "/start" or command[0] == "/start@weeelab_bot":
                 handler.start()

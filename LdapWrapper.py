@@ -2,6 +2,7 @@ from time import time
 from dataclasses import dataclass
 from typing import Optional, Iterable, List, Dict
 import ldap
+from ldap.filter import escape_filter_chars
 
 
 class LdapConnection:
@@ -81,6 +82,26 @@ class Users:
                 self.__users[tgid] = user
 
         return user
+
+    def update_invite(self, invite_code: str, tgid: int, nickname: Optional[str], conn: LdapConnection):
+        invite_code_escaped = escape_filter_chars(invite_code)
+        with conn as c:
+            result = c.search_s(self.invite_tree, ldap.SCOPE_SUBTREE, f"(inviteCode={invite_code_escaped})", ())
+
+            if len(result) == 0:
+                raise AccountNotFoundError()
+            if len(result) > 1:
+                raise DuplicateEntryError(f"Invite code {invite_code} associated to {len(result)} invites")
+
+            dn = result[0][0]
+            del result
+
+            modlist = [(ldap.MOD_REPLACE, 'telegramid', str(tgid).encode('UTF-8'))]
+            if nickname is None:
+                modlist.append((ldap.MOD_DELETE, 'telegramnickname', None))
+            else:
+                modlist.append((ldap.MOD_REPLACE, 'telegramnickname', nickname.encode('UTF-8')))
+            c.modify_s(dn, modlist)
 
     def delete_cache(self) -> int:
         busted = len(self.__users)
@@ -200,6 +221,7 @@ class User:
     @staticmethod
     def search(tgid: int, tgnick: Optional[str], admin_groups, conn, tree: str, invite_tree: str):
         print(f"Search {tgid}")
+        tgid = int(tgid)  # Safety measure
         result = conn.search_s(tree, ldap.SCOPE_SUBTREE, f"(&(objectClass=weeeOpenPerson)(telegramId={tgid}))", (
             'uid',
             'cn',
