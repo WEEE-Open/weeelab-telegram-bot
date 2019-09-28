@@ -1,21 +1,21 @@
 import datetime
 import re
+from time import time
 # noinspection PyUnresolvedReferences
 import owncloud
-from datetime import timedelta
 import pytz
 
 
 class WeeelabLogs:
-    def __init__(self, oc: owncloud, log_path: str, log_base: str, user_path: str, user_bot_path: str):
+    def __init__(self, oc: owncloud, log_path: str, log_base: str, user_bot_path: str):
         self.log = []
+        self.log_last_download = None
         self.log_last_update = None
         self.error = None
         self.oc = oc
 
         self.log_path = log_path
         self.log_base = log_base
-        self.user_path = user_path
         self.user_bot_path = user_bot_path
 
         # Logs from past months (no lines from current month)
@@ -27,6 +27,9 @@ class WeeelabLogs:
         self.local_tz = pytz.timezone("Europe/Rome")
 
     def get_log(self):
+        if self.log_last_download is not None and time() - self.log_last_download < 60:
+            return self
+
         self.log = []
         log_file = self.oc.get_file_contents(self.log_path).decode('utf-8')
         log_lines = log_file.splitlines()
@@ -38,6 +41,7 @@ class WeeelabLogs:
         # the data is in UTC so we convert it to local timezone
         last_update_utc = self.oc.file_info(self.log_path).get_last_modified()
         self.log_last_update = pytz.utc.localize(last_update_utc, is_dst=None).astimezone(self.local_tz)
+        self.log_last_download = time()
 
         return self
 

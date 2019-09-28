@@ -4,8 +4,6 @@ import os  # system library needed to read the environment variables
 OC_URL = os.environ.get('OC_URL')  # url of the OwnCloud server
 OC_USER = os.environ.get('OC_USER')  # OwnCloud username
 OC_PWD = os.environ.get('OC_PWD')  # OwnCloud password
-# path of the file with authorized users in OwnCloud (/folder/file.json)
-USER_PATH = os.environ.get('USER_PATH')
 # path of the log file to read in OwnCloud (/folder/file.txt)
 LOG_PATH = os.environ.get('LOG_PATH')
 TOLAB_PATH = os.environ.get('TOLAB_PATH')

@@ -368,7 +368,6 @@ a NextCloud shared folder.\nFor a list of the commands allowed send /help.', )
         Called with /log
         """
 
-        # TODO: this also downloads the file for each request. Maybe don't do it every time.
         self.logs.get_log()
 
         if cmd_days_to_filter is not None and cmd_days_to_filter.isdigit():
@@ -429,7 +428,6 @@ a NextCloud shared folder.\nFor a list of the commands allowed send /help.', )
         if target_username is not None:
             # Downloads them only if needed
             self.logs.get_old_logs()
-            # TODO: usual optimizations are possible
             self.logs.get_log()
 
             month_mins, total_mins = self.logs.count_time_user(target_username)
@@ -507,7 +505,6 @@ a NextCloud shared folder.\nFor a list of the commands allowed send /help.', )
         if self.user.isadmin:
             # Downloads them only if needed
             self.logs.get_old_logs()
-            # TODO: usual optimizations are possible
             self.logs.get_log()
 
             # TODO: add something like "/top 04 2018" that returns top list for April 2018
@@ -595,7 +592,7 @@ def main():
 
     bot = BotHandler(TOKEN_BOT)
     tarallo = TaralloSession(TARALLO)
-    logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_PATH, USER_BOT_PATH)
+    logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
     wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
     users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE, LDAP_TREE_INVITES)
