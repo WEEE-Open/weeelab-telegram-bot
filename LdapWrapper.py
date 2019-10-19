@@ -1,6 +1,6 @@
 from time import time
 from dataclasses import dataclass
-from typing import Optional, Iterable, List, Dict
+from typing import Optional, List, Dict, Tuple
 import ldap
 from ldap.filter import escape_filter_chars
 
@@ -185,6 +185,15 @@ class User:
         return time() - self.last_update > 3600
 
     def update(self, conn, admin_groups: List[str], also_nickname: bool, nickname: Optional[str] = None):
+        """
+        Update user (if cached result is old)
+
+        :param conn: LDAP Connection
+        :param admin_groups: Users that belong to these groups are considered admins
+        :param also_nickname: Also update the nickname, if false the nickname parameter is ignored
+        :param nickname: New nickname, will be updated if needed
+        :return: attributes, dn
+        """
         print(f"Update {self.tgid} ({self.dn})")
         result = conn.read_s(self.dn, None, (
             'uid',
@@ -220,29 +229,26 @@ class User:
 
     @staticmethod
     def search(tgid: int, tgnick: Optional[str], admin_groups, conn, tree: str, invite_tree: str):
+        """
+        Get User from Telegram ID. Or nickname as a fallback, Also update nickname and ID if needed.
+
+        :param conn: LDAP Connection
+        :param invite_tree: Invites tree DN
+        :param tgid: Telegram ID
+        :param tgnick: Telegram nickname
+        :param admin_groups: Users that belong to these groups are considered admins
+        :param tree: Users tree DN
+        :return: attributes, dn
+        """
         print(f"Search {tgid}")
         tgid = int(tgid)  # Safety measure
-        result = conn.search_s(tree, ldap.SCOPE_SUBTREE, f"(&(objectClass=weeeOpenPerson)(telegramId={tgid}))", (
-            'uid',
-            'cn',
-            'givenname',
-            'sn',
-            'memberof',
-            'telegramnickname',
-            'telegramid',
-            'nsaccountlock'
-        ))
-        if len(result) == 0:
-            invite = User.__get_invite_from_tgid(tgid, invite_tree, conn)
-            if invite is None:
-                raise AccountNotFoundError()
+        try:
+            attributes, dn = User.__search_by_tgid(conn, invite_tree, tgid, tree)
+        except AccountNotFoundError as e:
+            if tgnick is None:
+                raise e
             else:
-                raise AccountNotCompletedError(invite)
-        if len(result) > 1:
-            raise DuplicateEntryError(f"Telegram ID {tgid} associated to {len(result)} entries")
-
-        dn, attributes = User.__extract_the_only_result(result)
-        del result
+                attributes, dn = User.__search_by_nickname(conn, invite_tree, tgnick, tgid, tree)
 
         if 'nsaccountlock' in attributes:
             raise AccountLockedError()
@@ -254,6 +260,66 @@ class User:
             User.__update_nickname(dn, tgnick, conn)
         # self.__set_update_time() done in __post_init___
         return User(dn, tgid, attributes['uid'][0].decode(), attributes['cn'][0].decode(), attributes['givenname'][0].decode(), attributes['sn'][0].decode(), isadmin, tgnick)
+
+    @staticmethod
+    def __search_by_tgid(conn, invite_tree, tgid, tree) -> Tuple[Dict, str]:
+        """
+        Get attributes from a Telegram ID
+
+        :param conn: LDAP Connection
+        :param invite_tree: Invites tree DN
+        :param tgid: Telegram ID
+        :param tree: Users tree DN
+        :return: attributes, dn
+        """
+        result = conn.search_s(tree, ldap.SCOPE_SUBTREE, f"(&(objectClass=weeeOpenPerson)(telegramId={tgid}))", (
+            'uid',
+            'cn',
+            'givenname',
+            'sn',
+            'memberof',
+            'telegramnickname',
+            'telegramid',
+            'nsaccountlock'
+        ))
+        if len(result) == 0:
+            # TODO: this part can be removed, once every old user has signed up to the SSO
+            invite = User.__get_invite_from_tgid(tgid, invite_tree, conn)
+            if invite is None:
+                raise AccountNotFoundError()
+            else:
+                raise AccountNotCompletedError(invite)
+        if len(result) > 1:
+            raise DuplicateEntryError(f"Telegram ID {tgid} associated to {len(result)} entries")
+        dn, attributes = User.__extract_the_only_result(result)
+        del result
+        return attributes, dn
+
+    @staticmethod
+    def __search_by_nickname(conn, invite_tree, tgnick: str, tgid: int, tree) -> Tuple[Dict, str]:
+        """
+        Search a user by nickname IF Telegram ID is not set.
+        If found, update their Telegram ID, search again by ID and return the usual attributes.
+
+        :param conn: LDAP Connection
+        :param invite_tree: Invites tree DN
+        :param tgnick: Telegram nickname
+        :param tgid: Telegram ID
+        :param tree: Users tree DN
+        :return: attributes, dn
+        """
+        print(f"Search {tgnick}")
+        tgnick = ldap.filter.escape_filter_chars(tgnick)
+        result = conn.search_s(tree, ldap.SCOPE_SUBTREE, f"(&(objectClass=weeeOpenPerson)(!(telegramId=*))(telegramNickname={tgnick}))", ())
+        if len(result) == 0:
+            raise AccountNotFoundError()
+        if len(result) > 1:
+            raise DuplicateEntryError(f"Telegram nickname {tgnick} associated to {len(result)} entries")
+
+        dn = result[0][0]
+        User.__update_id(dn, tgid, conn)
+
+        return User.__search_by_tgid(conn, invite_tree, tgid, tree)
 
     @staticmethod
     def __get_invite_from_tgid(tgid: int, invite_tree: str, conn):
@@ -300,3 +366,9 @@ class User:
             conn.modify_s(dn, [
                 (ldap.MOD_REPLACE, 'telegramNickname', new_nickname.encode('UTF-8'))
             ])
+
+    @staticmethod
+    def __update_id(dn: str, new_id: int, conn):
+        conn.modify_s(dn, [
+            (ldap.MOD_REPLACE, 'telegramId', str(new_id).encode('UTF-8'))
+        ])
