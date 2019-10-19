@@ -10,7 +10,59 @@ class ToLab:
         self.tolab_path = tolab_path
         self.tolab_file = json.loads(oc.get_file_contents(self.tolab_path).decode('utf-8'))
         for entry in self.tolab_file:
-            entry["tolab"] = datetime.strptime(entry["tolab"], "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
+            entry["tolab"] = self.string_to_datetime(entry["tolab"])
+
+    def string_to_datetime(self, from_time):
+        # A very simple and linear work flow - NOT
+        # .replace(self.local_tz) is the ultimate solution that everyone suggests on the Internet, however that sets the
+        # time so some weird timezone offsets:
+        #
+        # >>> datetime.now().replace(tzinfo=pytz.timezone("Europe/Rome"))
+        # datetime.datetime(2019, 10, 19, 20, 37, 24, 302038, tzinfo=<DstTzInfo 'Europe/Rome' RMT+0:50:00 STD>)
+        #
+        # Erm, okay? Let's see what pytz has to say,,,
+        #
+        # >>> pytz.timezone("Europe/Rome")
+        # <DstTzInfo 'Europe/Rome' RMT+0:50:00 STD>
+        # >>> pytz.timezone("Europe/Berlin")
+        # <DstTzInfo 'Europe/Berlin' LMT+0:53:00 STD>
+        # >>> pytz.timezone("Europe/Madrid")
+        # <DstTzInfo 'Europe/Madrid' LMT-1 day, 23:45:00 STD>
+        # >>> pytz.timezone("Europe/Lisbon")
+        # <DstTzInfo 'Europe/Lisbon' LMT-1 day, 23:23:00 STD>
+        # >>> pytz.timezone("Europe/Amsterdam")
+        # <DstTzInfo 'Europe/Amsterdam' LMT+0:20:00 STD>
+        # >>> pytz.timezone("Europe/Brussels")
+        # <DstTzInfo 'Europe/Brussels' BMT+0:18:00 STD>
+        # >>> pytz.timezone("Europe/Paris")
+        # <DstTzInfo 'Europe/Paris' LMT+0:09:00 STD>
+        # >>> pytz.timezone("Europe/Vienna")
+        # <DstTzInfo 'Europe/Vienna' LMT+1:05:00 STD>
+        #
+        # These may be the same as the real timezone, just based on the RMT o LMT timezone.
+        # However, observe this, observe it very carefully:
+        #
+        # >>> datetime.now(pytz.timezone("Europe/Rome"))
+        # datetime.datetime(2019, 10, 19, 20, 22, 54, 579627, tzinfo=<DstTzInfo 'Europe/Rome' CEST+2:00:00 DST>)
+        #
+        # Can you spot it? What is that? CEST, the correct timezone. The one that should have been there all along.
+        # Smashing self.local_tz into an existing datetime with .replace() should work, but doesn't, it leaves the
+        # weird time zone offset thing in there, as we've seen.
+        #
+        # Aaaaaand every time comparison is now broken in a weird manner.
+        # So we have to create a datetime based on NOW, since that's the only reliable way to get the right timezone
+        # into a datetime object, and then change the date and time. For this task .combine() is not enough, it still
+        # has the weird time zone, so we have to break everything into smaller components...
+        correct_date = datetime.now(self.local_tz)
+        the_real_date = datetime.strptime(from_time, "%Y-%m-%d %H:%M")
+        return correct_date.replace(
+            day=the_real_date.day,
+            month=the_real_date.month,
+            year=the_real_date.year,
+            hour=the_real_date.hour,
+            minute=the_real_date.minute,
+            second=0,
+            microsecond=0)
 
     def __delete_user(self, telegram_id):
         keep = []
@@ -27,7 +79,7 @@ class ToLab:
         # Assume that the time refers to today
         theday = now + timedelta(days=day)
         theday = theday.strftime('%Y-%m-%d')
-        going = datetime.strptime(f"{theday} {time}", "%Y-%m-%d %H:%M").replace(tzinfo=self.local_tz)
+        going = self.string_to_datetime(f"{theday} {time}")
 
         # If it already passed, user probably meant "tomorrow"
         if now > going:
@@ -65,10 +117,10 @@ class ToLab:
             if entry["tolab"] < expires:
                 # Older than 30 minutes, remove
                 changed = True
-            elif entry["tolab"] < now and entry["username"] in people_inlab:
+            elif entry["tolab"] <= now and entry["username"] in people_inlab:
                 # Was in /tolab list for some time ago and is in lab right now, remove
                 # e.g. /tolab 10:00, student actually goes to lab at 10:00, this method is called at 10:03:
-                # entry < now and student is in lab, so we can remove the entry.
+                # entry <= now and student is in lab, so we can remove the entry.
                 # e.g. /tolab 16.00, student is in lab, this method is called at 10:00: entry is not removed, they may
                 # leave and come back later.
                 changed = True
@@ -88,4 +140,4 @@ class ToLab:
         for entry in serializable:
             # Save it in local timezone format, because who cares
             entry["tolab"] = datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
-        self.oc.put_file_contents(self.tolab_path, json.dumps(serializable, indent=4).encode('utf-8'))
+        self.oc.put_file_contents(self.tolab_path, json.dumps(serializable, indent=2).encode('utf-8'))
