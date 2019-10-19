@@ -177,10 +177,10 @@ class CommandHandler:
             if responded:
                 return
             self.store_id()
-            msg = "Sorry, you are not allowed to use this bot.\n\n"
-            "If you\'re a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, "
-            "add your user ID from the account management panel.\n"
-            f"Your user ID is: <b>{self.__last_user_id}</b>"
+            msg = f"""Sorry, you are not allowed to use this bot.
+            
+If you're a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, add your user ID in the account management panel. 
+Your user ID is: <b>{self.__last_user_id}</b>"""
             self._send_message(msg)
         except AccountNotCompletedError as e:
             self._send_message("Oh, hi, long time no see! We switched to a new account management system, "
