@@ -33,8 +33,8 @@ import traceback  # Print stack traces in logs
 import simpleaudio
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackQueryHandler
 from .stream_yt_audio import get_lofi_vlc_player
+from enum import Enum
 
 class BotHandler:
     """
@@ -131,6 +131,12 @@ class BotHandler:
 def escape_all(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
+
+class AcceptableQueries(Enum):
+    def __init__(self):
+        self.play = 'play',
+        self.pause = 'pause',
+        self.cancel = 'cancel'
 
 class CommandHandler:
     """
@@ -593,21 +599,31 @@ as well.\nFor a list of the available commands type /help.', )
     def lofi(self):
         # check if stream is playing to show correct button
         if self.lofi_player.is_playing():
-            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data='pause')]
+            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data=AcceptableQueries.pause)]
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
-            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data='play')]
+            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data=AcceptableQueries.play)]
             message = "Let's chill bruh"
 
         # TODO: add volume + and - buttons in second line
         reply_markup = InlineKeyboardMarkup([
             first_line_button,
-            [InlineKeyboardButton("❌ Cancel", callback_data='cancel')]
+            [InlineKeyboardButton("❌ Cancel", callback_data=AcceptableQueries.cancel)]
         ])
 
         self.bot.send_message(chat_id=self.__last_chat_id,
                               message=message,
                               reply_markup=reply_markup)
+
+    def lofi_callback(self, query: str):
+        if query == AcceptableQueries.play:
+            self.lofi_player.play()
+        elif query == AcceptableQueries.pause:
+            self.lofi_player.stop()  # .pause() only works on non-live streaming videos
+        elif query == AcceptableQueries.cancel:
+            # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
+            pass
+
 
     def unknown(self):
         """
@@ -668,72 +684,80 @@ def main():
             continue
         # noinspection PyBroadException
         try:
+            # per Telegram docs, either message or callback_query are None
             command = last_update['message']['text'].split()
             message_type = last_update['message']['chat']['type']
+            query = last_update['callback_query']['data']
             # print(last_update['message'])  # Extremely advanced debug techniques
 
-            # Don't respond to messages in group chats
-            if message_type != "private":
-                continue
+            if last_update['message']:
+                # Don't respond to messages in group chats
+                if message_type != "private":
+                    continue
 
-            authorized = handler.read_user_from_message(last_update)
-            if not authorized:
-                continue
+                authorized = handler.read_user_from_message(last_update)
+                if not authorized:
+                    continue
 
-            if command[0] == "/start" or command[0] == "/start@weeelab_bot":
-                handler.start()
+                if command[0] == "/start" or command[0] == "/start@weeelab_bot":
+                    handler.start()
 
-            elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
-                handler.inlab()
+                elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
+                    handler.inlab()
 
-            elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
-                if len(command) < 2:
-                    handler.history_error()
-                elif len(command) < 3:
-                    handler.history(command[1])
+                elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
+                    if len(command) < 2:
+                        handler.history_error()
+                    elif len(command) < 3:
+                        handler.history(command[1])
+                    else:
+                        handler.history(command[1], command[2])
+
+                elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
+                    if len(command) > 1:
+                        handler.log(command[1])
+                    else:
+                        handler.log()
+
+                elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
+                    if len(command) == 2:
+                        handler.tolab(command[1])
+                    elif len(command) >= 3:
+                        handler.tolab(command[1], command[2])
+                    else:
+                        handler.tolab_help()
+
+                elif command[0] == "/ring":
+                    handler.ring(wave_obj)
+
+                elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
+                    if len(command) > 1:
+                        handler.stat(command[1])
+                    else:
+                        handler.stat()
+
+                elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                    if len(command) > 1:
+                        handler.top(command[1])
+                    else:
+                        handler.top()
+
+                elif command[0] == "/deletecache" or command[0] == "/deletecache@weeelab_bot":
+                    handler.delete_cache()
+
+                elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
+                    handler.help()
+
+                elif command[0] == "/lofi" or command[0] == "lofi@weeelab_bot":
+                    handler.lofi()
+
                 else:
-                    handler.history(command[1], command[2])
+                    handler.unknown()
 
-            elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
-                if len(command) > 1:
-                    handler.log(command[1])
-                else:
-                    handler.log()
-
-            elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
-                if len(command) == 2:
-                    handler.tolab(command[1])
-                elif len(command) >= 3:
-                    handler.tolab(command[1], command[2])
-                else:
-                    handler.tolab_help()
-
-            elif command[0] == "/ring":
-                handler.ring(wave_obj)
-
-            elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
-                if len(command) > 1:
-                    handler.stat(command[1])
-                else:
-                    handler.stat()
-
-            elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
-                if len(command) > 1:
-                    handler.top(command[1])
-                else:
-                    handler.top()
-
-            elif command[0] == "/deletecache" or command[0] == "/deletecache@weeelab_bot":
-                handler.delete_cache()
-
-            elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
-                handler.help()
-
-            elif command[0] == "/lofi" or command[0] == "lofi@weeelab_bot":
-                handler.lofi()
-
+            # in case of callback_query instead of message
             else:
-                handler.unknown()
+                handler.lofi_callback(query)
+
 
         except:  # catch the exception if raised
             if "channel_post" in last_update:
