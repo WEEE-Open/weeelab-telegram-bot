@@ -32,6 +32,9 @@ import datetime
 import traceback  # Print stack traces in logs
 import simpleaudio
 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CallbackQueryHandler
+from .stream_yt_audio import get_lofi_vlc_player
 
 class BotHandler:
     """
@@ -155,6 +158,8 @@ class CommandHandler:
         self.__last_user_id = None
         self.__last_update = None
         self.__last_user_nickname = None
+
+        self.lofi_player = get_lofi_vlc_player()
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -584,6 +589,25 @@ as well.\nFor a list of the available commands type /help.', )
             last_name = ""
 
         self.logs.store_new_user(self.__last_user_id, first_name, last_name, username)
+
+    def lofi(self):
+        # check if stream is playing to show correct button
+        if self.lofi_player.is_playing():
+            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data='pause')]
+            message = "You're stopping this music only to listen to the Russian anthem, right?"
+        else:
+            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data='play')]
+            message = "Let's chill bruh"
+
+        # TODO: add volume + and - buttons in second line
+        reply_markup = InlineKeyboardMarkup([
+            first_line_button,
+            [InlineKeyboardButton("❌ Cancel", callback_data='cancel')]
+        ])
+
+        self.bot.send_message(chat_id=self.__last_chat_id,
+                              message=message,
+                              reply_markup=reply_markup)
 
     def unknown(self):
         """
