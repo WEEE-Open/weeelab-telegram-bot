@@ -729,6 +729,9 @@ def main():
             elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                 handler.help()
 
+            elif command[0] == "/lofi" or command[0] == "lofi@weeelab_bot":
+                handler.lofi()
+
             else:
                 handler.unknown()
 
