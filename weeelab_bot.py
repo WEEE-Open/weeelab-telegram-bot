@@ -135,7 +135,7 @@ def escape_all(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
-class AcceptableQueries(Enum):
+class AcceptableQueriesLoFi(Enum):
     def __init__(self):
         self.play = 'play'
         self.pause = 'pause'
@@ -610,16 +610,16 @@ as well.\nFor a list of the available commands type /help.', )
     def lofi(self):
         # check if stream is playing to show correct button
         if self.lofi_player.is_playing():
-            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data=AcceptableQueries.pause)]
+            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause)]
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
-            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data=AcceptableQueries.play)]
+            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
             message = "Let's chill bruh"
 
         # TODO: add volume + and - buttons in second line
         reply_markup = InlineKeyboardMarkup([
             first_line_button,
-            [InlineKeyboardButton("❌ Cancel", callback_data=AcceptableQueries.cancel)]
+            [InlineKeyboardButton("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
         ])
 
         self.bot.send_message(chat_id=self.__last_chat_id,
@@ -627,11 +627,11 @@ as well.\nFor a list of the available commands type /help.', )
                               reply_markup=reply_markup)
 
     def lofi_callback(self, query: str):
-        if query == AcceptableQueries.play:
+        if query == AcceptableQueriesLoFi.play:
             self.lofi_player.play()
-        elif query == AcceptableQueries.pause:
+        elif query == AcceptableQueriesLoFi.pause:
             self.lofi_player.stop()  # .pause() only works on non-live streaming videos
-        elif query == AcceptableQueries.cancel:
+        elif query == AcceptableQueriesLoFi.cancel:
             # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
             pass
 
