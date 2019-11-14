@@ -16,6 +16,8 @@ Author: WEEE Open Team
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# volume controls on pi-rla: amixer -c 0 set PCM 3dB+ (or 3dB-)
+
 # Modules
 from typing import Optional
 
@@ -32,6 +34,10 @@ import datetime
 import traceback  # Print stack traces in logs
 import simpleaudio
 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from .stream_yt_audio import get_lofi_vlc_player
+from enum import Enum
+from time import sleep
 
 class BotHandler:
     """
@@ -129,6 +135,14 @@ def escape_all(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
+class AcceptableQueriesLoFi(Enum):
+    def __init__(self):
+        self.play = 'play'
+        self.pause = 'pause'
+        self.cancel = 'cancel'
+        self.volume_plus = 'vol+'
+        self.volume_down = 'vol-'
+
 class CommandHandler:
     """
     Aggregates all the possible commands within one class.
@@ -155,6 +169,8 @@ class CommandHandler:
         self.__last_user_id = None
         self.__last_update = None
         self.__last_user_nickname = None
+
+        self.lofi_player = get_lofi_vlc_player()
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -380,7 +396,15 @@ as well.\nFor a list of the available commands type /help.', )
             self._send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
-        wave_obj.play()
+        if self.lofi_player.is_playing():
+            self.lofi_player.stop()
+            sleep(1)
+            wave_obj.play()
+            sleep(1)
+            self.lofi_player.play()
+        else:
+            wave_obj.play()
+
         self._send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
     def log(self, cmd_days_to_filter=None):
@@ -585,6 +609,39 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.logs.store_new_user(self.__last_user_id, first_name, last_name, username)
 
+    def lofi(self):
+        # check if stream is playing to show correct button
+        if self.lofi_player.is_playing():
+            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause)]
+            message = "You're stopping this music only to listen to the Russian anthem, right?"
+        else:
+            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
+            message = "Let's chill bruh"
+
+        reply_markup = InlineKeyboardMarkup([
+            first_line_button,
+            [InlineKeyboardButton("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down), InlineKeyboardButton("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus)],
+            [InlineKeyboardButton("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
+        ])
+
+        self.bot.send_message(chat_id=self.__last_chat_id,
+                              message=message,
+                              reply_markup=reply_markup)
+
+    def lofi_callback(self, query: str):
+        if query == AcceptableQueriesLoFi.play:
+            self.lofi_player.play()
+        elif query == AcceptableQueriesLoFi.pause:
+            self.lofi_player.stop()  # .pause() only works on non-live streaming videos
+        elif query == AcceptableQueriesLoFi.cancel:
+            # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
+            pass
+        elif query == AcceptableQueriesLoFi.volume_down:
+            os.system("amixer -c 0 set PCM 3dB-")
+        elif query == AcceptableQueriesLoFi.volume_plus:
+            os.system("amixer -c 0 set PCM 3dB-")
+
+
     def unknown(self):
         """
         Called when an unknown command is received
@@ -646,67 +703,78 @@ def main():
         try:
             command = last_update['message']['text'].split()
             message_type = last_update['message']['chat']['type']
+            query = last_update['callback_query']['data']  # TODO: verify this is the correct field by testing
             # print(last_update['message'])  # Extremely advanced debug techniques
 
-            # Don't respond to messages in group chats
-            if message_type != "private":
-                continue
+            # per Telegram docs, either message or callback_query are None
+            if last_update['message']:
+                # Don't respond to messages in group chats
+                if message_type != "private":
+                    continue
 
-            authorized = handler.read_user_from_message(last_update)
-            if not authorized:
-                continue
+                authorized = handler.read_user_from_message(last_update)
+                if not authorized:
+                    continue
 
-            if command[0] == "/start" or command[0] == "/start@weeelab_bot":
-                handler.start()
+                if command[0] == "/start" or command[0] == "/start@weeelab_bot":
+                    handler.start()
 
-            elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
-                handler.inlab()
+                elif command[0] == "/inlab" or command[0] == "/inlab@weeelab_bot":
+                    handler.inlab()
 
-            elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
-                if len(command) < 2:
-                    handler.history_error()
-                elif len(command) < 3:
-                    handler.history(command[1])
+                elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
+                    if len(command) < 2:
+                        handler.history_error()
+                    elif len(command) < 3:
+                        handler.history(command[1])
+                    else:
+                        handler.history(command[1], command[2])
+
+                elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
+                    if len(command) > 1:
+                        handler.log(command[1])
+                    else:
+                        handler.log()
+
+                elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
+                    if len(command) == 2:
+                        handler.tolab(command[1])
+                    elif len(command) >= 3:
+                        handler.tolab(command[1], command[2])
+                    else:
+                        handler.tolab_help()
+
+                elif command[0] == "/ring":
+                    handler.ring(wave_obj)
+
+                elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
+                    if len(command) > 1:
+                        handler.stat(command[1])
+                    else:
+                        handler.stat()
+
+                elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
+                    if len(command) > 1:
+                        handler.top(command[1])
+                    else:
+                        handler.top()
+
+                elif command[0] == "/deletecache" or command[0] == "/deletecache@weeelab_bot":
+                    handler.delete_cache()
+
+                elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
+                    handler.help()
+
+                elif command[0] == "/lofi" or command[0] == "lofi@weeelab_bot":
+                    handler.lofi()
+
                 else:
-                    handler.history(command[1], command[2])
+                    handler.unknown()
 
-            elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
-                if len(command) > 1:
-                    handler.log(command[1])
-                else:
-                    handler.log()
-
-            elif command[0] == "/tolab" or command[0] == "/tolab@weeelab_bot":
-                if len(command) == 2:
-                    handler.tolab(command[1])
-                elif len(command) >= 3:
-                    handler.tolab(command[1], command[2])
-                else:
-                    handler.tolab_help()
-
-            elif command[0] == "/ring":
-                handler.ring(wave_obj)
-
-            elif command[0] == "/stat" or command[0] == "/stat@weeelab_bot":
-                if len(command) > 1:
-                    handler.stat(command[1])
-                else:
-                    handler.stat()
-
-            elif command[0] == "/top" or command[0] == "/top@weeelab_bot":
-                if len(command) > 1:
-                    handler.top(command[1])
-                else:
-                    handler.top()
-
-            elif command[0] == "/deletecache" or command[0] == "/deletecache@weeelab_bot":
-                handler.delete_cache()
-
-            elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
-                handler.help()
-
+            # in case of callback_query instead of message
             else:
-                handler.unknown()
+                handler.lofi_callback(query)
+
 
         except:  # catch the exception if raised
             if "channel_post" in last_update:
