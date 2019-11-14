@@ -49,6 +49,7 @@ class BotHandler:
         """
         init function to set bot token and reference url
         """
+        print("Bot handler started")
         self.token = token
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
         self.offset = None
@@ -684,6 +685,7 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
 
 def main():
     """main function of the bot"""
+    print("Entered main")
     oc = owncloud.Client(OC_URL)
     oc.login(OC_USER, OC_PWD)
 
