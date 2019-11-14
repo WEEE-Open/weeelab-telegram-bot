@@ -35,7 +35,7 @@ import traceback  # Print stack traces in logs
 import simpleaudio
 
 # from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from stream_yt_audio import get_lofi_vlc_player
+# TODO: from stream_yt_audio import get_lofi_vlc_player
 from enum import Enum
 from time import sleep
 
@@ -177,7 +177,7 @@ class CommandHandler:
         self.__last_update = None
         self.__last_user_nickname = None
 
-        self.lofi_player = get_lofi_vlc_player()
+        self.lofi_player = None  # TODO: get_lofi_vlc_player()
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -647,7 +647,6 @@ as well.\nFor a list of the available commands type /help.', )
             os.system("amixer -c 0 set PCM 3dB-")
         elif query == AcceptableQueriesLoFi.volume_plus:
             os.system("amixer -c 0 set PCM 3dB-")
-
 
     def unknown(self):
         """
