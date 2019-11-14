@@ -35,9 +35,10 @@ import traceback  # Print stack traces in logs
 import simpleaudio
 
 # from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from .stream_yt_audio import get_lofi_vlc_player
+from stream_yt_audio import get_lofi_vlc_player
 from enum import Enum
 from time import sleep
+
 
 class BotHandler:
     """

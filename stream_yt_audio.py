@@ -1,6 +1,10 @@
+# this script does the same as:
+# cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
+
 import pafy  # pip dependency for backend: youtube-dl
 import vlc  # python-vlc when installing with pip
 from time import sleep
+
 
 def get_lofi_vlc_player():
     # lofi hip hop radio - beats to relax/study to by ChilledCow

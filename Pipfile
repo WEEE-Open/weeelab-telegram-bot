@@ -11,6 +11,9 @@ pyocclient = "*"
 pytz = "*"
 simpleaudio = "*"
 python-ldap = "*"
+pafy = "*"
+youtube-dl = "*"
+python-vlc = "*"
 
 [requires]
 python_version = "3.7"
