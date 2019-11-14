@@ -1,7 +1,7 @@
 # this script does the same as:
 # cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
 
-import pafy  # pip dependency for backend: youtube-dl
+import youtube_dl  # pip dependency for backend: youtube-dl
 import vlc  # python-vlc when installing with pip
 from time import sleep
 
@@ -9,15 +9,15 @@ from time import sleep
 def get_lofi_vlc_player():
     # lofi hip hop radio - beats to relax/study to by ChilledCow
     url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
-    video = pafy.new(url)
-    playurl = video.getbest().url
+    #video = youtube_dl.new(url)
+    #playurl = video.getbest().url
 
-    instance = vlc.Instance()
-    player = instance.media_player_new()
-    media = instance.media_new(playurl)
-    media.get_mrl()
-    player.set_media(media)
-    return player
+    #instance = vlc.Instance()
+    #player = instance.media_player_new()
+    #media = instance.media_new(playurl)
+    #media.get_mrl()
+    #player.set_media(media)
+    #return player
 
 # to test if streaming works
 # player = get_lofi_vlc_player()

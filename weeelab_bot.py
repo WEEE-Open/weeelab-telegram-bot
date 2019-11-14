@@ -783,7 +783,6 @@ def main():
             else:
                 handler.lofi_callback(query)
 
-
         except:  # catch the exception if raised
             if "channel_post" in last_update:
                 chat_id = last_update['channel_post']['chat']['id']
@@ -800,3 +799,7 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         exit()
+    except:
+        print("MEGAERROR!")
+        print(traceback.format_exc())
+        exit(1)

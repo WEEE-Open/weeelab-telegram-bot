@@ -12,8 +12,8 @@ pytz = "*"
 simpleaudio = "*"
 python-ldap = "*"
 pafy = "*"
-youtube-dl = "*"
-python-vlc = "*"
+youtube_dl = "*"
+python_vlc = "*"
 
 [requires]
 python_version = "3.7"
