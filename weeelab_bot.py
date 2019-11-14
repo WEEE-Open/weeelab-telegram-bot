@@ -16,6 +16,8 @@ Author: WEEE Open Team
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# volume controls on pi-rla: amixer -c 0 set PCM 3dB+ (or 3dB-)
+
 # Modules
 from typing import Optional
 
@@ -35,6 +37,7 @@ import simpleaudio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from .stream_yt_audio import get_lofi_vlc_player
 from enum import Enum
+from time import sleep
 
 class BotHandler:
     """
@@ -134,8 +137,8 @@ def escape_all(string):
 
 class AcceptableQueries(Enum):
     def __init__(self):
-        self.play = 'play',
-        self.pause = 'pause',
+        self.play = 'play'
+        self.pause = 'pause'
         self.cancel = 'cancel'
 
 class CommandHandler:
@@ -391,7 +394,15 @@ as well.\nFor a list of the available commands type /help.', )
             self._send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
-        wave_obj.play()
+        if self.lofi_player.is_playing():
+            self.lofi_player.stop()
+            sleep(1)
+            wave_obj.play()
+            sleep(1)
+            self.lofi_player.play()
+        else:
+            wave_obj.play()
+
         self._send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
     def log(self, cmd_days_to_filter=None):
@@ -684,12 +695,12 @@ def main():
             continue
         # noinspection PyBroadException
         try:
-            # per Telegram docs, either message or callback_query are None
             command = last_update['message']['text'].split()
             message_type = last_update['message']['chat']['type']
-            query = last_update['callback_query']['data']
+            query = last_update['callback_query']['data']  # TODO: verify this is the correct field
             # print(last_update['message'])  # Extremely advanced debug techniques
 
+            # per Telegram docs, either message or callback_query are None
             if last_update['message']:
                 # Don't respond to messages in group chats
                 if message_type != "private":
