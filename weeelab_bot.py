@@ -34,7 +34,7 @@ import datetime
 import traceback  # Print stack traces in logs
 import simpleaudio
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+# from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from .stream_yt_audio import get_lofi_vlc_player
 from enum import Enum
 from time import sleep
@@ -142,6 +142,11 @@ class AcceptableQueriesLoFi(Enum):
         self.cancel = 'cancel'
         self.volume_plus = 'vol+'
         self.volume_down = 'vol-'
+
+
+def inline_keyboard_button(label: str, callback_data: str):
+    return {"label": label, "callback_data": callback_data}
+
 
 class CommandHandler:
     """
@@ -612,17 +617,17 @@ as well.\nFor a list of the available commands type /help.', )
     def lofi(self):
         # check if stream is playing to show correct button
         if self.lofi_player.is_playing():
-            first_line_button = [InlineKeyboardButton("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause)]
+            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause)]
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
-            first_line_button = [InlineKeyboardButton("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
+            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
             message = "Let's chill bruh"
 
-        reply_markup = InlineKeyboardMarkup([
+        reply_markup = [
             first_line_button,
-            [InlineKeyboardButton("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down), InlineKeyboardButton("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus)],
-            [InlineKeyboardButton("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
-        ])
+            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down), inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus)],
+            [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
+        ]
 
         self.bot.send_message(chat_id=self.__last_chat_id,
                               message=message,
