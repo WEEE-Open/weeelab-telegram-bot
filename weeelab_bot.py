@@ -140,6 +140,8 @@ class AcceptableQueriesLoFi(Enum):
         self.play = 'play'
         self.pause = 'pause'
         self.cancel = 'cancel'
+        self.volume_plus = 'vol+'
+        self.volume_down = 'vol-'
 
 class CommandHandler:
     """
@@ -616,9 +618,9 @@ as well.\nFor a list of the available commands type /help.', )
             first_line_button = [InlineKeyboardButton("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
             message = "Let's chill bruh"
 
-        # TODO: add volume + and - buttons in second line
         reply_markup = InlineKeyboardMarkup([
             first_line_button,
+            [InlineKeyboardButton("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down), InlineKeyboardButton("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus)],
             [InlineKeyboardButton("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
         ])
 
@@ -634,6 +636,10 @@ as well.\nFor a list of the available commands type /help.', )
         elif query == AcceptableQueriesLoFi.cancel:
             # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
             pass
+        elif query == AcceptableQueriesLoFi.volume_down:
+            os.system("amixer -c 0 set PCM 3dB-")
+        elif query == AcceptableQueriesLoFi.volume_plus:
+            os.system("amixer -c 0 set PCM 3dB-")
 
 
     def unknown(self):
@@ -697,7 +703,7 @@ def main():
         try:
             command = last_update['message']['text'].split()
             message_type = last_update['message']['chat']['type']
-            query = last_update['callback_query']['data']  # TODO: verify this is the correct field
+            query = last_update['callback_query']['data']  # TODO: verify this is the correct field by testing
             # print(last_update['message'])  # Extremely advanced debug techniques
 
             # per Telegram docs, either message or callback_query are None
