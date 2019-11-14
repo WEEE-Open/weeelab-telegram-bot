@@ -11,6 +11,7 @@ pyocclient = "*"
 pytz = "*"
 simpleaudio = "*"
 python-ldap = "*"
+python-telegram-bot = "*"
 
 [requires]
 python_version = "3.7"
