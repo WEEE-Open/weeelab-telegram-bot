@@ -100,7 +100,7 @@ class BotHandler:
         }
         if reply_markup is not None:
             params['reply_markup'] = {"inline_keyboard": reply_markup}
-        return requests.post(self.api_url + 'sendMessage', params)
+        return requests.post(self.api_url + 'sendMessage', json=params)
 
     def get_last_update(self):
         """
