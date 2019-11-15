@@ -33,8 +33,7 @@ import owncloud
 import datetime
 import traceback  # Print stack traces in logs
 import simpleaudio
-
-from stream_yt_audio import get_lofi_vlc_player
+from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
 
@@ -176,7 +175,7 @@ class CommandHandler:
         self.__last_update = None
         self.__last_user_nickname = None
 
-        self.lofi_player = get_lofi_vlc_player()
+        self.lofi_player = LofiVlcPlayer()
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -405,12 +404,13 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
-        if self.lofi_player.is_playing():
-            self.lofi_player.stop()
+        lofi_player = self.lofi_player.get_player()
+        if lofi_player.is_playing():
+            lofi_player.stop()
             sleep(1)
             wave_obj.play()
             sleep(1)
-            self.lofi_player.play()
+            lofi_player.play()
         else:
             wave_obj.play()
 
@@ -620,7 +620,8 @@ as well.\nFor a list of the available commands type /help.', )
 
     def lofi(self):
         # check if stream is playing to show correct button
-        if self.lofi_player.is_playing():
+        lofi_player = self.lofi_player.get_player()
+        if lofi_player.is_playing():
             first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause.value)]
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
@@ -636,10 +637,11 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_inline_keyboard(message, reply_markup)
 
     def lofi_callback(self, query: str):
+        lofi_player = self.lofi_player.get_player()
         if query == AcceptableQueriesLoFi.play:
-            self.lofi_player.play()
+            lofi_player.play()
         elif query == AcceptableQueriesLoFi.pause:
-            self.lofi_player.stop()  # .pause() only works on non-live streaming videos
+            lofi_player.stop()  # .pause() only works on non-live streaming videos
         elif query == AcceptableQueriesLoFi.cancel:
             # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
             pass

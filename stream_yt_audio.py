@@ -6,23 +6,33 @@ import vlc  # python-vlc when installing with pip
 from time import sleep
 
 
-def get_lofi_vlc_player():
-    # lofi hip hop radio - beats to relax/study to by ChilledCow
-    url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
-    # https://stackoverflow.com/a/49249893
-    ydl_opts = {
-        'format': 'bestaudio/best',
-    }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        playurl = info['formats'][0]['url']
+class LofiVlcPlayer:
+    def __init__(self):
+        self.player = None
+        pass
 
-    instance = vlc.Instance()
-    player = instance.media_player_new()
-    media = instance.media_new(playurl)
-    media.get_mrl()
-    player.set_media(media)
-    return player
+    def get_player(self):
+        if self.player is None:
+            return self.__create_new_player()
+        else:
+            return self.player
+
+    def __create_new_player(self):
+        # lofi hip hop radio - beats to relax/study to by ChilledCow
+        url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
+        # https://stackoverflow.com/a/49249893
+        ydl_opts = {
+            'format': 'bestaudio/best',
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            playurl = info['formats'][0]['url']
+        instance = vlc.Instance()
+        player = instance.media_player_new()
+        media = instance.media_new(playurl)
+        media.get_mrl()
+        player.set_media(media)
+        return player
 
 # to test if streaming works
 # player = get_lofi_vlc_player()
