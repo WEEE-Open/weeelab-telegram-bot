@@ -137,12 +137,11 @@ def escape_all(string):
 
 
 class AcceptableQueriesLoFi(Enum):
-    def __init__(self):
-        self.play = 'play'
-        self.pause = 'pause'
-        self.cancel = 'cancel'
-        self.volume_plus = 'vol+'
-        self.volume_down = 'vol-'
+    play = 'play'
+    pause = 'pause'
+    cancel = 'cancel'
+    volume_plus = 'vol+'
+    volume_down = 'vol-'
 
 
 def inline_keyboard_button(label: str, callback_data: str):
@@ -618,16 +617,16 @@ as well.\nFor a list of the available commands type /help.', )
     def lofi(self):
         # check if stream is playing to show correct button
         if self.lofi_player.is_playing():
-            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause)]
+            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause.value)]
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
-            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
+            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play.value)]
             message = "Let's chill bruh"
 
         reply_markup = [
             first_line_button,
-            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down), inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus)],
-            [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
+            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down.value), inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus.value)],
+            [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel.value)]
         ]
 
         self.bot.send_message(chat_id=self.__last_chat_id,
