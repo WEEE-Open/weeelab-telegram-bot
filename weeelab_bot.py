@@ -98,8 +98,9 @@ class BotHandler:
             'text': text,
             'parse_mode': parse_mode,
             'disable_web_page_preview': disable_web_page_preview,
-            'reply_markup': reply_markup
         }
+        if reply_markup is not None:
+            params['reply_markup'] = reply_markup
         return requests.post(self.api_url + 'sendMessage', params)
 
     def get_last_update(self):
@@ -630,7 +631,7 @@ as well.\nFor a list of the available commands type /help.', )
         ]
 
         self.bot.send_message(chat_id=self.__last_chat_id,
-                              message=message,
+                              text=message,
                               reply_markup=reply_markup)
 
     def lofi_callback(self, query: str):
