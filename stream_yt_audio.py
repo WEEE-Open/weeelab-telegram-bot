@@ -9,15 +9,15 @@ from time import sleep
 def get_lofi_vlc_player():
     # lofi hip hop radio - beats to relax/study to by ChilledCow
     url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
-    #video = youtube_dl.new(url)
-    #playurl = video.getbest().url
+    video = youtube_dl.new(url)
+    playurl = video.getbest().url
 
-    #instance = vlc.Instance()
-    #player = instance.media_player_new()
-    #media = instance.media_new(playurl)
-    #media.get_mrl()
-    #player.set_media(media)
-    #return player
+    instance = vlc.Instance()
+    player = instance.media_player_new()
+    media = instance.media_new(playurl)
+    media.get_mrl()
+    player.set_media(media)
+    return player
 
 # to test if streaming works
 # player = get_lofi_vlc_player()
@@ -41,8 +41,6 @@ def get_lofi_vlc_player():
 #     else:
 #         sleep(5)
 #         player.play()
-
-
 
 # player.stop()  #-- to stop/end video
 # player.is_playing() # 1 if True, 0 if False

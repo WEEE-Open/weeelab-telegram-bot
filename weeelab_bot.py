@@ -34,8 +34,7 @@ import datetime
 import traceback  # Print stack traces in logs
 import simpleaudio
 
-# from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-# TODO: from stream_yt_audio import get_lofi_vlc_player
+from stream_yt_audio import get_lofi_vlc_player
 from enum import Enum
 from time import sleep
 
@@ -177,7 +176,7 @@ class CommandHandler:
         self.__last_update = None
         self.__last_user_nickname = None
 
-        self.lofi_player = None  # TODO: get_lofi_vlc_player()
+        self.lofi_player = get_lofi_vlc_player()
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -799,6 +798,7 @@ def main():
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
+    # noinspection PyBroadException
     try:
         main()
     except KeyboardInterrupt:
