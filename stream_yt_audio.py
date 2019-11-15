@@ -32,6 +32,7 @@ class LofiVlcPlayer:
         media = instance.media_new(playurl)
         media.get_mrl()
         player.set_media(media)
+        self.player = player
         return player
 
 # to test if streaming works
