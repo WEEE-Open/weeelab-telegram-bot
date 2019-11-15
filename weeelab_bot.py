@@ -146,7 +146,7 @@ class AcceptableQueriesLoFi(Enum):
 
 
 def inline_keyboard_button(label: str, callback_data: str):
-    return {"label": label, "callback_data": callback_data}
+    return {"text": label, "callback_data": callback_data}
 
 
 class CommandHandler:
