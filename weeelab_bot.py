@@ -100,7 +100,7 @@ class BotHandler:
             'disable_web_page_preview': disable_web_page_preview,
         }
         if reply_markup is not None:
-            params['reply_markup'] = reply_markup
+            params['reply_markup'] = {"inline_keyboard": reply_markup}
         return requests.post(self.api_url + 'sendMessage', params)
 
     def get_last_update(self):
@@ -213,6 +213,9 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
 
     def __send_message(self, message):
         self.bot.send_message(self.__last_chat_id, message)
+
+    def __send_inline_keyboard(self, message, markup):
+        self.bot.send_message(self.__last_chat_id, message, reply_markup=markup)
 
     def respond_to_invite_link(self, message) -> bool:
         message: str
@@ -630,9 +633,7 @@ as well.\nFor a list of the available commands type /help.', )
             [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel.value)]
         ]
 
-        self.bot.send_message(chat_id=self.__last_chat_id,
-                              text=message,
-                              reply_markup=reply_markup)
+        self.__send_inline_keyboard(message, reply_markup)
 
     def lofi_callback(self, query: str):
         if query == AcceptableQueriesLoFi.play:
