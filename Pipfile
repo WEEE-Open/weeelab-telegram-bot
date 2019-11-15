@@ -19,4 +19,4 @@ python_vlc = "*"
 python_version = "3.7"
 
 [scripts]
-bot = "python weeelab_bot.py"
+bot = "python -u weeelab_bot.py"
