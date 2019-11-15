@@ -704,17 +704,23 @@ def main():
         last_update = bot.get_last_update()
 
         if last_update == -1:
-            print("last_update = -1")
+            # When no messages are received...
+            # print("last_update = -1")
             continue
+
+        # per Telegram docs, either message or callback_query are None
         # noinspection PyBroadException
         try:
-            command = last_update['message']['text'].split()
-            message_type = last_update['message']['chat']['type']
-            query = last_update['callback_query']['data']  # TODO: verify this is the correct field by testing
-            # print(last_update['message'])  # Extremely advanced debug techniques
+            if "channel_post" in last_update:
+                # Leave scam channels where people add our bot randomly
+                chat_id = last_update['channel_post']['chat']['id']
+                print(bot.leave_chat(chat_id).text)
+            elif 'message' in last_update:
+                # Handle private messages
+                command = last_update['message']['text'].split()
+                message_type = last_update['message']['chat']['type']
+                # print(last_update['message'])  # Extremely advanced debug techniques
 
-            # per Telegram docs, either message or callback_query are None
-            if last_update['message']:
                 # Don't respond to messages in group chats
                 if message_type != "private":
                     continue
@@ -774,22 +780,21 @@ def main():
 
                 elif command[0] == "/lofi" or command[0] == "lofi@weeelab_bot":
                     handler.lofi()
-
                 else:
                     handler.unknown()
 
-            # in case of callback_query instead of message
-            else:
+            elif 'callback_query' in last_update:
+                # Handle button callbacks
+                query = last_update['callback_query']['data']
                 handler.lofi_callback(query)
-
-        except:  # catch the exception if raised
-            if "channel_post" in last_update:
-                chat_id = last_update['channel_post']['chat']['id']
-                print(bot.leave_chat(chat_id).text)
             else:
-                print("ERROR!")
+                print('Unsupported "last_update" type')
                 print(last_update)
-                print(traceback.format_exc())
+
+        except:  # catch any exception if raised
+            print("ERROR!")
+            print(last_update)
+            print(traceback.format_exc())
 
 
 # call the main() until a keyboard interrupt is called
