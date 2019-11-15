@@ -9,8 +9,13 @@ from time import sleep
 def get_lofi_vlc_player():
     # lofi hip hop radio - beats to relax/study to by ChilledCow
     url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
-    video = youtube_dl.new(url)
-    playurl = video.getbest().url
+    # https://stackoverflow.com/a/49249893
+    ydl_opts = {
+        'format': 'bestaudio/best',
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        playurl = info['formats'][0]['url']
 
     instance = vlc.Instance()
     player = instance.media_player_new()
