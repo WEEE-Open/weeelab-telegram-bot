@@ -192,7 +192,7 @@ class CommandHandler:
         except (LdapConnectionError, DuplicateEntryError) as e:
             self.exception(e.__class__.__name__)
         except AccountLockedError:
-            self._send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
+            self.__send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
                                "If you're a new team member, that will happen after the test on safety.")
         except AccountNotFoundError:
             responded = self.respond_to_invite_link(last_update['message']['text'])
@@ -203,15 +203,15 @@ class CommandHandler:
             
 If you're a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, add your user ID in the account management panel. 
 Your user ID is: <b>{self.__last_user_id}</b>"""
-            self._send_message(msg)
+            self.__send_message(msg)
         except AccountNotCompletedError as e:
-            self._send_message("Oh, hi, long time no see! We switched to a new account management system, "
+            self.__send_message("Oh, hi, long time no see! We switched to a new account management system, "
                                "so you will need to complete your registration here before we can talk again:\n"
                                f"{INVITE_LINK}{e.invite_code}\n"
                                "Once you're done, ask an administrator to enable your account. Have a nice day!")
         return False
 
-    def _send_message(self, message):
+    def __send_message(self, message):
         self.bot.send_message(self.__last_chat_id, message)
 
     def respond_to_invite_link(self, message) -> bool:
@@ -223,9 +223,9 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
         try:
             self.users.update_invite(code, self.__last_user_id, self.__last_user_nickname, self.conn)
         except AccountNotFoundError:
-            self._send_message("I couldn't find your invite. Are you sure of that link?")
+            self.__send_message("I couldn't find your invite. Are you sure of that link?")
             return True
-        self._send_message("Hey, I've filled some fields in the registration form for you, no need to say thanks.\n"
+        self.__send_message("Hey, I've filled some fields in the registration form for you, no need to say thanks.\n"
                            f"Just go back to {link} and complete the registration.\n"
                            "See you!")
         return True
@@ -235,7 +235,7 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
         Called with /start
         """
 
-        self._send_message('\
+        self.__send_message('\
 <b>WEEE Open Telegram bot</b>.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
@@ -311,20 +311,20 @@ as well.\nFor a list of the available commands type /help.', )
 
         if len(inlab) > 0 and not user_themself_inlab:
             msg += "\nUse /ring for the bell, if you are at door 3."
-        self._send_message(msg)
+        self.__send_message(msg)
 
     def tolab(self, time: str, day: str = None):
         try:
             time = self._tolab_parse_time(time)
         except ValueError:
-            self._send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
+            self.__send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
             return
 
         if time is not None:
             try:
                 day = self._tolab_parse_day(day)
             except ValueError:
-                self._send_message("Use correct day format: +1 for tomorrow, +2 for the day after tomorrow and so on")
+                self.__send_message("Use correct day format: +1 for tomorrow, +2 for the day after tomorrow and so on")
                 return
 
         # noinspection PyBroadException
@@ -334,18 +334,18 @@ as well.\nFor a list of the available commands type /help.', )
                 self.tolab_db.delete_entry(self.user.tgid)
                 # TODO: add random messages (changing constantly like the "unknown command" ones),
                 # like "but why?", "I'm sorry to hear that", "hope you have fun elsewhere", etc...
-                self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
+                self.__send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
-                    self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+                    self.__send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
                 elif days == 1:
-                    self._send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
+                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
                 else:
-                    self._send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
+                    self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
 \nMark it down on your calendar!")
         except Exception as e:
-            self._send_message(f"An error occurred: {str(e)}")
+            self.__send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
 
     @staticmethod
@@ -399,7 +399,7 @@ as well.\nFor a list of the available commands type /help.', )
         """
         inlab = self.logs.get_log().get_entries_inlab()
         if len(inlab) <= 0:
-            self._send_message("Nobody is in lab right now, I cannot ring the bell.")
+            self.__send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
         if self.lofi_player.is_playing():
@@ -411,7 +411,7 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             wave_obj.play()
 
-        self._send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
+        self.__send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
     def log(self, cmd_days_to_filter=None):
         """
@@ -451,7 +451,7 @@ as well.\nFor a list of the available commands type /help.', )
             msg += '<b>{day}</b>\n{rows}\n'.format(day=this_day, rows=''.join(days[this_day]))
 
         msg = msg + 'Latest log update: <b>{}</b>'.format(self.logs.log_last_update)
-        self._send_message(msg)
+        self.__send_message(msg)
 
     def stat(self, cmd_target_user=None):
         if cmd_target_user is None:
@@ -467,12 +467,12 @@ as well.\nFor a list of the available commands type /help.', )
                     person = self.people.get(target_username, self.conn)
                     if person is None:
                         target_username = None
-                        self._send_message('No statistics for the given user. Have you typed it correctly?')
+                        self.__send_message('No statistics for the given user. Have you typed it correctly?')
                     else:
                         target_username = person.uid
                 else:
                     target_username = None
-                    self._send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
+                    self.__send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
 
         # Do we know what to search?
         if target_username is not None:
@@ -489,10 +489,10 @@ as well.\nFor a list of the available commands type /help.', )
                   f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
                   f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
                   f'\n\nLast log update: {self.logs.log_last_update}'
-            self._send_message(msg)
+            self.__send_message(msg)
 
     def history_error(self):
-        self._send_message('Insert item the item to search, e.g. /history R100')
+        self.__send_message('Insert item the item to search, e.g. /history R100')
 
     def history(self, item, cmd_limit=None):
         if cmd_limit is None:
@@ -507,7 +507,7 @@ as well.\nFor a list of the available commands type /help.', )
             if self.tarallo.login(BOT_USER, BOT_PSW):
                 history = self.tarallo.get_history(item, limit)
                 if history is None:
-                    self._send_message(f'Item {item} not found.')
+                    self.__send_message(f'Item {item} not found.')
                 else:
                     msg = f'<b>History of item {item}</b>\n\n'
                     entries = 0
@@ -535,16 +535,16 @@ as well.\nFor a list of the available commands type /help.', )
                         display_user = CommandHandler.try_get_display_name(h_user, self.people.get(h_user, self.conn))
                         msg += f'{h_time} by <i>{display_user}</i>\n\n'
                         if entries >= 6:
-                            self._send_message(msg)
+                            self.__send_message(msg)
                             msg = ''
                             entries = 0
                     if entries != 0:
-                        self._send_message(msg)
+                        self.__send_message(msg)
             else:
-                self._send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+                self.__send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
         except RuntimeError:
             fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.last_status)}).'
-            self._send_message(fail_msg)
+            self.__send_message(fail_msg)
 
     def top(self, cmd_filter=None):
         """
@@ -580,25 +580,25 @@ as well.\nFor a list of the available commands type /help.', )
                         msg += f'{n}) [{time_hh}:{time_mm}] {display_user}\n'
 
             msg += f'\nLast log update: {self.logs.log_last_update}'
-            self._send_message(msg)
+            self.__send_message(msg)
         else:
-            self._send_message('Sorry, only admins can use this function!')
+            self.__send_message('Sorry, only admins can use this function!')
 
     def delete_cache(self):
         if not self.user.isadmin:
-            self._send_message('Sorry, only admins can use this function!')
+            self.__send_message('Sorry, only admins can use this function!')
             return
         users = self.users.delete_cache()
         people = self.people.delete_cache()
         logs = self.logs.delete_cache()
-        self._send_message("All caches busted! 💥\n"
+        self.__send_message("All caches busted! 💥\n"
                            f"Users: deleted {users} entries\n"
                            f"People: deleted {people} entries\n"
                            f"Logs: deleted {logs} lines")
 
     def exception(self, exception: str):
         msg = f"I tried to do that, but an exception occurred: {exception}"
-        self._send_message(msg)
+        self.__send_message(msg)
 
     def store_id(self):
         first_name = self.__last_update['message']['from']['first_name']
@@ -651,7 +651,7 @@ as well.\nFor a list of the available commands type /help.', )
         """
         Called when an unknown command is received
         """
-        self._send_message(self.bot.unknown_command_message + "\n\nType /help for list of commands")
+        self.__send_message(self.bot.unknown_command_message + "\n\nType /help for list of commands")
 
     def tolab_help(self):
         help_message = "Use /tolab and the time to tell the bot when you'll go to the lab.\n\n\
@@ -659,7 +659,7 @@ For example type <code>/tolab 10:30</code> if you're going at 10:30.\n\
 You can also set the day: <code>/tolab 10:30 +1</code> for tomorrow, <code>+2</code> for the day after tomorrow and so\
 on. If you don't set a day, I will consider the time for today or tomorrow, the one which makes more sense.\n\
 You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
-        self._send_message(help_message)
+        self.__send_message(help_message)
 
     def help(self):
         help_message = """Available commands and options:
@@ -678,7 +678,7 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
 /top - Show a list of top users by hours spent this month
 /top all - Show a list of top users by hours spent
 /deletecache - Delete caches (reload logs and users)"""
-        self._send_message(help_message)
+        self.__send_message(help_message)
 
 
 def main():
