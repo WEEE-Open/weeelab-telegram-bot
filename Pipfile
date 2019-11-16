@@ -12,12 +12,12 @@ pytz = "*"
 simpleaudio = "*"
 python-ldap = "*"
 pafy = "*"
-youtube-dl = "*"
-python-vlc = "*"
+youtube_dl = "*"
+python_vlc = "*"
 paramiko = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-bot = "python weeelab_bot.py"
+bot = "python -u weeelab_bot.py"

@@ -34,17 +34,12 @@ import owncloud
 import datetime
 import traceback  # Print stack traces in logs
 import simpleaudio
-
-# from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from stream_yt_audio import get_lofi_vlc_player
+from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
 from remote_commands import ssh_command, wol_command
 
 MAX_WORK_DONE = 2000
-# user = get_user(username)
-# username = user.username
-# pretty_name = user.full_name
 
 class BotHandler:
     """
@@ -55,6 +50,7 @@ class BotHandler:
         """
         init function to set bot token and reference url
         """
+        print("Bot handler started")
         self.token = token
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
         self.offset = None
@@ -104,9 +100,10 @@ class BotHandler:
             'text': text,
             'parse_mode': parse_mode,
             'disable_web_page_preview': disable_web_page_preview,
-            'reply_markup': reply_markup
         }
-        return requests.post(self.api_url + 'sendMessage', params)
+        if reply_markup is not None:
+            params['reply_markup'] = {"inline_keyboard": reply_markup}
+        return requests.post(self.api_url + 'sendMessage', json=params)
 
     def get_last_update(self):
         """
@@ -143,16 +140,15 @@ def escape_all(string):
 
 
 class AcceptableQueriesLoFi(Enum):
-    def __init__(self):
-        self.play = 'play'
-        self.pause = 'pause'
-        self.cancel = 'cancel'
-        self.volume_plus = 'vol+'
-        self.volume_down = 'vol-'
+    play = 'play'
+    pause = 'pause'
+    cancel = 'cancel'
+    volume_plus = 'vol+'
+    volume_down = 'vol-'
 
 
 def inline_keyboard_button(label: str, callback_data: str):
-    return {"label": label, "callback_data": callback_data}
+    return {"text": label, "callback_data": callback_data}
 
 
 class CommandHandler:
@@ -182,7 +178,7 @@ class CommandHandler:
         self.__last_update = None
         self.__last_user_nickname = None
 
-        self.lofi_player = get_lofi_vlc_player()
+        self.lofi_player = LofiVlcPlayer()
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -198,7 +194,7 @@ class CommandHandler:
         except (LdapConnectionError, DuplicateEntryError) as e:
             self.exception(e.__class__.__name__)
         except AccountLockedError:
-            self._send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
+            self.__send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
                                "If you're a new team member, that will happen after the test on safety.")
         except AccountNotFoundError:
             responded = self.respond_to_invite_link(last_update['message']['text'])
@@ -209,16 +205,19 @@ class CommandHandler:
             
 If you're a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, add your user ID in the account management panel. 
 Your user ID is: <b>{self.__last_user_id}</b>"""
-            self._send_message(msg)
+            self.__send_message(msg)
         except AccountNotCompletedError as e:
-            self._send_message("Oh, hi, long time no see! We switched to a new account management system, "
+            self.__send_message("Oh, hi, long time no see! We switched to a new account management system, "
                                "so you will need to complete your registration here before we can talk again:\n"
                                f"{INVITE_LINK}{e.invite_code}\n"
                                "Once you're done, ask an administrator to enable your account. Have a nice day!")
         return False
 
-    def _send_message(self, message):
+    def __send_message(self, message):
         self.bot.send_message(self.__last_chat_id, message)
+
+    def __send_inline_keyboard(self, message, markup):
+        self.bot.send_message(self.__last_chat_id, message, reply_markup=markup)
 
     def respond_to_invite_link(self, message) -> bool:
         message: str
@@ -229,9 +228,9 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
         try:
             self.users.update_invite(code, self.__last_user_id, self.__last_user_nickname, self.conn)
         except AccountNotFoundError:
-            self._send_message("I couldn't find your invite. Are you sure of that link?")
+            self.__send_message("I couldn't find your invite. Are you sure of that link?")
             return True
-        self._send_message("Hey, I've filled some fields in the registration form for you, no need to say thanks.\n"
+        self.__send_message("Hey, I've filled some fields in the registration form for you, no need to say thanks.\n"
                            f"Just go back to {link} and complete the registration.\n"
                            "See you!")
         return True
@@ -241,7 +240,7 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
         Called with /start
         """
 
-        self._send_message('\
+        self.__send_message('\
 <b>WEEE Open Telegram bot</b>.\nThe goal of this bot is to obtain information \
 about who is currently in the lab, who has done what, compute some stats and, \
 in general, simplify the life of our members and to avoid waste of paper \
@@ -317,20 +316,20 @@ as well.\nFor a list of the available commands type /help.', )
 
         if len(inlab) > 0 and not user_themself_inlab:
             msg += "\nUse /ring for the bell, if you are at door 3."
-        self._send_message(msg)
+        self.__send_message(msg)
 
     def tolab(self, time: str, day: str = None):
         try:
             time = self._tolab_parse_time(time)
         except ValueError:
-            self._send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
+            self.__send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
             return
 
         if time is not None:
             try:
                 day = self._tolab_parse_day(day)
             except ValueError:
-                self._send_message("Use correct day format: +1 for tomorrow, +2 for the day after tomorrow and so on")
+                self.__send_message("Use correct day format: +1 for tomorrow, +2 for the day after tomorrow and so on")
                 return
 
         # noinspection PyBroadException
@@ -340,18 +339,18 @@ as well.\nFor a list of the available commands type /help.', )
                 self.tolab_db.delete_entry(self.user.tgid)
                 # TODO: add random messages (changing constantly like the "unknown command" ones),
                 # like "but why?", "I'm sorry to hear that", "hope you have fun elsewhere", etc...
-                self._send_message(f"Ok, you aren't going to the lab, I've taken note.")
+                self.__send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
-                    self._send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+                    self.__send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
                 elif days == 1:
-                    self._send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
+                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
                 else:
-                    self._send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
+                    self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
 \nMark it down on your calendar!")
         except Exception as e:
-            self._send_message(f"An error occurred: {str(e)}")
+            self.__send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
 
     @staticmethod
@@ -405,19 +404,20 @@ as well.\nFor a list of the available commands type /help.', )
         """
         inlab = self.logs.get_log().get_entries_inlab()
         if len(inlab) <= 0:
-            self._send_message("Nobody is in lab right now, I cannot ring the bell.")
+            self.__send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
-        if self.lofi_player.is_playing():
-            self.lofi_player.stop()
+        lofi_player = self.lofi_player.get_player()
+        if lofi_player.is_playing():
+            lofi_player.stop()
             sleep(1)
             wave_obj.play()
             sleep(1)
-            self.lofi_player.play()
+            lofi_player.play()
         else:
             wave_obj.play()
 
-        self._send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
+        self.__send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
     def log(self, cmd_days_to_filter=None):
         """
@@ -457,7 +457,7 @@ as well.\nFor a list of the available commands type /help.', )
             msg += '<b>{day}</b>\n{rows}\n'.format(day=this_day, rows=''.join(days[this_day]))
 
         msg = msg + 'Latest log update: <b>{}</b>'.format(self.logs.log_last_update)
-        self._send_message(msg)
+        self.__send_message(msg)
 
     def stat(self, cmd_target_user=None):
         if cmd_target_user is None:
@@ -473,12 +473,12 @@ as well.\nFor a list of the available commands type /help.', )
                     person = self.people.get(target_username, self.conn)
                     if person is None:
                         target_username = None
-                        self._send_message('No statistics for the given user. Have you typed it correctly?')
+                        self.__send_message('No statistics for the given user. Have you typed it correctly?')
                     else:
                         target_username = person.uid
                 else:
                     target_username = None
-                    self._send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
+                    self.__send_message('Sorry! You are not allowed to see stat of other users!\nOnly admins can!')
 
         # Do we know what to search?
         if target_username is not None:
@@ -495,10 +495,10 @@ as well.\nFor a list of the available commands type /help.', )
                   f'\n<b>{month_mins_hh} h {month_mins_mm} m</b> this month.' \
                   f'\n<b>{total_mins_hh} h {total_mins_mm} m</b> in total.' \
                   f'\n\nLast log update: {self.logs.log_last_update}'
-            self._send_message(msg)
+            self.__send_message(msg)
 
     def history_error(self):
-        self._send_message('Insert item the item to search, e.g. /history R100')
+        self.__send_message('Insert item the item to search, e.g. /history R100')
 
     def history(self, item, cmd_limit=None):
         if cmd_limit is None:
@@ -513,7 +513,7 @@ as well.\nFor a list of the available commands type /help.', )
             if self.tarallo.login(BOT_USER, BOT_PSW):
                 history = self.tarallo.get_history(item, limit)
                 if history is None:
-                    self._send_message(f'Item {item} not found.')
+                    self.__send_message(f'Item {item} not found.')
                 else:
                     msg = f'<b>History of item {item}</b>\n\n'
                     entries = 0
@@ -541,16 +541,16 @@ as well.\nFor a list of the available commands type /help.', )
                         display_user = CommandHandler.try_get_display_name(h_user, self.people.get(h_user, self.conn))
                         msg += f'{h_time} by <i>{display_user}</i>\n\n'
                         if entries >= 6:
-                            self._send_message(msg)
+                            self.__send_message(msg)
                             msg = ''
                             entries = 0
                     if entries != 0:
-                        self._send_message(msg)
+                        self.__send_message(msg)
             else:
-                self._send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+                self.__send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
         except RuntimeError:
             fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.last_status)}).'
-            self._send_message(fail_msg)
+            self.__send_message(fail_msg)
 
     def top(self, cmd_filter=None):
         """
@@ -586,25 +586,25 @@ as well.\nFor a list of the available commands type /help.', )
                         msg += f'{n}) [{time_hh}:{time_mm}] {display_user}\n'
 
             msg += f'\nLast log update: {self.logs.log_last_update}'
-            self._send_message(msg)
+            self.__send_message(msg)
         else:
-            self._send_message('Sorry, only admins can use this function!')
+            self.__send_message('Sorry, only admins can use this function!')
 
     def delete_cache(self):
         if not self.user.isadmin:
-            self._send_message('Sorry, only admins can use this function!')
+            self.__send_message('Sorry, only admins can use this function!')
             return
         users = self.users.delete_cache()
         people = self.people.delete_cache()
         logs = self.logs.delete_cache()
-        self._send_message("All caches busted! 💥\n"
+        self.__send_message("All caches busted! 💥\n"
                            f"Users: deleted {users} entries\n"
                            f"People: deleted {people} entries\n"
                            f"Logs: deleted {logs} lines")
 
     def exception(self, exception: str):
         msg = f"I tried to do that, but an exception occurred: {exception}"
-        self._send_message(msg)
+        self.__send_message(msg)
 
     def store_id(self):
         first_name = self.__last_update['message']['from']['first_name']
@@ -623,28 +623,28 @@ as well.\nFor a list of the available commands type /help.', )
 
     def lofi(self):
         # check if stream is playing to show correct button
-        if self.lofi_player.is_playing():
-            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause)]
+        lofi_player = self.lofi_player.get_player()
+        if lofi_player.is_playing():
+            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause.value)]
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
-            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play)]
+            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play.value)]
             message = "Let's chill bruh"
 
         reply_markup = [
             first_line_button,
-            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down), inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus)],
-            [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel)]
+            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down.value), inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus.value)],
+            [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel.value)]
         ]
 
-        self.bot.send_message(chat_id=self.__last_chat_id,
-                              message=message,
-                              reply_markup=reply_markup)
+        self.__send_inline_keyboard(message, reply_markup)
 
     def lofi_callback(self, query: str):
+        lofi_player = self.lofi_player.get_player()
         if query == AcceptableQueriesLoFi.play:
-            self.lofi_player.play()
+            lofi_player.play()
         elif query == AcceptableQueriesLoFi.pause:
-            self.lofi_player.stop()  # .pause() only works on non-live streaming videos
+            lofi_player.stop()  # .pause() only works on non-live streaming videos
         elif query == AcceptableQueriesLoFi.cancel:
             # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
             pass
@@ -688,12 +688,11 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             self._send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
 
-
     def unknown(self):
         """
         Called when an unknown command is received
         """
-        self._send_message(self.bot.unknown_command_message + "\n\nType /help for list of commands")
+        self.__send_message(self.bot.unknown_command_message + "\n\nType /help for list of commands")
 
     def tolab_help(self):
         help_message = "Use /tolab and the time to tell the bot when you'll go to the lab.\n\n\
@@ -701,7 +700,7 @@ For example type <code>/tolab 10:30</code> if you're going at 10:30.\n\
 You can also set the day: <code>/tolab 10:30 +1</code> for tomorrow, <code>+2</code> for the day after tomorrow and so\
 on. If you don't set a day, I will consider the time for today or tomorrow, the one which makes more sense.\n\
 You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
-        self._send_message(help_message)
+        self.__send_message(help_message)
 
     def logout_help(self):
         help_message = """
@@ -727,13 +726,13 @@ Note: the username <b>must</b> be a single word with no spaces in between."""
 /stat <i>username</i> - Show hours spent in lab by this user
 /top - Show a list of top users by hours spent this month
 /top all - Show a list of top users by hours spent
-/deletecache - Delete caches (reload logs and users)
-/logout <i>username</i> <i>description of what they've done</i> - Logout a user with weeelab"""
-        self._send_message(help_message)
+/deletecache - Delete caches (reload logs and users)"""
+        self.__send_message(help_message)
 
 
 def main():
     """main function of the bot"""
+    print("Entered main")
     oc = owncloud.Client(OC_URL)
     oc.login(OC_USER, OC_PWD)
 
@@ -753,17 +752,23 @@ def main():
         last_update = bot.get_last_update()
 
         if last_update == -1:
-            print("last_update = -1")
+            # When no messages are received...
+            # print("last_update = -1")
             continue
+
+        # per Telegram docs, either message or callback_query are None
         # noinspection PyBroadException
         try:
-            command = last_update['message']['text'].split()
-            message_type = last_update['message']['chat']['type']
-            query = last_update['callback_query']['data']  # TODO: verify this is the correct field by testing
-            # print(last_update['message'])  # Extremely advanced debug techniques
+            if "channel_post" in last_update:
+                # Leave scam channels where people add our bot randomly
+                chat_id = last_update['channel_post']['chat']['id']
+                print(bot.leave_chat(chat_id).text)
+            elif 'message' in last_update:
+                # Handle private messages
+                command = last_update['message']['text'].split()
+                message_type = last_update['message']['chat']['type']
+                # print(last_update['message'])  # Extremely advanced debug techniques
 
-            # per Telegram docs, either message or callback_query are None
-            if last_update['message']:
                 # Don't respond to messages in group chats
                 if message_type != "private":
                     continue
@@ -833,24 +838,28 @@ def main():
                 else:
                     handler.unknown()
 
-            # in case of callback_query instead of message
-            else:
+            elif 'callback_query' in last_update:
+                # Handle button callbacks
+                query = last_update['callback_query']['data']
                 handler.lofi_callback(query)
-
-
-        except:  # catch the exception if raised
-            if "channel_post" in last_update:
-                chat_id = last_update['channel_post']['chat']['id']
-                print(bot.leave_chat(chat_id).text)
             else:
-                print("ERROR!")
+                print('Unsupported "last_update" type')
                 print(last_update)
-                print(traceback.format_exc())
+
+        except:  # catch any exception if raised
+            print("ERROR!")
+            print(last_update)
+            print(traceback.format_exc())
 
 
 # call the main() until a keyboard interrupt is called
 if __name__ == '__main__':
+    # noinspection PyBroadException
     try:
         main()
     except KeyboardInterrupt:
         exit()
+    except:
+        print("MEGAERROR!")
+        print(traceback.format_exc())
+        exit(1)

@@ -1,23 +1,39 @@
 # this script does the same as:
 # cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
 
-import pafy  # pip dependency for backend: youtube-dl
+import youtube_dl  # pip dependency for backend: youtube-dl
 import vlc  # python-vlc when installing with pip
 from time import sleep
 
 
-def get_lofi_vlc_player():
-    # lofi hip hop radio - beats to relax/study to by ChilledCow
-    url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
-    video = pafy.new(url)
-    playurl = video.getbest().url
+class LofiVlcPlayer:
+    def __init__(self):
+        self.player = None
+        pass
 
-    instance = vlc.Instance()
-    player = instance.media_player_new()
-    media = instance.media_new(playurl)
-    media.get_mrl()
-    player.set_media(media)
-    return player
+    def get_player(self):
+        if self.player is None:
+            return self.__create_new_player()
+        else:
+            return self.player
+
+    def __create_new_player(self):
+        # lofi hip hop radio - beats to relax/study to by ChilledCow
+        url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
+        # https://stackoverflow.com/a/49249893
+        ydl_opts = {
+            'format': 'bestaudio/best',
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            playurl = info['formats'][0]['url']
+        instance = vlc.Instance()
+        player = instance.media_player_new()
+        media = instance.media_new(playurl)
+        media.get_mrl()
+        player.set_media(media)
+        self.player = player
+        return player
 
 # to test if streaming works
 # player = get_lofi_vlc_player()
@@ -41,8 +57,6 @@ def get_lofi_vlc_player():
 #     else:
 #         sleep(5)
 #         player.play()
-
-
 
 # player.stop()  #-- to stop/end video
 # player.is_playing() # 1 if True, 0 if False
