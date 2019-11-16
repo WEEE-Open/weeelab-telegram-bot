@@ -14,6 +14,7 @@ python-ldap = "*"
 pafy = "*"
 youtube-dl = "*"
 python-vlc = "*"
+paramiko = "*"
 
 [requires]
 python_version = "3.7"
