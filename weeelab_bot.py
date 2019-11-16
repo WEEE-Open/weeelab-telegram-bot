@@ -17,6 +17,7 @@ Author: WEEE Open Team
 """
 
 # volume controls on pi-rla: amixer -c 0 set PCM 3dB+ (or 3dB-)
+# TODO: also check vlc specific volume controls
 
 # Modules
 from typing import Optional
@@ -38,7 +39,12 @@ import simpleaudio
 from stream_yt_audio import get_lofi_vlc_player
 from enum import Enum
 from time import sleep
+from remote_commands import ssh_command, wol_command
 
+MAX_WORK_DONE = 2000
+# user = get_user(username)
+# username = user.username
+# pretty_name = user.full_name
 
 class BotHandler:
     """
@@ -643,9 +649,44 @@ as well.\nFor a list of the available commands type /help.', )
             # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
             pass
         elif query == AcceptableQueriesLoFi.volume_down:
-            os.system("amixer -c 0 set PCM 3dB-")
+            os.system("amixer -c 0 set PCM 3dB-")  # TODO: change to vlc only volume
         elif query == AcceptableQueriesLoFi.volume_plus:
-            os.system("amixer -c 0 set PCM 3dB-")
+            os.system("amixer -c 0 set PCM 3dB+")
+
+    def logout(self, *words):
+        if self.user.isadmin:
+            username = words[0]
+
+            logout_message = ""
+            for word in words[1:]:
+                logout_message += word + " "
+            logout_message.rstrip().replace("  ", " ")
+
+            if logout_message.__len__() > MAX_WORK_DONE:
+                self._send_message(
+                    "Try not to write the story of your life. Re-send a shorter logout message with /logout")
+                return
+
+            # TODO: check return codes, check if weeelab return code is preserved through ssh
+            # TODO: check why os.system("ssh ...") doesn't work with keys even when given explicitly
+            # test if scma is turned on, turn it on if it isn't
+            # ssh to scma with weeelab command
+            # if return code is 0, send OK message - if return code is 3, send NO message
+
+            # send commands
+            ssh_return_code = os.system(ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"')
+            if ssh_return_code != 0:
+                wol_return_code = os.system(wol_command)
+                if wol_return_code != 0:
+                    self._send_message("Something went wrong during the wol command.")
+                    return
+                self._send_message("Sent wol command. Waiting a couple minutes until it's completed. "
+                                   "I'll reach out to you when I've completed the logout execution.")
+                sleep(120)
+            self._send_message("Logout for " + username + " completed!")
+
+        else:
+            self._send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
 
 
     def unknown(self):
@@ -660,6 +701,14 @@ For example type <code>/tolab 10:30</code> if you're going at 10:30.\n\
 You can also set the day: <code>/tolab 10:30 +1</code> for tomorrow, <code>+2</code> for the day after tomorrow and so\
 on. If you don't set a day, I will consider the time for today or tomorrow, the one which makes more sense.\n\
 You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's going when."
+        self._send_message(help_message)
+
+    def logout_help(self):
+        help_message = """
+Use /logout followed by a username and a description of what they've done to logout that user via weeelab.\n\n\
+An example would be: /logout asd.asdoni Riparato PC 69.\n\
+No special symbols are needed to separate the different fields, just use spaces.\n\
+Note: the username <b>must</b> be a single word with no spaces in between."""
         self._send_message(help_message)
 
     def help(self):
@@ -678,7 +727,8 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
 /stat <i>username</i> - Show hours spent in lab by this user
 /top - Show a list of top users by hours spent this month
 /top all - Show a list of top users by hours spent
-/deletecache - Delete caches (reload logs and users)"""
+/deletecache - Delete caches (reload logs and users)
+/logout <i>username</i> <i>description of what they've done</i> - Logout a user with weeelab"""
         self._send_message(help_message)
 
 
@@ -771,8 +821,14 @@ def main():
                 elif command[0] == "/help" or command[0] == "/help@weeelab_bot":
                     handler.help()
 
-                elif command[0] == "/lofi" or command[0] == "lofi@weeelab_bot":
+                elif command[0] == "/lofi" or command[0] == "/lofi@weeelab_bot":
                     handler.lofi()
+
+                elif command[0] == "/logout" or command[0] == "/logout@weeelab_bot":
+                    if len(command) > 1:
+                        handler.logout(command[1:])
+                    else:
+                        handler.logout_help()
 
                 else:
                     handler.unknown()
