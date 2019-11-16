@@ -37,7 +37,8 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command, wol_command
+from remote_commands import ssh_command, wol_command, SSH_USER, SSH_KEY_PATH
+from ssh_util import SSHUtil
 
 MAX_WORK_DONE = 2000
 
@@ -179,6 +180,7 @@ class CommandHandler:
         self.__last_user_nickname = None
 
         self.lofi_player = LofiVlcPlayer()
+        self.ssh_retry_times = 1  # if in the future we want to enable auto-retry
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
@@ -663,30 +665,48 @@ as well.\nFor a list of the available commands type /help.', )
             logout_message.rstrip().replace("  ", " ")
 
             if logout_message.__len__() > MAX_WORK_DONE:
-                self._send_message(
+                self.__send_message(
                     "Try not to write the story of your life. Re-send a shorter logout message with /logout")
                 return
 
-            # TODO: check return codes, check if weeelab return code is preserved through ssh
-            # TODO: check why os.system("ssh ...") doesn't work with keys even when given explicitly
             # test if scma is turned on, turn it on if it isn't
             # ssh to scma with weeelab command
             # if return code is 0, send OK message - if return code is 3, send NO message
 
             # send commands
-            ssh_return_code = os.system(ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"')
-            if ssh_return_code != 0:
-                wol_return_code = os.system(wol_command)
-                if wol_return_code != 0:
-                    self._send_message("Something went wrong during the wol command.")
-                    return
-                self._send_message("Sent wol command. Waiting a couple minutes until it's completed. "
-                                   "I'll reach out to you when I've completed the logout execution.")
-                sleep(120)
-            self._send_message("Logout for " + username + " completed!")
+            command = ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"'
+            ssh_connection = SSHUtil(username=SSH_USER,
+                                     private_key_path=SSH_KEY_PATH,
+                                     commands=command,
+                                     timeout=3)
+
+            for _ in range(self.ssh_retry_times):
+
+                # SSH worked, check return code
+                if ssh_connection.execute_command(command):
+                    # weeelab logout worked
+                    if ssh_connection.return_code == 0:
+                        self.__send_message("Logout for " + username + " completed!")
+                        return
+                    # weeelab logout didn't work
+                    elif ssh_connection.return_code == 3:
+                        self.__send_message("Logout didn't work. Try checking the parameters you've sent me.")
+
+                # SSH didn't work
+                else:
+                    # TODO: check wol return codes, they're not in man
+                    wol_return_code = os.system(wol_command)
+                    if wol_return_code != 0:
+                        self.__send_message("Something went wrong during the wol command.")
+                        return
+                    else:
+                        self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
+                                            "I'll reach out to you when I've completed the logout execution.")
+                        # sleep(120)  # TODO: istantiate new thread so that sleep is non-blocking for the whole bot
+                        # redo lines 685 through 693
 
         else:
-            self._send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
+            self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
 
     def unknown(self):
         """
