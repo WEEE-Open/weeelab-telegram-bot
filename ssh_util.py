@@ -6,28 +6,50 @@ import sys
 import paramiko
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from remote_commands import ssh_conf as conf_file
 import socket
+from sys import stderr
 
 
 class SSHUtil:
     """Class to connect to a remote server"""
 
-    def __init__(self):
+    def __init__(self,
+                 host: str = None,
+                 username: str = None,
+                 password: str = None,
+                 timeout: float = 10.,
+                 commands: [str] = None,
+                 private_key_path: str = None,
+                 connection_port: int = 22,
+                 upload_remote_filepath: str = None,
+                 upload_local_filepath: str = None,
+                 download_remote_filepath: str = None,
+                 download_local_filepath: str = None
+                 ):  # come on, constructor, don't be sad :)
         self.ssh_output = None
         self.ssh_error = None
+        self.return_code = None
         self.client = None
-        self.host = conf_file.HOST
-        self.username = conf_file.USERNAME
-        self.password = conf_file.PASSWORD
-        self.timeout = float(conf_file.TIMEOUT)
-        self.commands = conf_file.COMMANDS
-        self.pkey = conf_file.PKEY
-        self.port = conf_file.PORT
-        self.upload_remote_filepath = conf_file.UPLOADREMOTEFILEPATH
-        self.upload_local_filepath = conf_file.UPLOADLOCALFILEPATH
-        self.download_remote_filepath = conf_file.DOWNLOADREMOTEFILEPATH
-        self.download_local_filepath = conf_file.DOWNLOADLOCALFILEPATH
+        self.host = host
+        self.username = username
+        self.password = password
+        self.timeout = float(timeout)
+        self.commands = commands
+        self.pkey = private_key_path
+        self.port = connection_port
+        self.upload_remote_filepath = upload_remote_filepath
+        self.upload_local_filepath = upload_local_filepath
+        self.download_remote_filepath = download_remote_filepath
+        self.download_local_filepath = download_local_filepath
+
+        if host is None:
+            raise HostNotFoundException
+        if password is None and private_key_path is None:
+            raise AuthenticationMethodNotFoundException
+        if self.commands is None:
+            print("WARNING: No commands given.", file=stderr)
+        if not isinstance(self.commands, list):
+            self.commands = [self.commands]  # make iterable list from single command
 
     def connect(self):
         """Login to the remote server"""
@@ -79,13 +101,15 @@ class SSHUtil:
                     stdin, stdout, stderr = self.client.exec_command(command, timeout=10)
                     self.ssh_output = stdout.read()
                     self.ssh_error = stderr.read()
+                    self.return_code = stdout.channel.recv_exit_status()
                     if self.ssh_error:
-                        print("Problem occurred while running command:" + command + " The error is " + self.ssh_error.decode())
+                        print(
+                            "Problem occurred while running command:" + command + " The error is " + self.ssh_error.decode())
                         result_flag = False
                     else:
                         print("Command execution completed successfully:", '"' + command + '"')
                         print("stdout:\n" + self.ssh_output.decode())
-                        print("return code is", stdout.channel.recv_exit_status())
+                        print("return code is", self.return_code)
             else:
                 print("Could not establish SSH connection")
                 result_flag = False
@@ -143,6 +167,18 @@ class SSHUtil:
         return result_flag
 
 
+class HostNotFoundException(Exception):
+    def __init__(self, arg):
+        self.strerror = arg
+        self.args = {arg}
+
+
+class AuthenticationMethodNotFoundException(Exception):
+    def __init__(self, arg):
+        self.strerror = arg
+        self.args = {arg}
+
+
 # ---USAGE EXAMPLES
 if __name__ == '__main__':
     print("Start of %s" % __file__)
@@ -169,21 +205,3 @@ if __name__ == '__main__':
     else:
         print  "Failed to download the file"
     """
-
-"""
-Example contents of remote_commands.py:
-
-class ssh_conf:
-    HOST = "192.168.X.Y"
-    USERNAME = "asd"
-    PASSWORD = ""
-    TIMEOUT = 3
-    COMMANDS = ["echo ciao", "exit 4", "return 3", "ls | head -1"]
-    # https://github.com/paramiko/paramiko/issues/340#issuecomment-492448662
-    PKEY = "/home/user/.ssh/id_rsa"
-    PORT = 22
-    UPLOADREMOTEFILEPATH = ""
-    UPLOADLOCALFILEPATH = ""
-    DOWNLOADREMOTEFILEPATH = ""
-    DOWNLOADLOCALFILEPATH = ""
-"""
