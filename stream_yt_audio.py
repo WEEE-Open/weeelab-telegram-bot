@@ -1,7 +1,7 @@
 # this script does the same as:
 # cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
 
-import youtube_dl  # pip dependency for backend: youtube-dl
+import youtube_dl
 import vlc  # python-vlc when installing with pip
 from time import sleep
 
@@ -36,19 +36,19 @@ class LofiVlcPlayer:
         return player
 
 # to test if streaming works
-# player = get_lofi_vlc_player()
+# player = LofiVlcPlayer().get_player()
 # player.play()
 # sleep(5)
 # player.stop()
 
 # to test if endless streaming works
-# player = get_lofi_vlc_player()
+# player = LofiVlcPlayer().get_player()
 # player.play()
 # while True:
 #     sleep(1)
 
 # to test start and stop
-# player = get_lofi_vlc_player()
+# player = LofiVlcPlayer().get_player()
 # player.play()
 # while True:
 #     if player.is_playing():
