@@ -688,10 +688,6 @@ as well.\nFor a list of the available commands type /help.', )
                     "Try not to write the story of your life. Re-send a shorter logout message with /logout")
                 return
 
-            # test if scma is turned on, turn it on if it isn't
-            # ssh to scma with weeelab command
-            # if return code is 0, send OK message - if return code is 3, send NO message
-
             # send commands
             command = ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"'
             ssh_connection = SSHUtil(username=SSH_USER,
@@ -874,10 +870,9 @@ def main():
 
                 elif command[0] == "/logout" or command[0] == "/logout@weeelab_bot":
                     if len(command) > 1:
-                        logout = Thread(target=handler.logout, args=(command[1:],))
                         # handler.logout(command[1:])
+                        logout = Thread(target=handler.logout, args=(command[1:],))
                         logout.start()
-                        logout.join()
                     else:
                         handler.logout_help()
 
@@ -902,10 +897,7 @@ def main():
 if __name__ == '__main__':
     # noinspection PyBroadException
     try:
-        # needed so the sleep() during the wol command in CommandHandler.logout() is non-blocking
-        main = Thread(target=main)
-        main.start()
-        main.join()
+        main()
     except KeyboardInterrupt:
         exit()
     except:
