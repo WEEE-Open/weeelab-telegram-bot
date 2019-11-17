@@ -37,7 +37,7 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command, wol_command, SSH_USER, SSH_HOST_IP, SSH_KEY_PATH
+from remote_commands import ssh_command, wol_command
 from ssh_util import SSHUtil
 from threading import Thread
 
