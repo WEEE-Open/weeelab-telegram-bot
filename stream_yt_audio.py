@@ -27,7 +27,7 @@ class LofiVlcPlayer:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             playurl = info['formats'][0]['url']
-        instance = vlc.Instance()
+        instance = vlc.Instance('-q')
         player = instance.media_player_new()
         media = instance.media_new(playurl)
         media.get_mrl()
@@ -35,28 +35,30 @@ class LofiVlcPlayer:
         self.player = player
         return player
 
-# to test if streaming works
-# player = LofiVlcPlayer().get_player()
-# player.play()
-# sleep(5)
-# player.stop()
 
-# to test if endless streaming works
-# player = LofiVlcPlayer().get_player()
-# player.play()
-# while True:
-#     sleep(1)
+if __name__ == '__main__':
+    # to test if streaming works
+    # player = LofiVlcPlayer().get_player()
+    # player.play()
+    # sleep(5)
+    # player.stop()
 
-# to test start and stop
-# player = LofiVlcPlayer().get_player()
-# player.play()
-# while True:
-#     if player.is_playing():
-#         sleep(10)
-#         player.stop()
-#     else:
-#         sleep(5)
-#         player.play()
+    # to test if endless streaming works
+    player = LofiVlcPlayer().get_player()
+    player.play()
+    while True:
+        pass
+
+    # to test start and stop
+    # player = LofiVlcPlayer().get_player()
+    # player.play()
+    # while True:
+    #     if player.is_playing():
+    #         sleep(10)
+    #         player.stop()
+    #     else:
+    #         sleep(5)
+    #         player.play()
 
 # player.stop()  #-- to stop/end video
 # player.is_playing() # 1 if True, 0 if False
