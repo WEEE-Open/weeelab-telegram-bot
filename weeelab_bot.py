@@ -37,10 +37,12 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command, wol_command, SSH_USER, SSH_KEY_PATH
+from remote_commands import ssh_command, wol_command, SSH_USER, SSH_HOST_IP, SSH_KEY_PATH
 from ssh_util import SSHUtil
+from threading import Thread
 
 MAX_WORK_DONE = 2000
+
 
 class BotHandler:
     """
@@ -180,13 +182,13 @@ class CommandHandler:
         self.__last_user_nickname = None
 
         self.lofi_player = LofiVlcPlayer()
-        self.ssh_retry_times = 1  # if in the future we want to enable auto-retry
+        self.ssh_retry_times = 2
 
     def read_user_from_message(self, last_update):
         self.__last_update = last_update
         self.__last_chat_id = last_update['message']['chat']['id']
         self.__last_user_id = last_update['message']['from']['id']
-        self.__last_user_nickname = last_update['message']['from']['username']\
+        self.__last_user_nickname = last_update['message']['from']['username'] \
             if 'username' in last_update['message']['from'] else None
 
         self.user = None
@@ -197,7 +199,7 @@ class CommandHandler:
             self.exception(e.__class__.__name__)
         except AccountLockedError:
             self.__send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
-                               "If you're a new team member, that will happen after the test on safety.")
+                                "If you're a new team member, that will happen after the test on safety.")
         except AccountNotFoundError:
             responded = self.respond_to_invite_link(last_update['message']['text'])
             if responded:
@@ -210,9 +212,9 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
             self.__send_message(msg)
         except AccountNotCompletedError as e:
             self.__send_message("Oh, hi, long time no see! We switched to a new account management system, "
-                               "so you will need to complete your registration here before we can talk again:\n"
-                               f"{INVITE_LINK}{e.invite_code}\n"
-                               "Once you're done, ask an administrator to enable your account. Have a nice day!")
+                                "so you will need to complete your registration here before we can talk again:\n"
+                                f"{INVITE_LINK}{e.invite_code}\n"
+                                "Once you're done, ask an administrator to enable your account. Have a nice day!")
         return False
 
     def __send_message(self, message):
@@ -233,8 +235,8 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
             self.__send_message("I couldn't find your invite. Are you sure of that link?")
             return True
         self.__send_message("Hey, I've filled some fields in the registration form for you, no need to say thanks.\n"
-                           f"Just go back to {link} and complete the registration.\n"
-                           "See you!")
+                            f"Just go back to {link} and complete the registration.\n"
+                            "See you!")
         return True
 
     def start(self):
@@ -345,7 +347,8 @@ as well.\nFor a list of the available commands type /help.', )
             else:
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
-                    self.__send_message(f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+                    self.__send_message(
+                        f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
                 elif days == 1:
                     self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
                 else:
@@ -600,9 +603,9 @@ as well.\nFor a list of the available commands type /help.', )
         people = self.people.delete_cache()
         logs = self.logs.delete_cache()
         self.__send_message("All caches busted! 💥\n"
-                           f"Users: deleted {users} entries\n"
-                           f"People: deleted {people} entries\n"
-                           f"Logs: deleted {logs} lines")
+                            f"Users: deleted {users} entries\n"
+                            f"People: deleted {people} entries\n"
+                            f"Logs: deleted {logs} lines")
 
     def exception(self, exception: str):
         msg = f"I tried to do that, but an exception occurred: {exception}"
@@ -635,7 +638,8 @@ as well.\nFor a list of the available commands type /help.', )
 
         reply_markup = [
             first_line_button,
-            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down.value), inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus.value)],
+            [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down.value),
+             inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus.value)],
             [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel.value)]
         ]
 
@@ -655,14 +659,29 @@ as well.\nFor a list of the available commands type /help.', )
         elif query == AcceptableQueriesLoFi.volume_plus:
             os.system("amixer -c 0 set PCM 3dB+")
 
-    def logout(self, *words):
-        if self.user.isadmin:
+    def logout(self, *words, recursion_counter: int = 0):
+
+        if recursion_counter >= self.ssh_retry_times:
+            self.__send_message("I've tried too many times. You'd better just do the logout manually.")
+            return
+
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
+            return
+
+        else:
             username = words[0]
 
             logout_message = ""
             for word in words[1:]:
                 logout_message += word + " "
             logout_message.rstrip().replace("  ", " ")
+
+            if '"' in logout_message:
+                self.__send_message("What have I told you? The logout message cannot contain double quotes.\n"
+                                    "Please try again.")
+                self.logout_help()
+                return
 
             if logout_message.__len__() > MAX_WORK_DONE:
                 self.__send_message(
@@ -676,37 +695,39 @@ as well.\nFor a list of the available commands type /help.', )
             # send commands
             command = ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"'
             ssh_connection = SSHUtil(username=SSH_USER,
+                                     host=SSH_HOST_IP,
                                      private_key_path=SSH_KEY_PATH,
                                      commands=command,
-                                     timeout=3)
+                                     timeout=5)
 
-            for _ in range(self.ssh_retry_times):
+            # SSH worked, check return code
+            if ssh_connection.execute_command(command):
+                self.__check_logout_ssh(ssh_connection, username)
 
-                # SSH worked, check return code
-                if ssh_connection.execute_command(command):
-                    # weeelab logout worked
-                    if ssh_connection.return_code == 0:
-                        self.__send_message("Logout for " + username + " completed!")
-                        return
-                    # weeelab logout didn't work
-                    elif ssh_connection.return_code == 3:
-                        self.__send_message("Logout didn't work. Try checking the parameters you've sent me.")
+            # SSH didn't work
+            else:
+                # wol always exits with 0, cannot check if it worked
+                os.system(wol_command)
+                self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
+                                    "I'll reach out to you when I've completed the logout process.")
+                # boot time is around 115 seconds
+                sleep(150)
+                # extreme recursion
+                recursion_counter += 1
+                self.logout(*words, recursion_counter)
 
-                # SSH didn't work
-                else:
-                    # TODO: check wol return codes, they're not in man
-                    wol_return_code = os.system(wol_command)
-                    if wol_return_code != 0:
-                        self.__send_message("Something went wrong during the wol command.")
-                        return
-                    else:
-                        self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
-                                            "I'll reach out to you when I've completed the logout execution.")
-                        # sleep(120)  # TODO: istantiate new thread so that sleep is non-blocking for the whole bot
-                        # redo lines 685 through 693
+            return
 
+    def __check_logout_ssh(self, ssh_connection, username: str):
+        # weeelab logout worked
+        if ssh_connection.return_code == 0:
+            self.__send_message("Logout for " + username + " completed!")
+        # weeelab logout didn't work
+        elif ssh_connection.return_code == 3:
+            self.__send_message("Logout didn't work. Try checking the parameters you've sent me.")
         else:
-            self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
+            self.__send_message("Unexpected weeelab return code. Please check what happened.")
+        return
 
     def unknown(self):
         """
@@ -727,8 +748,9 @@ You can use <code>/tolab no</code> to cancel your plans and /inlab to see who's 
 Use /logout followed by a username and a description of what they've done to logout that user via weeelab.\n\n\
 An example would be: /logout asd.asdoni Riparato PC 69.\n\
 No special symbols are needed to separate the different fields, just use spaces.\n\
-Note: the username <b>must</b> be a single word with no spaces in between."""
-        self._send_message(help_message)
+Note: the username <b>must</b> be a single word with no spaces in between.\n\
+Note: the logout message cannot contain double quotes characters such as " """
+        self.__send_message(help_message)
 
     def help(self):
         help_message = """Available commands and options:
@@ -746,7 +768,8 @@ Note: the username <b>must</b> be a single word with no spaces in between."""
 /stat <i>username</i> - Show hours spent in lab by this user
 /top - Show a list of top users by hours spent this month
 /top all - Show a list of top users by hours spent
-/deletecache - Delete caches (reload logs and users)"""
+/deletecache - Delete caches (reload logs and users)
+/logout <i>username</i> <i>description of what they've done</i> - Logout a user with weeelab"""
         self.__send_message(help_message)
 
 
@@ -851,7 +874,10 @@ def main():
 
                 elif command[0] == "/logout" or command[0] == "/logout@weeelab_bot":
                     if len(command) > 1:
-                        handler.logout(command[1:])
+                        logout = Thread(target=handler.logout, args=(command[1:],))
+                        # handler.logout(command[1:])
+                        logout.start()
+                        logout.join()
                     else:
                         handler.logout_help()
 
@@ -876,7 +902,10 @@ def main():
 if __name__ == '__main__':
     # noinspection PyBroadException
     try:
-        main()
+        # needed so the sleep() during the wol command in CommandHandler.logout() is non-blocking
+        main = Thread(target=main)
+        main.start()
+        main.join()
     except KeyboardInterrupt:
         exit()
     except:
