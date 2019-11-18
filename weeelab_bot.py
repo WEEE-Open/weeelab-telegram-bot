@@ -18,6 +18,7 @@ Author: WEEE Open Team
 
 
 # Modules
+import json
 from typing import Optional, List
 
 from pytarallo.AuditEntry import AuditEntry, AuditChanges
@@ -106,7 +107,12 @@ class BotHandler:
         }
         if reply_markup is not None:
             params['reply_markup'] = {"inline_keyboard": reply_markup}
-        return requests.post(self.api_url + 'sendMessage', json=params)
+        result = requests.post(self.api_url + 'sendMessage', json=params)
+        if result.status_code >= 400:
+            print(f"Telegram server says there's an error: {result.status_code}")
+            print(result.content)
+            print("Our message:")
+            print(json.dumps(params))
 
     def get_last_update(self):
         """
@@ -571,7 +577,7 @@ as well.\nFor a list of the available commands type /help.', )
         try:
             item = self.tarallo.get_item(item)
             location = ' → '.join(item.path)
-            msg = f'Item <b>{item}</b>\nLocation: {location}\n\n'
+            msg = f'Item <b>{item.code}</b>\nLocation: {location}\n\n'
             for feature in item.features:
                 msg += f"{feature}: {item.features[feature]}\n"
             self.__send_message(msg)
@@ -849,7 +855,10 @@ def main():
     tarallo = Tarallo(TARALLO, TARALLO_TOKEN)
     logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
-    wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
+    if os.path.isfile("weeedong.wav"):
+        wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
+    else:
+        wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong_default.wav")
     users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE, LDAP_TREE_INVITES)
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
