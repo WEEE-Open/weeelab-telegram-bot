@@ -22,7 +22,7 @@ from typing import Optional, List
 
 from pytarallo.AuditEntry import AuditEntry, AuditChanges
 from pytarallo.Errors import ItemNotFoundError, AuthenticationError
-from pytarallo.tarallo import Tarallo
+from pytarallo.Tarallo import Tarallo
 
 from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
@@ -514,8 +514,8 @@ as well.\nFor a list of the available commands type /help.', )
                   f'\n\nLast log update: {self.logs.log_last_update}'
             self.__send_message(msg)
 
-    def history_error(self):
-        self.__send_message('Insert item the item to search, e.g. /history R100')
+    def item_command_error(self, command):
+        self.__send_message(f"Add the item the code, e.g. /{command} R100")
 
     def history(self, item, cmd_limit=None):
         if cmd_limit is None:
@@ -527,7 +527,7 @@ as well.\nFor a list of the available commands type /help.', )
             elif limit > 50:
                 limit = 50
         try:
-            history = self.tarallo.get_history(item)
+            history = self.tarallo.get_history(item, limit)
             msg = f'<b>History of item {item}</b>\n\n'
             entries = 0
             for index in range(0, len(history)):
@@ -559,6 +559,21 @@ as well.\nFor a list of the available commands type /help.', )
                     entries = 0
             if entries != 0:
                 self.__send_message(msg)
+        except ItemNotFoundError:
+            self.__send_message(f'Item {item} not found.')
+        except AuthenticationError:
+            self.__send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+        except RuntimeError:
+            fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.response.status_code)}).'
+            self.__send_message(fail_msg)
+
+    def item_info(self, item):
+        try:
+            item = self.tarallo.get_item(item)
+            location = item.path.join(' → ')
+            msg = f'Item <b>{item}</b>\nLocation: {location}\n\n'
+            for feature, value in item.features:
+                msg += f"{feature}: value"
         except ItemNotFoundError:
             self.__send_message(f'Item {item} not found.')
         except AuthenticationError:
@@ -879,11 +894,17 @@ def main():
 
                 elif command[0] == "/history" or command[0] == "/history@weeelab_bot":
                     if len(command) < 2:
-                        handler.history_error()
+                        handler.item_command_error('history')
                     elif len(command) < 3:
                         handler.history(command[1])
                     else:
                         handler.history(command[1], command[2])
+
+                elif command[0] == "/item" or command[0] == "/item@weeelab_bot":
+                    if len(command) < 2:
+                        handler.item_command_error('item')
+                    else:
+                        handler.item_info(command[1])
 
                 elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     if len(command) > 1:
