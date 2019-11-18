@@ -42,8 +42,9 @@ SSH_USER = os.environ.get('SSH_USER')  # foo
 SSH_HOST_IP = os.environ.get('SSH_HOST_IP')  # 10.20.30.40
 SSH_KEY_PATH = os.environ.get('SSH_KEY_PATH')  # /home/whatever/ssh_key
 
-WOL_MACHINES = os.environ.get('SSH_KEY_PATH')  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
+WOL_MACHINES = os.environ.get('WOL_MACHINES')  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
 if WOL_MACHINES is not None:
     WOL_MACHINES = __unpack_wol(WOL_MACHINES)
+WOL_LOGOUT = os.environ.get('WOL_LOGOUT')  # 00:0a:0b:0c:0d:0e
 
 MAX_WORK_DONE = os.environ.get('MAX_WORK_DONE')  # 2000

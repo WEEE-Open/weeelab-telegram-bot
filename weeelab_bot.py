@@ -36,7 +36,7 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command, wol_command
+from remote_commands import ssh_command
 from ssh_util import SSHUtil
 from threading import Thread
 
@@ -756,7 +756,7 @@ as well.\nFor a list of the available commands type /help.', )
             # SSH didn't work
             else:
                 # wol always exits with 0, cannot check if it worked
-                os.system(wol_command)
+                Wol.send(WOL_LOGOUT)
                 self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
                                     "I'll reach out to you when I've completed the logout process.")
                 # boot time is around 115 seconds
