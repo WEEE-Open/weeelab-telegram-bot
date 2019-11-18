@@ -16,8 +16,6 @@ Author: WEEE Open Team
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# volume controls on pi-rla: amixer -c 0 set PCM 3dB+ (or 3dB-)
-# TODO: also check vlc specific volume controls
 
 # Modules
 from typing import Optional
@@ -174,7 +172,7 @@ class CommandHandler:
         self.users = users
         self.people = people
         self.conn = conn
-        self.wol = wol
+        self.wol_dict = wol
 
         self.user: Optional[User] = None
         self.__last_chat_id = None
@@ -349,12 +347,15 @@ as well.\nFor a list of the available commands type /help.', )
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
                     self.__send_message(
-                        f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel.")
+                        f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel. Check if "
+                        f"anybody else is coming with /inlab")
                 elif days == 1:
-                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel.")
+                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel."
+                                        f"Check if anyone else is coming with /inlab")
                 else:
-                    self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to cancel.\
-\nMark it down on your calendar!")
+                    self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to "
+                                        f"cancel. Check if anyone else is coming with /inlab"
+                                        f"\nMark it down on your calendar!")
         except Exception as e:
             self.__send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
@@ -639,7 +640,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins.")
             return
         buttons = []
-        for machine in self.wol:
+        for machine in self.wol_dict:
             buttons.append([inline_keyboard_button(machine, 'wol_' + machine)])
         self.__send_inline_keyboard("Who do I wake up?", buttons)
 
@@ -704,7 +705,7 @@ as well.\nFor a list of the available commands type /help.', )
 
     def wol_callback(self, query: str):
         machine = query.split('_', 1)[1]
-        mac = self.wol.get(machine, None)
+        mac = self.wol_dict.get(machine, None)
         if mac is None:
             self.__send_message("That machine does not exist")
             return

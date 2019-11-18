@@ -32,6 +32,7 @@ class LofiVlcPlayer:
         media = instance.media_new(playurl)
         media.get_mrl()
         player.set_media(media)
+        player.audio_set_volume(50)
         self.player = player
         return player
 
