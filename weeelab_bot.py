@@ -422,10 +422,10 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.__send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
-    def user_is_in_lab(self, username):
+    def user_is_in_lab(self, uid):
         inlab = self.logs.get_log().get_entries_inlab()
         for username in inlab:
-            if username == username:
+            if username == uid:
                 return True
         return False
 
