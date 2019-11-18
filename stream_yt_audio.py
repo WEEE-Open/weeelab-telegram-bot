@@ -52,13 +52,13 @@ if __name__ == '__main__':
     # to test if volume change works
     player = LofiVlcPlayer().get_player()
     player.play()
+    variation = -10
     while True:
-        print(player.audio_get_volume())
-        sleep(10)
-        player.audio_set_volume(30)
-        print(player.audio_get_volume())
-        sleep(10)
-        player.audio_set_volume(100)
+        print("VLC Volume:", player.audio_get_volume())
+        sleep(5)
+        player.audio_set_volume(player.audio_get_volume() + variation)
+        if player.audio_get_volume() == 0 or player.audio_get_volume() == 100:
+            variation = -variation
 
     # to test start and stop
     # player = LofiVlcPlayer().get_player()
