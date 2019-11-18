@@ -644,6 +644,7 @@ as well.\nFor a list of the available commands type /help.', )
         ]
 
         self.__send_inline_keyboard(message, reply_markup)
+        # TODO: find out how to edit messages without a Python library
 
     def lofi_callback(self, query: str) -> str:
         lofi_player = self.lofi_player.get_player()
