@@ -570,7 +570,7 @@ as well.\nFor a list of the available commands type /help.', )
     def item_info(self, item):
         try:
             item = self.tarallo.get_item(item)
-            location = item.path.join(' → ')
+            location = ' → '.join(item.path)
             msg = f'Item <b>{item}</b>\nLocation: {location}\n\n'
             for feature, value in item.features:
                 msg += f"{feature}: value"
