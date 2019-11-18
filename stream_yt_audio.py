@@ -44,10 +44,21 @@ if __name__ == '__main__':
     # player.stop()
 
     # to test if endless streaming works
+    # player = LofiVlcPlayer().get_player()
+    # player.play()
+    # while True:
+    #     pass
+
+    # to test if volume change works
     player = LofiVlcPlayer().get_player()
     player.play()
     while True:
-        pass
+        print(player.audio_get_volume())
+        sleep(10)
+        player.audio_set_volume(30)
+        print(player.audio_get_volume())
+        sleep(10)
+        player.audio_set_volume(100)
 
     # to test start and stop
     # player = LofiVlcPlayer().get_player()
