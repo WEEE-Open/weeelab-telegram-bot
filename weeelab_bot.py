@@ -172,7 +172,7 @@ class CommandHandler:
         self.users = users
         self.people = people
         self.conn = conn
-        self.wol = wol
+        self.wol_dict = wol
 
         self.user: Optional[User] = None
         self.__last_chat_id = None
@@ -640,7 +640,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins.")
             return
         buttons = []
-        for machine in self.wol:
+        for machine in self.wol_dict:
             buttons.append([inline_keyboard_button(machine, 'wol_' + machine)])
         self.__send_inline_keyboard("Who do I wake up?", buttons)
 
@@ -705,7 +705,7 @@ as well.\nFor a list of the available commands type /help.', )
 
     def wol_callback(self, query: str):
         machine = query.split('_', 1)[1]
-        mac = self.wol.get(machine, None)
+        mac = self.wol_dict.get(machine, None)
         if mac is None:
             self.__send_message("That machine does not exist")
             return
