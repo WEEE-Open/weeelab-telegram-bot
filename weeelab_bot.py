@@ -422,6 +422,13 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.__send_message("You rang the bell 🔔 Wait at door 3 until someone comes. 🔔")
 
+    def user_is_in_lab(self, username):
+        inlab = self.logs.get_log().get_entries_inlab()
+        for username in inlab:
+            if username == username:
+                return True
+        return False
+
     def log(self, cmd_days_to_filter=None):
         """
         Called with /log
@@ -626,6 +633,9 @@ as well.\nFor a list of the available commands type /help.', )
 
     def lofi(self):
         # check if stream is playing to show correct button
+        if not self.user_is_in_lab(self.user.uid):
+            self.__send_message("You are not in lab, no relaxing lo-fi beats for you!")
+            return
         lofi_player = self.lofi_player.get_player()
         if lofi_player.is_playing():
             first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause.value)]
