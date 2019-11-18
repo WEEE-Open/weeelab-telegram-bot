@@ -22,6 +22,7 @@ Author: WEEE Open Team
 # Modules
 from typing import Optional
 
+from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
     AccountNotFoundError, AccountNotCompletedError, User, Person
 from TaralloSession import TaralloSession
@@ -164,7 +165,8 @@ class CommandHandler:
                  tolab: ToLab,
                  users: Users,
                  people: People,
-                 conn: LdapConnection):
+                 conn: LdapConnection,
+                 wol: dict):
         self.bot = bot
         self.tarallo = tarallo
         self.logs = logs
@@ -172,6 +174,7 @@ class CommandHandler:
         self.users = users
         self.people = people
         self.conn = conn
+        self.wol = wol
 
         self.user: Optional[User] = None
         self.__last_chat_id = None
@@ -631,6 +634,15 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.logs.store_new_user(self.__last_user_id, first_name, last_name, username)
 
+    def wol(self):
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins.")
+            return
+        buttons = []
+        for machine in self.wol:
+            buttons.append([inline_keyboard_button(machine, 'wol_' + machine)])
+        self.__send_inline_keyboard("Who do I wake up?", buttons)
+
     def lofi(self):
         # check if stream is playing to show correct button
         if not self.user_is_in_lab(self.user.uid):
@@ -689,6 +701,15 @@ as well.\nFor a list of the available commands type /help.', )
                 reply = "The volume is already cranked up to 11."
 
         return reply
+
+    def wol_callback(self, query: str):
+        machine = query.split('_', 1)[1]
+        mac = self.wol.get(machine, None)
+        if mac is None:
+            self.__send_message("That machine does not exist")
+            return
+        Wol.send(mac)
+        self.__send_message(f"Waking up {machine} ({mac}) from its slumber...")
 
     def logout(self, *words, recursion_counter: int = 0):
 
@@ -814,8 +835,9 @@ def main():
     users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE, LDAP_TREE_INVITES)
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
+    wol = WOL_MACHINES
 
-    handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn)
+    handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
 
     while True:
         # call the function to check if there are new messages
@@ -899,6 +921,9 @@ def main():
                 elif command[0] == "/lofi" or command[0] == "/lofi@weeelab_bot":
                     handler.lofi()
 
+                elif command[0] == "/wol" or command[0] == "/wol@weeelab_bot":
+                    handler.wol()
+
                 elif command[0] == "/logout" or command[0] == "/logout@weeelab_bot":
                     if len(command) > 1:
                         # handler.logout(command[1:])
@@ -913,7 +938,10 @@ def main():
             elif 'callback_query' in last_update:
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
-                handler.lofi_callback(query)
+                if query.startswith('wol_'):
+                    handler.wol_callback(query)
+                else:
+                    handler.lofi_callback(query)
             else:
                 print('Unsupported "last_update" type')
                 print(last_update)
