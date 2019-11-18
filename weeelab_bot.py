@@ -37,11 +37,9 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command, wol_command, SSH_USER, SSH_HOST_IP, SSH_KEY_PATH
+from remote_commands import ssh_command, wol_command
 from ssh_util import SSHUtil
 from threading import Thread
-
-MAX_WORK_DONE = 2000
 
 
 class BotHandler:
@@ -644,20 +642,43 @@ as well.\nFor a list of the available commands type /help.', )
         ]
 
         self.__send_inline_keyboard(message, reply_markup)
+        # TODO: find out how to edit messages without a Python library
 
-    def lofi_callback(self, query: str):
+    def lofi_callback(self, query: str) -> str:
         lofi_player = self.lofi_player.get_player()
+        reply = ""
         if query == AcceptableQueriesLoFi.play:
-            lofi_player.play()
+            if lofi_player.play() == 0:
+                reply = "Playing..."
+            else:  # == -1
+                reply = "Stream could not be started because of an error."
+
         elif query == AcceptableQueriesLoFi.pause:
+            # there are no checks implemented for stop() in vlc.py
             lofi_player.stop()  # .pause() only works on non-live streaming videos
+            reply = "Stopping..."
+
         elif query == AcceptableQueriesLoFi.cancel:
-            # TODO: add reply to each of these so that the keyboard closes or set keyboard for single use
-            pass
+            reply = "Canceled."
+
         elif query == AcceptableQueriesLoFi.volume_down:
-            os.system("amixer -c 0 set PCM 3dB-")  # TODO: change to vlc only volume
+            # os.system("amixer -c 0 set PCM 3dB-")  # system volume
+            if lofi_player.audio_set_volume(lofi_player.audio_get_volume() - 10) == 0:
+                reply = "Volume down 10%"
+            else:  # == -1
+                reply = "The volume is already muted."
+
         elif query == AcceptableQueriesLoFi.volume_plus:
-            os.system("amixer -c 0 set PCM 3dB+")
+            # os.system("amixer -c 0 set PCM 3dB+")  # system volume
+            if lofi_player.audio_get_volume() == 100:
+                if lofi_player.audio_set_volume(lofi_player.audio_get_volume() + 10):
+                    reply = "Volume up 10%"
+                else:
+                    reply = "There was an error pumpin' up. Lame."
+            else:  # == -1
+                reply = "The volume is already cranked up to 11."
+
+        return reply
 
     def logout(self, *words, recursion_counter: int = 0):
 

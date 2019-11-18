@@ -25,3 +25,9 @@ LDAP_TREE_INVITES = os.environ.get('LDAP_TREE_INVITES')
 LDAP_ADMIN_GROUPS = os.environ.get('LDAP_ADMIN_GROUPS').split('|')  # ou=Group,dc=weeeopen,dc=it|ou=OtherGroup,dc=weeeopen,dc=it
 
 INVITE_LINK = os.environ.get('INVITE_LINK')  # https://example.com/register.php?invite= (invite code will be appended, no spaces in invite code)
+
+SSH_USER = os.environ.get('SSH_USER')
+SSH_HOST_IP = os.environ.get('SSH_HOST_IP')
+SSH_KEY_PATH = os.environ.get('SSH_KEY_PATH')
+
+MAX_WORK_DONE = 2000
