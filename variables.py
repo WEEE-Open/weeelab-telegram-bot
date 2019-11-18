@@ -29,3 +29,5 @@ INVITE_LINK = os.environ.get('INVITE_LINK')  # https://example.com/register.php?
 SSH_USER = os.environ.get('SSH_USER')
 SSH_HOST_IP = os.environ.get('SSH_HOST_IP')
 SSH_KEY_PATH = os.environ.get('SSH_KEY_PATH')
+
+MAX_WORK_DONE = 2000

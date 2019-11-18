@@ -41,8 +41,6 @@ from remote_commands import ssh_command, wol_command
 from ssh_util import SSHUtil
 from threading import Thread
 
-MAX_WORK_DONE = 2000
-
 
 class BotHandler:
     """
