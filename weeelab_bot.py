@@ -573,7 +573,8 @@ as well.\nFor a list of the available commands type /help.', )
             location = ' → '.join(item.path)
             msg = f'Item <b>{item}</b>\nLocation: {location}\n\n'
             for feature in item.features:
-                msg += f"{feature}: {item.features[feature]}"
+                msg += f"{feature}: {item.features[feature]}\n"
+            self.__send_message(msg)
         except ItemNotFoundError:
             self.__send_message(f'Item {item} not found.')
         except AuthenticationError:
