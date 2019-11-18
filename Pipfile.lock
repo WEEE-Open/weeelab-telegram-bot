@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "711a725a96eed2c11ba847e50242b4d8b9fbb09ffacc57057fa48b7e3c3e34bf"
+            "sha256": "fcf1d093ed760e6666a9fb6eff8af2ec3c75df73f1a35d8ff3c5d51e2bdcb47f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -148,7 +148,8 @@
         },
         "pycparser": {
             "hashes": [
-                "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
+                "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3",
+                "sha256:ccd65eeba42a19a88b11edc24252ef9f72afece8b038af1f0af6c8dbd2f26376"
             ],
             "version": "==2.19"
         },
@@ -184,6 +185,14 @@
             ],
             "index": "pypi",
             "version": "==0.4"
+        },
+        "pytarallo": {
+            "hashes": [
+                "sha256:304ba32b41fd7ac4704204e66fc8563d77e67ffa96dd9595ef4db29b3b5dc069",
+                "sha256:e3a54fb274c526821bcf6635ce7169466e268e54587d22f5929d1b6c5278b87a"
+            ],
+            "index": "pypi",
+            "version": "==1.1"
         },
         "python-ldap": {
             "hashes": [

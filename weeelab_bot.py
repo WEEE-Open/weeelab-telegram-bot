@@ -18,12 +18,15 @@ Author: WEEE Open Team
 
 
 # Modules
-from typing import Optional
+from typing import Optional, List
+
+from pytarallo.AuditEntry import AuditEntry, AuditChanges
+from pytarallo.Errors import ItemNotFoundError, AuthenticationError
+from pytarallo.tarallo import Tarallo
 
 from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
     AccountNotFoundError, AccountNotCompletedError, User, Person
-from TaralloSession import TaralloSession
 from ToLab import ToLab
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
@@ -158,7 +161,7 @@ class CommandHandler:
 
     def __init__(self,
                  bot,
-                 tarallo: TaralloSession,
+                 tarallo: Tarallo,
                  logs: WeeelabLogs,
                  tolab: ToLab,
                  users: Users,
@@ -524,46 +527,44 @@ as well.\nFor a list of the available commands type /help.', )
             elif limit > 50:
                 limit = 50
         try:
-            if self.tarallo.login(BOT_USER, BOT_PSW):
-                history = self.tarallo.get_history(item, limit)
-                if history is None:
-                    self.__send_message(f'Item {item} not found.')
+            history = self.tarallo.get_history(item)
+            msg = f'<b>History of item {item}</b>\n\n'
+            entries = 0
+            for index in range(0, len(history)):
+                history: List[AuditEntry]
+                change = history[index].change
+                h_user = history[index].user
+                h_other = history[index].other
+                h_time = datetime.datetime.fromtimestamp(int(history[index].time)).strftime('%d-%m-%Y %H:%M')
+                if change == AuditChanges.Move:
+                    msg += f'➡️ Moved to <b>{h_other}</b>\n'
+                elif change == AuditChanges.Update:
+                    msg += '🛠️ Updated features\n'
+                elif change == AuditChanges.Create:
+                    msg += '📋 Created\n'
+                elif change == AuditChanges.Rename:
+                    msg += f'✏️ Renamed from <b>{h_other}</b>\n'
+                elif change == AuditChanges.Delete:
+                    msg += '❌ Deleted\n'
+                elif change == AuditChanges.Lose:
+                    msg += '🔍 Lost\n'
                 else:
-                    msg = f'<b>History of item {item}</b>\n\n'
+                    msg += f'Unknown change {change.value}'
+                entries += 1
+                display_user = CommandHandler.try_get_display_name(h_user, self.people.get(h_user, self.conn))
+                msg += f'{h_time} by <i>{display_user}</i>\n\n'
+                if entries >= 6:
+                    self.__send_message(msg)
+                    msg = ''
                     entries = 0
-                    for index in range(0, len(history)):
-                        change = history[index]['change']
-                        h_user = history[index]['user']
-                        h_location = history[index]['other']
-                        h_time = datetime.datetime.fromtimestamp(
-                            int(float(history[index]['time']))).strftime('%d-%m-%Y %H:%M')
-                        if change == 'M':
-                            msg += f'➡️ Moved to <b>{h_location}</b>\n'
-                        elif change == 'U':
-                            msg += '🛠️ Updated features\n'
-                        elif change == 'C':
-                            msg += '📋 Created\n'
-                        elif change == 'R':
-                            msg += f'✏️ Renamed from <b>{h_location}</b>\n'
-                        elif change == 'D':
-                            msg += '❌ Deleted\n'
-                        elif change == 'L':
-                            msg += '🔍 Lost\n'
-                        else:
-                            msg += f'Unknown change {change}'
-                        entries += 1
-                        display_user = CommandHandler.try_get_display_name(h_user, self.people.get(h_user, self.conn))
-                        msg += f'{h_time} by <i>{display_user}</i>\n\n'
-                        if entries >= 6:
-                            self.__send_message(msg)
-                            msg = ''
-                            entries = 0
-                    if entries != 0:
-                        self.__send_message(msg)
-            else:
-                self.__send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
+            if entries != 0:
+                self.__send_message(msg)
+        except ItemNotFoundError:
+            self.__send_message(f'Item {item} not found.')
+        except AuthenticationError:
+            self.__send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
         except RuntimeError:
-            fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.last_status)}).'
+            fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.response.status_code)}).'
             self.__send_message(fail_msg)
 
     def top(self, cmd_filter=None):
@@ -829,7 +830,7 @@ def main():
     oc.login(OC_USER, OC_PWD)
 
     bot = BotHandler(TOKEN_BOT)
-    tarallo = TaralloSession(TARALLO)
+    tarallo = Tarallo(TARALLO, TARALLO_TOKEN)
     logs = WeeelabLogs(oc, LOG_PATH, LOG_BASE, USER_BOT_PATH)
     tolab = ToLab(oc, TOLAB_PATH)
     wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")

@@ -22,9 +22,8 @@ LOG_BASE = os.environ.get('LOG_BASE')
 # path of the file to store bot users in OwnCloud (/folder/file.txt)
 USER_BOT_PATH = os.environ.get('USER_BOT_PATH')
 TOKEN_BOT = os.environ.get('TOKEN_BOT')  # Telegram token for the bot API
-BOT_USER = os.environ.get('BOT_USER')  # user tarallo
-BOT_PSW = os.environ.get('BOT_PSW')  # password tarallo
-TARALLO = os.environ.get('TARALLO')  # Url tarallo
+TARALLO = os.environ.get('TARALLO')  # tarallo URL
+TARALLO_TOKEN = os.environ.get('TARALLO_TOKEN')  # tarallo token
 
 LDAP_SERVER = os.environ.get('LDAP_SERVER')  # ldap.example.com
 LDAP_USER = os.environ.get('LDAP_USER')  # cn=whatever,ou=whatever
