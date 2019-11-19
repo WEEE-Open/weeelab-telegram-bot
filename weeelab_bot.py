@@ -183,7 +183,7 @@ class CommandHandler:
     """
 
     def __init__(self,
-                 bot,
+                 bot: BotHandler,
                  tarallo: Tarallo,
                  logs: WeeelabLogs,
                  tolab: ToLab,
@@ -263,7 +263,7 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
         self.bot.send_message(self.__last_chat_id, message, reply_markup=markup)
 
     def __edit_message(self, message_id, message, markup):
-        self.bot.edit_messsage(self.__last_chat_id, message_id, message, reply_markup=markup)
+        self.bot.edit_message(self.__last_chat_id, message_id, message, reply_markup=markup)
 
     def respond_to_invite_link(self, message) -> bool:
         message: str
