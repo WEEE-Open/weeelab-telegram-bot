@@ -738,6 +738,7 @@ as well.\nFor a list of the available commands type /help.', )
 
     def lofi_callback(self, query: str, messge_id: int):
         lofi_player = self.lofi_player.get_player()
+        playing = lofi_player.is_playing()
         try:
             query = AcceptableQueriesLoFi(query)
         except ValueError:
@@ -746,42 +747,42 @@ as well.\nFor a list of the available commands type /help.', )
 
         if query == AcceptableQueriesLoFi.play:
             if lofi_player.play() == 0:
-                self.__edit_message(messge_id, "Playing...", None)
+                self.__edit_message(messge_id, "Playing...", self.lofi_keyboard(True))
             else:  # == -1
-                self.__edit_message(messge_id, "Stream could not be started because of an error.", None)
+                self.__edit_message(messge_id, "Stream could not be started because of an error.", self.lofi_keyboard(playing))
 
         elif query == AcceptableQueriesLoFi.pause:
             # there are no checks implemented for stop() in vlc.py
             lofi_player.stop()  # .pause() only works on non-live streaming videos
-            self.__edit_message(messge_id, "Stopping...", None)
+            self.__edit_message(messge_id, "Stopping...", self.lofi_keyboard(False))
 
         elif query == AcceptableQueriesLoFi.volume_down:
             # os.system("amixer -c 0 set PCM 3dB-")  # system volume
             if lofi_player.audio_set_volume(lofi_player.audio_get_volume() - 10) == 0:
-                self.__edit_message(messge_id, "Volume down 10%", None)
+                self.__edit_message(messge_id, "Volume down 10%", self.lofi_keyboard(playing))
             else:  # == -1
-                self.__edit_message(messge_id, "The volume is already muted.", None)
+                self.__edit_message(messge_id, "The volume is already muted.", self.lofi_keyboard(playing))
 
         elif query == AcceptableQueriesLoFi.volume_plus:
             # os.system("amixer -c 0 set PCM 3dB+")  # system volume
             if lofi_player.audio_get_volume() >= 100:
                 if lofi_player.audio_set_volume(lofi_player.audio_get_volume() + 10):
-                    self.__edit_message(messge_id, "Volume up 10%", None)
+                    self.__edit_message(messge_id, "Volume up 10%", self.lofi_keyboard(playing))
                 else:
-                    self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", None)
+                    self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", self.lofi_keyboard(playing))
             else:  # == -1
-                self.__edit_message(messge_id, "The volume is already cranked up to 11.", None)
+                self.__edit_message(messge_id, "The volume is already cranked up to 11.", self.lofi_keyboard(playing))
         elif query == AcceptableQueriesLoFi.cancel:
-            self.__edit_message(messge_id, self.lofi_message(lofi_player.is_playing()), [])
+            self.__edit_message(messge_id, self.lofi_message(playing), None)
 
-    def wol_callback(self, query: str):
+    def wol_callback(self, query: str, message_id: int):
         machine = query.split('_', 1)[1]
         mac = self.wol_dict.get(machine, None)
         if mac is None:
             self.__send_message("That machine does not exist")
             return
         Wol.send(mac)
-        self.__send_message(f"Waking up {machine} ({mac}) from its slumber...")
+        self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
 
     def logout(self, *words, recursion_counter: int = 0):
 
@@ -1026,7 +1027,7 @@ def main():
                 message_id = last_update['callback_query']['message']['message_id']
 
                 if query.startswith('wol_'):
-                    handler.wol_callback(query)
+                    handler.wol_callback(query, message_id)
                 elif query.startswith('lofi_'):
                     handler.lofi_callback(query, message_id)
                 else:
