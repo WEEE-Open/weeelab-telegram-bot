@@ -200,21 +200,33 @@ class CommandHandler:
         self.wol_dict = wol
 
         self.user: Optional[User] = None
+        self.__last_from = None
         self.__last_chat_id = None
         self.__last_user_id = None
-        self.__last_update = None
         self.__last_user_nickname = None
 
         self.lofi_player = LofiVlcPlayer()
         self.ssh_retry_times = 2
 
+    def read_user_from_callback(self, last_update):
+        self.__last_from = last_update['callback_query']['from']
+        self.__last_chat_id = last_update['callback_query']['message']['chat']['id']
+        self.__last_user_id = last_update['callback_query']['from']['id']
+        self.__last_user_nickname = last_update['callback_query']['from']['username'] \
+            if 'username' in last_update['callback_query']['from'] else None
+
+        return self.__read_user(last_update['message']['text'])
+
     def read_user_from_message(self, last_update):
-        self.__last_update = last_update
+        self.__last_from = last_update['message']['from']
         self.__last_chat_id = last_update['message']['chat']['id']
         self.__last_user_id = last_update['message']['from']['id']
         self.__last_user_nickname = last_update['message']['from']['username'] \
             if 'username' in last_update['message']['from'] else None
 
+        return self.__read_user(last_update['message']['text'])
+
+    def __read_user(self, text: Optional[str]):
         self.user = None
         try:
             self.user = self.users.get(self.__last_user_id, self.__last_user_nickname, self.conn)
@@ -225,12 +237,14 @@ class CommandHandler:
             self.__send_message("Your account is locked. You cannot use the bot until an administrator unlocks it.\n"
                                 "If you're a new team member, that will happen after the test on safety.")
         except AccountNotFoundError:
-            responded = self.respond_to_invite_link(last_update['message']['text'])
-            if responded:
-                return
+            if text is not None:
+                # Maybe it is the invite link for an account that doesn't exist yet?
+                responded = self.respond_to_invite_link(text)
+                if responded:
+                    return
             self.store_id()
             msg = f"""Sorry, you are not allowed to use this bot.
-            
+
 If you're a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, add your user ID in the account management panel. 
 Your user ID is: <b>{self.__last_user_id}</b>"""
             self.__send_message(msg)
@@ -663,15 +677,15 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_message(msg)
 
     def store_id(self):
-        first_name = self.__last_update['message']['from']['first_name']
+        first_name = self.__last_from['first_name']
 
-        if 'username' in self.__last_update['message']['from']:
-            username = self.__last_update['message']['from']['username']
+        if 'username' in self.__last_from:
+            username = self.__last_from['username']
         else:
             username = ""
 
-        if 'last_name' in self.__last_update['message']['from']:
-            last_name = self.__last_update['message']['from']['last_name']
+        if 'last_name' in self.__last_from['from']:
+            last_name = self.__last_from['from']['last_name']
         else:
             last_name = ""
 
@@ -1001,10 +1015,13 @@ def main():
                     handler.unknown()
 
             elif 'callback_query' in last_update:
+                authorized = handler.read_user_from_callback(last_update)
+                if not authorized:
+                    continue
+
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
                 message_id = last_update['callback_query']['message']['message_id']
-                chat_id = last_update['callback_query']['message']['chat']['chat_id']
 
                 if query.startswith('wol_'):
                     handler.wol_callback(query)
