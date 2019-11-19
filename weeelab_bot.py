@@ -216,7 +216,7 @@ class CommandHandler:
         self.__last_user_nickname = last_update['callback_query']['from']['username'] \
             if 'username' in last_update['callback_query']['from'] else None
 
-        return self.__read_user(last_update['message']['text'])
+        return self.__read_user(None)
 
     def read_user_from_message(self, last_update):
         self.__last_from = last_update['message']['from']
