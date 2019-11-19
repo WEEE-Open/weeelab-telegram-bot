@@ -109,7 +109,8 @@ class BotHandler:
             params['reply_markup'] = {"inline_keyboard": reply_markup}
         self.__do_post('sendMessage', params)
 
-    def edit_message(self, chat_id: int, message_id: int, text: Optional[str] = None, reply_markup=None, parse_mode='HTML', disable_web_page_preview=True):
+    def edit_message(self, chat_id: int, message_id: int, text: Optional[str] = None, reply_markup=None,
+                     parse_mode='HTML', disable_web_page_preview=True):
         params = {
             'chat_id': chat_id,
             'message_id': message_id,
@@ -245,7 +246,7 @@ class CommandHandler:
             self.store_id()
             msg = f"""Sorry, you are not allowed to use this bot.
 
-If you're a member of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a>, add your user ID in the account management panel. 
+If you're part of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a> add your user ID in the account management panel. 
 Your user ID is: <b>{self.__last_user_id}</b>"""
             self.__send_message(msg)
         except AccountNotCompletedError as e:
@@ -713,7 +714,8 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.__send_inline_keyboard(message, reply_markup)
 
-    def lofi_message(self, playing):
+    @staticmethod
+    def lofi_message(playing):
         if playing:
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
