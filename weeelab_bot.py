@@ -107,7 +107,23 @@ class BotHandler:
         }
         if reply_markup is not None:
             params['reply_markup'] = {"inline_keyboard": reply_markup}
-        result = requests.post(self.api_url + 'sendMessage', json=params)
+        self.__do_post('sendMessage', params)
+
+    def edit_message(self, chat_id: int, message_id: int, text: Optional[str] = None, reply_markup=None, parse_mode='HTML', disable_web_page_preview=True):
+        params = {
+            'chat_id': chat_id,
+            'message_id': message_id,
+        }
+        if text is not None:
+            params["text"] = text
+            params["parse_mode"] = parse_mode
+            params["disable_web_page_preview"] = disable_web_page_preview
+        if reply_markup is not None:
+            params["reply_markup"] = reply_markup
+        self.__do_post("editMessageText", params)
+
+    def __do_post(self, endpoint, params):
+        result = requests.post(self.api_url + endpoint, json=params)
         if result.status_code >= 400:
             print(f"Telegram server says there's an error: {result.status_code}")
             print(result.content)
@@ -149,11 +165,11 @@ def escape_all(string):
 
 
 class AcceptableQueriesLoFi(Enum):
-    play = 'play'
-    pause = 'pause'
-    cancel = 'cancel'
-    volume_plus = 'vol+'
-    volume_down = 'vol-'
+    play = 'lofi_play'
+    pause = 'lofi_pause'
+    cancel = 'lofi_cancel'
+    volume_plus = 'lofi_vol+'
+    volume_down = 'lofi_vol-'
 
 
 def inline_keyboard_button(label: str, callback_data: str):
@@ -230,6 +246,9 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
 
     def __send_inline_keyboard(self, message, markup):
         self.bot.send_message(self.__last_chat_id, message, reply_markup=markup)
+
+    def __edit_message(self, message_id, message, markup):
+        self.bot.edit_messsage(self.__last_chat_id, message_id, message, reply_markup=markup)
 
     def respond_to_invite_link(self, message) -> bool:
         message: str
@@ -669,62 +688,75 @@ as well.\nFor a list of the available commands type /help.', )
 
     def lofi(self):
         # check if stream is playing to show correct button
-        if not self.user_is_in_lab(self.user.uid):
+        if not self.user_is_in_lab(self.user.uid) and not self.user.isadmin:
             self.__send_message("You are not in lab, no relaxing lo-fi beats for you!")
             return
         lofi_player = self.lofi_player.get_player()
-        if lofi_player.is_playing():
-            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause.value)]
+        playing = lofi_player.is_playing()
+
+        message = self.lofi_message(playing)
+        reply_markup = self.lofi_keyboard(playing)
+
+        self.__send_inline_keyboard(message, reply_markup)
+
+    def lofi_message(self, playing):
+        if playing:
             message = "You're stopping this music only to listen to the Russian anthem, right?"
         else:
-            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play.value)]
             message = "Let's chill bruh"
+        return message
 
+    @staticmethod
+    def lofi_keyboard(playing: bool):
+        if playing:
+            first_line_button = [inline_keyboard_button("⏸ Pause", callback_data=AcceptableQueriesLoFi.pause.value)]
+        else:
+            first_line_button = [inline_keyboard_button("▶️ Play", callback_data=AcceptableQueriesLoFi.play.value)]
         reply_markup = [
             first_line_button,
             [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down.value),
              inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus.value)],
-            [inline_keyboard_button("❌ Cancel", callback_data=AcceptableQueriesLoFi.cancel.value)]
+            [inline_keyboard_button("❌ Close", callback_data=AcceptableQueriesLoFi.cancel.value)]
         ]
+        return reply_markup
 
-        self.__send_inline_keyboard(message, reply_markup)
-        # TODO: find out how to edit messages without a Python library
-
-    def lofi_callback(self, query: str) -> str:
+    def lofi_callback(self, query: str, messge_id: int):
         lofi_player = self.lofi_player.get_player()
-        reply = ""
+        try:
+            query = AcceptableQueriesLoFi(query)
+        except ValueError:
+            self.__send_message("I did not understand that button press")
+            return
+
         if query == AcceptableQueriesLoFi.play:
             if lofi_player.play() == 0:
-                reply = "Playing..."
+                self.__edit_message(messge_id, "Playing...", None)
             else:  # == -1
-                reply = "Stream could not be started because of an error."
+                self.__edit_message(messge_id, "Stream could not be started because of an error.", None)
 
         elif query == AcceptableQueriesLoFi.pause:
             # there are no checks implemented for stop() in vlc.py
             lofi_player.stop()  # .pause() only works on non-live streaming videos
-            reply = "Stopping..."
-
-        elif query == AcceptableQueriesLoFi.cancel:
-            reply = "Canceled."
+            self.__edit_message(messge_id, "Stopping...", None)
 
         elif query == AcceptableQueriesLoFi.volume_down:
             # os.system("amixer -c 0 set PCM 3dB-")  # system volume
             if lofi_player.audio_set_volume(lofi_player.audio_get_volume() - 10) == 0:
-                reply = "Volume down 10%"
+                self.__edit_message(messge_id, "Volume down 10%", None)
             else:  # == -1
-                reply = "The volume is already muted."
+                self.__edit_message(messge_id, "The volume is already muted.", None)
 
         elif query == AcceptableQueriesLoFi.volume_plus:
             # os.system("amixer -c 0 set PCM 3dB+")  # system volume
-            if lofi_player.audio_get_volume() == 100:
+            if lofi_player.audio_get_volume() >= 100:
                 if lofi_player.audio_set_volume(lofi_player.audio_get_volume() + 10):
-                    reply = "Volume up 10%"
+                    self.__edit_message(messge_id, "Volume up 10%", None)
                 else:
-                    reply = "There was an error pumpin' up. Lame."
+                    self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", None)
             else:  # == -1
-                reply = "The volume is already cranked up to 11."
-
-        return reply
+                self.__edit_message(messge_id, "The volume is already cranked up to 11.", None)
+        elif query == AcceptableQueriesLoFi.cancel:
+            self.__edit_message(messge_id, self.lofi_message(lofi_player.is_playing()), [])
 
     def wol_callback(self, query: str):
         machine = query.split('_', 1)[1]
@@ -971,10 +1003,15 @@ def main():
             elif 'callback_query' in last_update:
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
+                message_id = last_update['callback_query']['message']['message_id']
+                chat_id = last_update['callback_query']['message']['chat']['chat_id']
+
                 if query.startswith('wol_'):
                     handler.wol_callback(query)
+                elif query.startswith('lofi_'):
+                    handler.lofi_callback(query, message_id)
                 else:
-                    handler.lofi_callback(query)
+                    handler.unknown()
             else:
                 print('Unsupported "last_update" type')
                 print(last_update)
