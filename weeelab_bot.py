@@ -769,7 +769,7 @@ as well.\nFor a list of the available commands type /help.', )
             if lofi_player.audio_set_volume(volume - 10) == 0:
                 self.__edit_message(messge_id, "Volume down 10% - current volume: " + str(volume-10), self.lofi_keyboard(playing))
                 if volume - 10 == 0:
-                    self.lofi_player_last_volume = volume
+                    self.lofi_player_last_volume = 0
                     lofi_player.stop()  # otherwise volume == -1
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already muted.", self.lofi_keyboard(playing))
