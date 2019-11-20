@@ -773,7 +773,7 @@ as well.\nFor a list of the available commands type /help.', )
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already cranked up to 11.", self.lofi_keyboard(playing))
         elif query == AcceptableQueriesLoFi.close:
-            self.__edit_message(messge_id, "Closed. No more lofi for you.\nUse /lofi to re-open.", None)
+            self.__edit_message(messge_id, "Closed. 🐄\nUse /lofi to re-open.", None)
 
     def wol_callback(self, query: str, message_id: int):
         machine = query.split('_', 1)[1]
