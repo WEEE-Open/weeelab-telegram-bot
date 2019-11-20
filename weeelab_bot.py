@@ -782,6 +782,11 @@ as well.\nFor a list of the available commands type /help.', )
             if volume < 100:
                 if volume == 0:  # was muted, now resuming
                     lofi_player.play()
+                    while True:
+                        if lofi_player.is_playing():
+                            break
+                        else:
+                            sleep(.1)
                 if lofi_player.audio_set_volume(volume + 10) == 0:
                     self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume+10), self.lofi_keyboard(playing))
                 else:
