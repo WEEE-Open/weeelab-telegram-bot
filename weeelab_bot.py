@@ -207,6 +207,7 @@ class CommandHandler:
         self.__last_user_nickname = None
 
         self.lofi_player = LofiVlcPlayer()
+        self.lofi_player.audio_set_volume(70)
         self.ssh_retry_times = 2
 
     def read_user_from_callback(self, last_update):
