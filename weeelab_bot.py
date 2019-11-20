@@ -207,6 +207,7 @@ class CommandHandler:
         self.__last_user_nickname = None
 
         self.lofi_player = LofiVlcPlayer()
+        self.lofi_player_last_volume = -1
         self.ssh_retry_times = 2
 
     def read_user_from_callback(self, last_update):
@@ -748,12 +749,15 @@ as well.\nFor a list of the available commands type /help.', )
         if query == AcceptableQueriesLoFi.play:
             if lofi_player.play() == 0:
                 volume = lofi_player.audio_get_volume()
+                if volume == -1:
+                    volume = self.lofi_player_last_volume
                 self.__edit_message(messge_id, "Playing... - current volume: " + str(volume), self.lofi_keyboard(True))
             else:  # == -1
                 self.__edit_message(messge_id, "Stream could not be started because of an error.", self.lofi_keyboard(playing))
 
         elif query == AcceptableQueriesLoFi.pause:
             # there are no checks implemented for stop() in vlc.py
+            self.lofi_player_last_volume = lofi_player.audio_get_volume()
             lofi_player.stop()  # .pause() only works on non-live streaming videos
             self.__edit_message(messge_id, "Stopping...", self.lofi_keyboard(False))
 
