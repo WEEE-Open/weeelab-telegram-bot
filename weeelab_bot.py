@@ -120,7 +120,7 @@ class BotHandler:
             params["parse_mode"] = parse_mode
             params["disable_web_page_preview"] = disable_web_page_preview
         if reply_markup is not None:
-            params["reply_markup"] = reply_markup
+            params["reply_markup"] = {"inline_keyboard": reply_markup}
         self.__do_post("editMessageText", params)
 
     def __do_post(self, endpoint, params):
@@ -814,6 +814,7 @@ as well.\nFor a list of the available commands type /help.', )
                 return
 
             # send commands
+            # TODO: cannot concatenate list only str
             command = ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"'
             ssh_connection = SSHUtil(username=SSH_USER,
                                      host=SSH_HOST_IP,
