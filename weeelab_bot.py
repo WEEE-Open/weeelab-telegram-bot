@@ -766,7 +766,7 @@ as well.\nFor a list of the available commands type /help.', )
         elif query == AcceptableQueriesLoFi.volume_plus:
             # os.system("amixer -c 0 set PCM 3dB+")  # system volume
             if lofi_player.audio_get_volume() <= 100:
-                if lofi_player.audio_set_volume(lofi_player.audio_get_volume() + 10):
+                if lofi_player.audio_set_volume(lofi_player.audio_get_volume() + 10) == 0:
                     self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(lofi_player.audio_get_volume()), self.lofi_keyboard(playing))
                 else:
                     self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", self.lofi_keyboard(playing))
