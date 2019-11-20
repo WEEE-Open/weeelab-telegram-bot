@@ -789,6 +789,8 @@ as well.\nFor a list of the available commands type /help.', )
                         else:
                             sleep(.1)
                 if lofi_player.audio_set_volume(volume + 10) == 0:
+                    print("volume", volume)
+                    print("playing", lofi_player.is_playing())
                     self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume+10), self.lofi_keyboard(playing))
                 else:
                     self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", self.lofi_keyboard(playing))
