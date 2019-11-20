@@ -206,7 +206,7 @@ class CommandHandler:
         self.__last_user_id = None
         self.__last_user_nickname = None
 
-        self.lofi_player = LofiVlcPlayer()
+        self.lofi_player = LofiVlcPlayer().get_player()
         self.lofi_player.audio_set_volume(70)
         self.ssh_retry_times = 2
 
