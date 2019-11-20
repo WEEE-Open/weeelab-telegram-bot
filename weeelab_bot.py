@@ -168,7 +168,7 @@ def escape_all(string):
 class AcceptableQueriesLoFi(Enum):
     play = 'lofi_play'
     pause = 'lofi_pause'
-    cancel = 'lofi_cancel'
+    close = 'lofi_close'
     volume_plus = 'lofi_vol+'
     volume_down = 'lofi_vol-'
 
@@ -732,7 +732,7 @@ as well.\nFor a list of the available commands type /help.', )
             first_line_button,
             [inline_keyboard_button("🔉 Vol-", callback_data=AcceptableQueriesLoFi.volume_down.value),
              inline_keyboard_button("🔊 Vol+", callback_data=AcceptableQueriesLoFi.volume_plus.value)],
-            [inline_keyboard_button("❌ Close", callback_data=AcceptableQueriesLoFi.cancel.value)]
+            [inline_keyboard_button("❌ Close", callback_data=AcceptableQueriesLoFi.close.value)]
         ]
         return reply_markup
 
@@ -772,8 +772,8 @@ as well.\nFor a list of the available commands type /help.', )
                     self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", self.lofi_keyboard(playing))
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already cranked up to 11.", self.lofi_keyboard(playing))
-        elif query == AcceptableQueriesLoFi.cancel:
-            self.__edit_message(messge_id, self.lofi_message(playing), None)
+        elif query == AcceptableQueriesLoFi.close:
+            self.__edit_message(messge_id, "Closed. No more lofi for you.\nUse /lofi to re-open.", None)
 
     def wol_callback(self, query: str, message_id: int):
         machine = query.split('_', 1)[1]
