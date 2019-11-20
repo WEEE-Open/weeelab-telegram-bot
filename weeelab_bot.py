@@ -782,13 +782,10 @@ as well.\nFor a list of the available commands type /help.', )
                 volume = self.lofi_player_last_volume
             if volume < 100:
                 if volume == 0:  # was muted, now resuming
-                    lofi_player.play()
-                    while True:
-                        if lofi_player.is_playing():
-                            self.__edit_message(messge_id, "Playing... - current volume: " + str(volume), self.lofi_keyboard(True))
-                            break
-                        else:
-                            sleep(.1)
+                    if lofi_player.play() == 0:
+                        lofi_player.audio_set_volume(10)
+                        self.__edit_message(messge_id, "Playing... - current volume: " + str(10), self.lofi_keyboard(True))
+                        return
                 if lofi_player.audio_set_volume(volume + 10) == 0:
                     print("volume", volume)
                     print("playing", lofi_player.is_playing())
@@ -797,6 +794,7 @@ as well.\nFor a list of the available commands type /help.', )
                     self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", self.lofi_keyboard(playing))
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already cranked up to 11.", self.lofi_keyboard(playing))
+
         elif query == AcceptableQueriesLoFi.close:
             self.__edit_message(messge_id, "Closed. 🐄\nUse /lofi to re-open.", None)
 
