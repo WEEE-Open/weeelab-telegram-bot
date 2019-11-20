@@ -46,4 +46,4 @@ if WOL_MACHINES is not None:
     WOL_MACHINES = __unpack_wol(WOL_MACHINES)
 WOL_LOGOUT = os.environ.get('WOL_LOGOUT')  # 00:0a:0b:0c:0d:0e
 
-MAX_WORK_DONE = os.environ.get('MAX_WORK_DONE')  # 2000
+MAX_WORK_DONE = int(os.environ.get('MAX_WORK_DONE'))  # 2000
