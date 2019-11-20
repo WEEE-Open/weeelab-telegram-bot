@@ -778,17 +778,16 @@ as well.\nFor a list of the available commands type /help.', )
             # os.system("amixer -c 0 set PCM 3dB+")  # system volume
             volume = lofi_player.audio_get_volume()
             if volume == -1:
-                print("volume==-1")
                 volume = self.lofi_player_last_volume
             if volume < 100:
-                print("volume<100", volume)
                 if volume == 0:  # was muted, now resuming
                     lofi_player.play()
-                    sleep(10)
-                    if lofi_player.audio_set_volume(10) == 0:
-                        print("OK")
-                    else:
-                        print("Error")
+                    while True:
+                        if lofi_player.is_playing():
+                            self.__edit_message(messge_id, "Playing... - current volume: " + str(volume), self.lofi_keyboard(True))
+                            break
+                        else:
+                            sleep(.1)
                 if lofi_player.audio_set_volume(volume + 10) == 0:
                     self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume+10), self.lofi_keyboard(playing))
                 else:
