@@ -748,7 +748,8 @@ as well.\nFor a list of the available commands type /help.', )
 
         if query == AcceptableQueriesLoFi.play:
             if lofi_player.play() == 0:
-                self.__edit_message(messge_id, "Playing...", self.lofi_keyboard(True))
+                volume = lofi_player.audio_get_volume()
+                self.__edit_message(messge_id, "Playing... - current volume: " + str(volume), self.lofi_keyboard(True))
             else:  # == -1
                 self.__edit_message(messge_id, "Stream could not be started because of an error.", self.lofi_keyboard(playing))
 
