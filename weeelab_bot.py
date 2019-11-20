@@ -771,6 +771,7 @@ as well.\nFor a list of the available commands type /help.', )
                 if volume - 10 == 0:
                     self.lofi_player_last_volume = 0
                     lofi_player.stop()  # otherwise volume == -1
+                    self.__edit_message(messge_id, "Stopping...", self.lofi_keyboard(False))
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already muted.", self.lofi_keyboard(playing))
 
