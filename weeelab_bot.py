@@ -751,6 +751,8 @@ as well.\nFor a list of the available commands type /help.', )
                 volume = lofi_player.audio_get_volume()
                 if volume == -1:
                     volume = self.lofi_player_last_volume
+                if volume == 0:
+                    lofi_player.audio_set_volume(10)  # automatically turn up the volume by one notch
                 self.__edit_message(messge_id, "Playing... - current volume: " + str(volume), self.lofi_keyboard(True))
             else:  # == -1
                 self.__edit_message(messge_id, "Stream could not be started because of an error.", self.lofi_keyboard(playing))
@@ -787,11 +789,9 @@ as well.\nFor a list of the available commands type /help.', )
                         self.__edit_message(messge_id, "Playing... - current volume: " + str(10), self.lofi_keyboard(True))
                         return
                 if lofi_player.audio_set_volume(volume + 10) == 0:
-                    print("volume", volume)
-                    print("playing", lofi_player.is_playing())
                     self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume+10), self.lofi_keyboard(playing))
                 else:
-                    self.__edit_message(messge_id, "There was an error pumpin' up. Lame.", self.lofi_keyboard(playing))
+                    self.__edit_message(messge_id, "There was an error pumpin' up. Try hitting 'Play'.", self.lofi_keyboard(playing))
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already cranked up to 11.", self.lofi_keyboard(playing))
 
