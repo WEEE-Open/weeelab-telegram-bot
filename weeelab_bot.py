@@ -764,15 +764,24 @@ as well.\nFor a list of the available commands type /help.', )
         elif query == AcceptableQueriesLoFi.volume_down:
             # os.system("amixer -c 0 set PCM 3dB-")  # system volume
             volume = lofi_player.audio_get_volume()
+            if volume == -1:
+                volume = self.lofi_player_last_volume
             if lofi_player.audio_set_volume(volume - 10) == 0:
                 self.__edit_message(messge_id, "Volume down 10% - current volume: " + str(volume-10), self.lofi_keyboard(playing))
+                if volume - 10 == 0:
+                    self.lofi_player_last_volume = volume
+                    lofi_player.stop()  # otherwise volume == -1
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already muted.", self.lofi_keyboard(playing))
 
         elif query == AcceptableQueriesLoFi.volume_plus:
             # os.system("amixer -c 0 set PCM 3dB+")  # system volume
             volume = lofi_player.audio_get_volume()
+            if volume == -1:
+                volume = self.lofi_player_last_volume
             if volume < 100:
+                if volume == 0:  # was muted, now resuming
+                    lofi_player.play()
                 if lofi_player.audio_set_volume(volume + 10) == 0:
                     self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume+10), self.lofi_keyboard(playing))
                 else:
