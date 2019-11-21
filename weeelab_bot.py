@@ -905,7 +905,8 @@ Note: the logout message cannot contain double quotes characters such as " """
 /stat - Show hours you've spent in lab
 /ring - ring the bell at the door
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.
-/history <i>item</i> <i>n</i> - Show <i>n</i> history entries"""
+/history <i>item</i> <i>n</i> - Show <i>n</i> history entries
+/lofi - Spawns a keyboard with media controls for the lofi YouTube stream"""
 
         if self.user.isadmin:
             help_message += """
