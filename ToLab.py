@@ -97,10 +97,14 @@ class ToLab:
         self.__delete_user(telegram_id)
         entry, days = self.__create_entry(username, telegram_id, time, day)
         keep = []
+        appended = False
         for user in self.tolab_file:
             if entry["tolab"] < user["tolab"]:
                 keep.append(entry)
+                appended = True
             keep.append(user)
+        if not appended:
+            keep.append(entry)
         self.tolab_file = keep
         self.save(self.tolab_file)
         return days
