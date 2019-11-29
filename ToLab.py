@@ -96,7 +96,12 @@ class ToLab:
     def set_entry(self, username: str, telegram_id: int, time: str, day: int) -> int:
         self.__delete_user(telegram_id)
         entry, days = self.__create_entry(username, telegram_id, time, day)
-        self.tolab_file.append(entry)
+        keep = []
+        for user in self.tolab_file:
+            if entry["tolab"] < user["tolab"]:
+                keep.append(entry)
+            keep.append(user)
+        self.tolab_file = keep
         self.save(self.tolab_file)
         return days
 
