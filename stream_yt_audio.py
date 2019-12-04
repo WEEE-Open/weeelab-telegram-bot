@@ -16,11 +16,11 @@ class LofiVlcPlayer:
 
     def get_player(self):
         if self.player is None:
-            if not self.player.is_playing() and time() > self.last_player_time + 3600:
-                self.player.release()  # TODO: how do we close this thing?
-                return self.__create_new_player()
-        else:
-            return self.player
+            self.__create_new_player()
+        elif not self.player.is_playing() and time() > self.last_player_time + 3600:
+            self.player.release()  # TODO: how do we close this thing?
+            self.__create_new_player()
+        return self.player
 
     def __create_new_player(self):
         playurl = self.__get_playurl()
