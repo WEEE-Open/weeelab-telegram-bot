@@ -1,6 +1,6 @@
 # this script does the same as:
 # cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
-from datetime import time
+from time import time
 
 import youtube_dl
 import vlc  # python-vlc when installing with pip
@@ -17,7 +17,7 @@ class LofiVlcPlayer:
     def get_player(self):
         if self.player is None:
             self.__create_new_player()
-        elif not self.player.is_playing() and time() > self.last_player_time + 3600:
+        elif not self.player.is_playing() and int(time()) > self.last_player_time + 3600:
             self.player.release()  # TODO: how do we close this thing?
             self.__create_new_player()
         return self.player
