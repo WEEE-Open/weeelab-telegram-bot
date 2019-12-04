@@ -1,5 +1,6 @@
 # this script does the same as:
 # cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
+from datetime import time
 
 import youtube_dl
 import vlc  # python-vlc when installing with pip
@@ -9,15 +10,38 @@ from time import sleep
 class LofiVlcPlayer:
     def __init__(self):
         self.player = None
+        self.playurl = None
+        self.last_player_time = None
         pass
 
     def get_player(self):
         if self.player is None:
-            return self.__create_new_player()
+            if not self.player.is_playing() and time() > self.last_player_time + 3600:
+                self.player.release()  # TODO: how do we close this thing?
+                return self.__create_new_player()
         else:
             return self.player
 
     def __create_new_player(self):
+        playurl = self.__get_playurl()
+        instance = vlc.Instance('-q')
+        player = instance.media_player_new()
+        media = instance.media_new(playurl)
+        media.get_mrl()  # TODO: what does this do?
+        player.set_media(media)
+        player.audio_set_volume(70)
+        self.player = player
+        return player
+
+    def __get_playurl(self):
+        if self.last_player_time is None:
+            self.__download_metadata()
+        elif time() > self.last_player_time + 300:
+            self.__download_metadata()
+        return self.playurl
+
+    def __download_metadata(self):
+        self.last_player_time = time()
         # lofi hip hop radio - beats to relax/study to by ChilledCow
         url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
         # https://stackoverflow.com/a/49249893
@@ -27,14 +51,8 @@ class LofiVlcPlayer:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             playurl = info['formats'][0]['url']
-        instance = vlc.Instance('-q')
-        player = instance.media_player_new()
-        media = instance.media_new(playurl)
-        media.get_mrl()
-        player.set_media(media)
-        player.audio_set_volume(70)
-        self.player = player
-        return player
+        self.playurl = playurl
+        self.last_player_time = time()
 
 
 if __name__ == '__main__':
