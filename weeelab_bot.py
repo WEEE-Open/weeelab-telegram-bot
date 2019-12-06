@@ -819,6 +819,7 @@ as well.\nFor a list of the available commands type /help.', )
 
         else:
             username = words[0]
+            print(type(username))
 
             logout_message = ""
             for word in words[1:]:
