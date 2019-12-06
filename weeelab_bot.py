@@ -838,10 +838,11 @@ as well.\nFor a list of the available commands type /help.', )
 
             # send commands
             command = ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"'
+            commands = [command]
             ssh_connection = SSHUtil(username=SSH_USER,
                                      host=SSH_HOST_IP,
                                      private_key_path=SSH_KEY_PATH,
-                                     commands=command,
+                                     commands=commands,
                                      timeout=5)
 
             # SSH worked, check return code
