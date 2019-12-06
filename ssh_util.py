@@ -93,12 +93,14 @@ class SSHUtil:
 
         return result_flag
 
-    def execute_command(self, commands):
+    def execute_command(self, commands=None):
         """Execute a command on the remote host.Return a tuple containing
         an integer status and a two strings, the first containing stdout
         and the second containing stderr from the command."""
         self.ssh_output = None
         result_flag = True
+        if commands is None:
+            commands = self.commands
         try:
             if self.connect():
                 for command in commands:

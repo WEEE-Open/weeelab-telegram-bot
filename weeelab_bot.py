@@ -845,7 +845,7 @@ as well.\nFor a list of the available commands type /help.', )
                                      timeout=5)
 
             # SSH worked, check return code
-            if ssh_connection.execute_command(command):
+            if ssh_connection.execute_command():
                 self.__check_logout_ssh(ssh_connection, username)
 
             # SSH didn't work
