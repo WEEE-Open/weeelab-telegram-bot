@@ -48,8 +48,8 @@ class SSHUtil:
             raise AuthenticationMethodNotFoundException
         if self.commands is None:
             print("WARNING: No commands given.", file=stderr)
-        # if not isinstance(self.commands, list):
-        #     self.commands = [self.commands]  # make iterable list from single command
+        if isinstance(self.commands, str):
+            self.commands = [self.commands]  # make iterable list from single command
 
     def connect(self):
         """Login to the remote server"""
@@ -61,6 +61,7 @@ class SSHUtil:
             self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             # Connect to the server
             if self.password is None:
+                # this needs to be a PEM key (begins with RSA not OPENSSH)
                 self.pkey = paramiko.RSAKey.from_private_key_file(self.pkey)
                 self.client.connect(hostname=self.host, port=self.port, username=self.username, pkey=self.pkey,
                                     timeout=self.timeout, allow_agent=False, look_for_keys=False)
