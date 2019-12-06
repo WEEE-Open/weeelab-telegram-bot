@@ -837,11 +837,6 @@ as well.\nFor a list of the available commands type /help.', )
                 return
 
             # send commands
-            # TODO: cannot concatenate list only str
-            print(ssh_command[0])
-            print(ssh_command[1])
-            print(username)
-            print(logout_message)
             command = ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"'
             ssh_connection = SSHUtil(username=SSH_USER,
                                      host=SSH_HOST_IP,

@@ -170,13 +170,11 @@ class SSHUtil:
 class HostNotFoundException(Exception):
     def __init__(self, arg):
         self.strerror = arg
-        self.args = {arg}
 
 
 class AuthenticationMethodNotFoundException(Exception):
     def __init__(self, arg):
         self.strerror = arg
-        self.args = {arg}
 
 
 # ---USAGE EXAMPLES
