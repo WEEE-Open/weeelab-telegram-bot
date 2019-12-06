@@ -49,6 +49,8 @@ class SSHUtil:
         if self.commands is None:
             print("WARNING: No commands given.", file=stderr)
         print(isinstance(self.commands, str))
+        print(type(self.commands))
+        print(self.commands)
         if isinstance(self.commands, str):
             self.commands = [self.commands]  # make iterable list from single command
             print(self.commands)
