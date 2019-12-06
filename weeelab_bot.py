@@ -808,6 +808,8 @@ as well.\nFor a list of the available commands type /help.', )
         self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
 
     def logout(self, *words, recursion_counter: int = 0):
+        # convert tuple to list
+        words = list(words)
 
         if recursion_counter >= self.ssh_retry_times:
             self.__send_message("I've tried too many times. You'd better just do the logout manually.")
