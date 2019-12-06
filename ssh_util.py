@@ -60,7 +60,7 @@ class SSHUtil:
             # Parsing an instance of the AutoAddPolicy to set_missing_host_key_policy() changes it to allow any host.
             self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             # Connect to the server
-            if self.password == '':
+            if self.password is None:
                 self.pkey = paramiko.RSAKey.from_private_key_file(self.pkey)
                 self.client.connect(hostname=self.host, port=self.port, username=self.username, pkey=self.pkey,
                                     timeout=self.timeout, allow_agent=False, look_for_keys=False)
