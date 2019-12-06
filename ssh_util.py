@@ -48,8 +48,8 @@ class SSHUtil:
             raise AuthenticationMethodNotFoundException
         if self.commands is None:
             print("WARNING: No commands given.", file=stderr)
-        if not isinstance(self.commands, list):
-            self.commands = [self.commands]  # make iterable list from single command
+        # if not isinstance(self.commands, list):
+        #     self.commands = [self.commands]  # make iterable list from single command
 
     def connect(self):
         """Login to the remote server"""
