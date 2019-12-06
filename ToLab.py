@@ -95,8 +95,17 @@ class ToLab:
 
     def set_entry(self, username: str, telegram_id: int, time: str, day: int) -> int:
         self.__delete_user(telegram_id)
-        entry, days = self.__create_entry(username, telegram_id, time, day)
-        self.tolab_file.append(entry)
+        new_entry, days = self.__create_entry(username, telegram_id, time, day)
+        keep = []
+        appended = False
+        for existing_entry in self.tolab_file:
+            if not appended and new_entry["tolab"] < existing_entry["tolab"]:
+                keep.append(new_entry)
+                appended = True
+            keep.append(existing_entry)
+        if not appended:
+            keep.append(new_entry)
+        self.tolab_file = keep
         self.save(self.tolab_file)
         return days
 
