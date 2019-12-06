@@ -807,9 +807,7 @@ as well.\nFor a list of the available commands type /help.', )
         Wol.send(mac)
         self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
 
-    def logout(self, *words, recursion_counter: int = 0):
-        # convert tuple to list
-        words = list(words)
+    def logout(self, words, recursion_counter: int = 0):
 
         if recursion_counter >= self.ssh_retry_times:
             self.__send_message("I've tried too many times. You'd better just do the logout manually.")
@@ -821,7 +819,6 @@ as well.\nFor a list of the available commands type /help.', )
 
         else:
             username = words[0]
-            print(type(username))
 
             logout_message = ""
             for word in words[1:]:
