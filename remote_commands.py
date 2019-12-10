@@ -3,4 +3,4 @@ ssh_command = [
     " -m "
 ]
 
-shutdown_command = "poweroff"
+shutdown_command = "shutdown now"
