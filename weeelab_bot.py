@@ -390,14 +390,14 @@ as well.\nFor a list of the available commands type /help.', )
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
                     self.__send_message(
-                        f"I took note that you'll go the lab at {time}. Use <i>/tolab no</i> to cancel. Check if "
+                        f"I took note that you'll go to the lab at {time}. Use <i>/tolab no</i> to cancel. Check if "
                         f"anybody else is coming with /inlab")
                 elif days == 1:
-                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel."
+                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel. "
                                         f"Check if anyone else is coming with /inlab")
                 else:
                     self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to "
-                                        f"cancel. Check if anyone else is coming with /inlab"
+                                        f"cancel. Check if anyone else is coming with /inlab "
                                         f"\nMark it down on your calendar!")
         except Exception as e:
             self.__send_message(f"An error occurred: {str(e)}")
