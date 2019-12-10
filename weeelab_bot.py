@@ -40,7 +40,7 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command
+from remote_commands import ssh_command, shutdown_command
 from ssh_util import SSHUtil
 from threading import Thread
 
@@ -171,6 +171,10 @@ class AcceptableQueriesLoFi(Enum):
     close = 'lofi_close'
     volume_plus = 'lofi_vol+'
     volume_down = 'lofi_vol-'
+
+class AcceptableQueriesLogout(Enum):
+    yes = 'logout_yes'
+    no = 'logout_no'
 
 
 def inline_keyboard_button(label: str, callback_data: str):
@@ -857,6 +861,16 @@ as well.\nFor a list of the available commands type /help.', )
                         self.__check_logout_ssh(ssh_connection, username)
                         break
 
+            # give the user the option to shutdown the logout machine
+            message = "Do you want to shutdown the machine now?"
+            reply_markup = [
+                inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesLogout.yes.value),
+                inline_keyboard_button("No, it's crucial that it stays alive!",
+                                       callback_data=AcceptableQueriesLogout.no.value)
+            ]
+            self.__send_inline_keyboard(message, reply_markup)
+
+
             return
 
     def __check_logout_ssh(self, ssh_connection, username: str):
@@ -869,6 +883,31 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
+
+    def logout_callback(self, query, message_id: int):
+        shutdown_retry_times = 5
+
+        try:
+            query = AcceptableQueriesLoFi(query)
+        except ValueError:
+            self.__send_message("I did not understand that button press")
+            return
+
+        if query == AcceptableQueriesLogout.yes:
+            ssh_connection = SSHUtil(username=SSH_USER,
+                                     host=SSH_HOST_IP,
+                                     private_key_path=SSH_KEY_PATH,
+                                     commands=shutdown_command,
+                                     timeout=5)
+
+            for _ in range(shutdown_retry_times):
+                if ssh_connection.execute_command():
+                    self.__edit_message(message_id, "Shutdown successful!", None)
+                else:
+                    self.__edit_message(message_id, "There was an issue with the shutdown. Retrying...", None)
+
+        elif query == AcceptableQueriesLogout.no:
+            self.__edit_message(message_id, "Alright, we'll leave it alive. <i>For now.</i>", None)
 
     def unknown(self):
         """
@@ -1052,6 +1091,8 @@ def main():
                     handler.wol_callback(query, message_id)
                 elif query.startswith('lofi_'):
                     handler.lofi_callback(query, message_id)
+                elif query.startswith('logout_'):
+                    handler.logout_callback(query, message_id)
                 else:
                     handler.unknown()
             else:
