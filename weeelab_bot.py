@@ -208,7 +208,6 @@ class CommandHandler:
 
         self.lofi_player = LofiVlcPlayer()
         self.lofi_player_last_volume = -1
-        self.ssh_retry_times = 2
 
     def read_user_from_callback(self, last_update):
         self.__last_from = last_update['callback_query']['from']
@@ -807,11 +806,7 @@ as well.\nFor a list of the available commands type /help.', )
         Wol.send(mac)
         self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
 
-    def logout(self, words, recursion_counter: int = 0):
-
-        if recursion_counter >= self.ssh_retry_times:
-            self.__send_message("I've tried too many times. You'd better just do the logout manually.")
-            return
+    def logout(self, words):
 
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
@@ -855,10 +850,12 @@ as well.\nFor a list of the available commands type /help.', )
                 self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
                                     "I'll reach out to you when I've completed the logout process.")
                 # boot time is around 115 seconds
-                sleep(150)
-                # extreme recursion
-                recursion_counter += 1
-                self.logout(words, recursion_counter)
+                # check instead of guessing when the machine has finished booting
+                while True:
+                    sleep(10)
+                    if ssh_connection.execute_command():
+                        self.__check_logout_ssh(ssh_connection, username)
+                        break
 
             return
 
