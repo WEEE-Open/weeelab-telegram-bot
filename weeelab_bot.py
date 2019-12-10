@@ -903,6 +903,7 @@ as well.\nFor a list of the available commands type /help.', )
             for _ in range(shutdown_retry_times):
                 if ssh_connection.execute_command():
                     self.__edit_message(message_id, "Shutdown successful!", None)
+                    break
                 else:
                     self.__edit_message(message_id, "There was an issue with the shutdown. Retrying...", None)
 
