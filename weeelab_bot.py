@@ -858,7 +858,7 @@ as well.\nFor a list of the available commands type /help.', )
                 sleep(150)
                 # extreme recursion
                 recursion_counter += 1
-                self.logout(*words, recursion_counter)
+                self.logout(words, recursion_counter)
 
             return
 
