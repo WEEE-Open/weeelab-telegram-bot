@@ -3,4 +3,4 @@ ssh_command = [
     " -m "
 ]
 
-shutdown_command = "shutdown now"
+shutdown_command = "sudo shutdown now"
