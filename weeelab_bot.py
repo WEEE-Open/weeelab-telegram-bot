@@ -888,7 +888,7 @@ as well.\nFor a list of the available commands type /help.', )
         shutdown_retry_times = 5
 
         try:
-            query = AcceptableQueriesLoFi(query)
+            query = AcceptableQueriesLogout(query)
         except ValueError:
             self.__send_message("I did not understand that button press")
             return
