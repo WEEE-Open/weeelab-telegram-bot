@@ -863,11 +863,11 @@ as well.\nFor a list of the available commands type /help.', )
 
             # give the user the option to shutdown the logout machine
             message = "Do you want to shutdown the machine now?"
-            reply_markup = [
+            reply_markup = [[
                 inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesLogout.yes.value),
                 inline_keyboard_button("No, it's crucial that it stays alive!",
                                        callback_data=AcceptableQueriesLogout.no.value)
-            ]
+            ]]
             self.__send_inline_keyboard(message, reply_markup)
 
 
