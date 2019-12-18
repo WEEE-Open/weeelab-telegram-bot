@@ -172,14 +172,9 @@ class AcceptableQueriesLoFi(Enum):
     volume_down = 'lofi_vol-'
 
 
-class AcceptableQueriesLogout(Enum):
+class AcceptableQueriesShutdown(Enum):
     yes = 'logout_yes'
     no = 'logout_no'
-
-
-class Machines(Enum):
-    scma = 'scma'
-    piall = 'piall'
 
 
 def inline_keyboard_button(label: str, callback_data: str):
@@ -887,12 +882,12 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
 
-    def shutdown_prompt(self, machine: str):
+    def shutdown_prompt(self):
         message = "Do you want to shutdown the machine now?"
         reply_markup = [
-            [inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesLogout.yes.value)],
+            [inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesShutdown.yes.value)],
             [inline_keyboard_button("No, it's crucial that it stays alive!",
-                                    callback_data=AcceptableQueriesLogout.no.value)]
+                                    callback_data=AcceptableQueriesShutdown.no.value)]
         ]
         self.__send_inline_keyboard(message, reply_markup)
 
@@ -900,12 +895,12 @@ as well.\nFor a list of the available commands type /help.', )
         shutdown_retry_times = 5
 
         try:
-            query = AcceptableQueriesLogout(query)
+            query = AcceptableQueriesShutdown(query)
         except ValueError:
             self.__send_message("I did not understand that button press")
             return
 
-        if query == AcceptableQueriesLogout.yes:
+        if query == AcceptableQueriesShutdown.yes:
             ssh_connection = SSHUtil(username=ssh_user,
                                      host=ssh_host_ip,
                                      private_key_path=ssh_key_path,
@@ -919,7 +914,7 @@ as well.\nFor a list of the available commands type /help.', )
                 else:
                     self.__edit_message(message_id, "There was an issue with the shutdown. Retrying...", None)
 
-        elif query == AcceptableQueriesLogout.no:
+        elif query == AcceptableQueriesShutdown.no:
             self.__edit_message(message_id, "Alright, we'll leave it alive. <i>For now.</i>", None)
 
     def unknown(self):
