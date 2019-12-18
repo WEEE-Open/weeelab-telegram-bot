@@ -1003,7 +1003,8 @@ Note: the logout message cannot contain double quotes characters such as " """
 /top all - Show a list of top users by hours spent
 /deletecache - Delete caches (reload logs and users)
 /logout <i>username</i> <i>description of what they've done</i> - Logout a user with weeelab
-/wol - Spawns a keyboard with machines an admin can Wake On LAN"""
+/wol - Spawns a keyboard with machines an admin can Wake On LAN
+/door - sonoporta"""
         self.__send_message(help_message)
 
 
