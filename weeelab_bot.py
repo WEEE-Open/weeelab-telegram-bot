@@ -39,7 +39,7 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_command, shutdown_command
+from remote_commands import ssh_weeelab_command, shutdown_command
 from ssh_util import SSHUtil
 from threading import Thread
 
@@ -839,7 +839,7 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         # send commands
-        command = str(ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"')
+        command = str(ssh_weeelab_command[0] + username + ssh_weeelab_command[1] + '"' + logout_message + '"')
         ssh_connection = SSHUtil(username=SSH_SCMA_USER,
                                  host=SSH_SCMA_HOST_IP,
                                  private_key_path=SSH_SCMA_KEY_PATH,
@@ -885,6 +885,36 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
             return
 
+        # send commands
+        command =
+        ssh_connection = SSHUtil(username=SSH_SCMA_USER,
+                                 host=SSH_SCMA_HOST_IP,
+                                 private_key_path=SSH_SCMA_KEY_PATH,
+                                 commands=command,
+                                 timeout=5)
+
+        # SSH worked, check return code
+        if ssh_connection.execute_command():
+            self.__check_logout_ssh(ssh_connection, username)
+
+        # SSH didn't work
+        else:
+            # wol always exits with 0, cannot check if it worked
+            Wol.send(WOL_LOGOUT)
+            self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
+                                "I'll reach out to you when I've completed the logout process.")
+            # boot time is around 115 seconds
+            # check instead of guessing when the machine has finished booting
+            while True:
+                sleep(10)
+                if ssh_connection.execute_command():
+                    self.__check_logout_ssh(ssh_connection, username)
+                    break
+
+        # give the user the option to shutdown the logout machine
+        self.shutdown_prompt()
+
+        return
 
 
     def shutdown_prompt(self):
