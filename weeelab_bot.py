@@ -39,7 +39,7 @@ import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
 from enum import Enum
 from time import sleep
-from remote_commands import ssh_weeelab_command, shutdown_command
+from remote_commands import ssh_weeelab_command, shutdown_command, ssh_i_am_door_command
 from ssh_util import SSHUtil
 from threading import Thread
 
@@ -173,8 +173,15 @@ class AcceptableQueriesLoFi(Enum):
 
 
 class AcceptableQueriesShutdown(Enum):
-    yes = 'logout_yes'
-    no = 'logout_no'
+    logout_yes = 'logout_yes'
+    logout_no = 'logout_no'
+    i_am_door_yes = "i_am_door_yes"
+    i_am_door_no = "i_am_door_no"
+
+
+class Machines(Enum):
+    scma = 'scma'
+    piall = 'piall'
 
 
 def inline_keyboard_button(label: str, callback_data: str):
@@ -865,7 +872,7 @@ as well.\nFor a list of the available commands type /help.', )
                     break
 
         # give the user the option to shutdown the logout machine
-        self.shutdown_prompt()
+        self.shutdown_prompt(Machines.scma)
 
         return
 
@@ -885,44 +892,46 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
             return
 
-        # send commands
-        command =
         ssh_connection = SSHUtil(username=SSH_SCMA_USER,
                                  host=SSH_SCMA_HOST_IP,
                                  private_key_path=SSH_SCMA_KEY_PATH,
-                                 commands=command,
+                                 commands=ssh_i_am_door_command,
                                  timeout=5)
 
-        # SSH worked, check return code
-        if ssh_connection.execute_command():
-            self.__check_logout_ssh(ssh_connection, username)
-
         # SSH didn't work
-        else:
+        if not ssh_connection.execute_command():
             # wol always exits with 0, cannot check if it worked
-            Wol.send(WOL_LOGOUT)
+            Wol.send(WOL_I_AM_DOOR)
             self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
                                 "I'll reach out to you when I've completed the logout process.")
-            # boot time is around 115 seconds
-            # check instead of guessing when the machine has finished booting
             while True:
                 sleep(10)
                 if ssh_connection.execute_command():
-                    self.__check_logout_ssh(ssh_connection, username)
                     break
 
         # give the user the option to shutdown the logout machine
-        self.shutdown_prompt()
+        self.shutdown_prompt(Machines.piall)
 
         return
 
+    def shutdown_prompt(self, machine):
+        try:
+            machine = Machines(machine)
+        except ValueError:
+            self.__send_message("That machine does not exist!")
+            return
 
-    def shutdown_prompt(self):
+        if machine == Machines.scma:
+            yes = AcceptableQueriesShutdown.logout_yes.value
+            no = AcceptableQueriesShutdown.logout_no.value
+        elif machine == Machines.piall:
+            yes = AcceptableQueriesShutdown.i_am_door_yes.value
+            no = AcceptableQueriesShutdown.i_am_door_no.value
+
         message = "Do you want to shutdown the machine now?"
         reply_markup = [
-            [inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesShutdown.yes.value)],
-            [inline_keyboard_button("No, it's crucial that it stays alive!",
-                                    callback_data=AcceptableQueriesShutdown.no.value)]
+            [inline_keyboard_button("Kill it with fire!", callback_data=yes)],
+            [inline_keyboard_button("No, it's crucial that it stays alive!", callback_data=no)]
         ]
         self.__send_inline_keyboard(message, reply_markup)
 
