@@ -884,7 +884,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
 
-    def logout_callback(self, query, message_id: int):
+    def shutdown_callback(self, query, message_id: int, ssh_user: str, ssh_host_ip: str, ssh_key_path: str):
         shutdown_retry_times = 5
 
         try:
@@ -894,9 +894,9 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         if query == AcceptableQueriesLogout.yes:
-            ssh_connection = SSHUtil(username=SSH_SCMA_USER,
-                                     host=SSH_SCMA_HOST_IP,
-                                     private_key_path=SSH_SCMA_KEY_PATH,
+            ssh_connection = SSHUtil(username=ssh_user,
+                                     host=ssh_host_ip,
+                                     private_key_path=ssh_key_path,
                                      commands=shutdown_command,
                                      timeout=5)
 
@@ -1093,7 +1093,7 @@ def main():
                 elif query.startswith('lofi_'):
                     handler.lofi_callback(query, message_id)
                 elif query.startswith('logout_'):
-                    handler.logout_callback(query, message_id)
+                    handler.shutdown_callback(query, message_id, SSH_SCMA_USER, SSH_SCMA_HOST_IP, SSH_SCMA_KEY_PATH)
                 else:
                     handler.unknown()
             else:
