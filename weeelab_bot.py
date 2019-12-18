@@ -816,60 +816,58 @@ as well.\nFor a list of the available commands type /help.', )
         self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
 
     def logout(self, words):
-
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
             return
 
-        else:
-            username = words[0]
+        username = words[0]
 
-            logout_message = ""
-            for word in words[1:]:
-                logout_message += word + " "
-            logout_message.rstrip().replace("  ", " ")
+        logout_message = ""
+        for word in words[1:]:
+            logout_message += word + " "
+        logout_message.rstrip().replace("  ", " ")
 
-            if '"' in logout_message:
-                self.__send_message("What have I told you? The logout message cannot contain double quotes.\n"
-                                    "Please try again.")
-                self.logout_help()
-                return
-
-            if logout_message.__len__() > MAX_WORK_DONE:
-                self.__send_message(
-                    "Try not to write the story of your life. Re-send a shorter logout message with /logout")
-                return
-
-            # send commands
-            command = str(ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"')
-            ssh_connection = SSHUtil(username=SSH_SCMA_USER,
-                                     host=SSH_SCMA_HOST_IP,
-                                     private_key_path=SSH_SCMA_KEY_PATH,
-                                     commands=command,
-                                     timeout=5)
-
-            # SSH worked, check return code
-            if ssh_connection.execute_command():
-                self.__check_logout_ssh(ssh_connection, username)
-
-            # SSH didn't work
-            else:
-                # wol always exits with 0, cannot check if it worked
-                Wol.send(WOL_LOGOUT)
-                self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
-                                    "I'll reach out to you when I've completed the logout process.")
-                # boot time is around 115 seconds
-                # check instead of guessing when the machine has finished booting
-                while True:
-                    sleep(10)
-                    if ssh_connection.execute_command():
-                        self.__check_logout_ssh(ssh_connection, username)
-                        break
-
-            # give the user the option to shutdown the logout machine
-            self.shutdown_prompt()
-
+        if '"' in logout_message:
+            self.__send_message("What have I told you? The logout message cannot contain double quotes.\n"
+                                "Please try again.")
+            self.logout_help()
             return
+
+        if logout_message.__len__() > MAX_WORK_DONE:
+            self.__send_message(
+                "Try not to write the story of your life. Re-send a shorter logout message with /logout")
+            return
+
+        # send commands
+        command = str(ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"')
+        ssh_connection = SSHUtil(username=SSH_SCMA_USER,
+                                 host=SSH_SCMA_HOST_IP,
+                                 private_key_path=SSH_SCMA_KEY_PATH,
+                                 commands=command,
+                                 timeout=5)
+
+        # SSH worked, check return code
+        if ssh_connection.execute_command():
+            self.__check_logout_ssh(ssh_connection, username)
+
+        # SSH didn't work
+        else:
+            # wol always exits with 0, cannot check if it worked
+            Wol.send(WOL_LOGOUT)
+            self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
+                                "I'll reach out to you when I've completed the logout process.")
+            # boot time is around 115 seconds
+            # check instead of guessing when the machine has finished booting
+            while True:
+                sleep(10)
+                if ssh_connection.execute_command():
+                    self.__check_logout_ssh(ssh_connection, username)
+                    break
+
+        # give the user the option to shutdown the logout machine
+        self.shutdown_prompt()
+
+        return
 
     def __check_logout_ssh(self, ssh_connection, username: str):
         # weeelab logout worked
@@ -881,6 +879,13 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
+
+    def i_am_door(self):
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
+            return
+
+
 
     def shutdown_prompt(self):
         message = "Do you want to shutdown the machine now?"
