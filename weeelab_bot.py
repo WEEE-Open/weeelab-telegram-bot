@@ -910,7 +910,8 @@ as well.\nFor a list of the available commands type /help.', )
                     break
 
         # give the user the option to shutdown the logout machine
-        self.shutdown_prompt(Machines.piall)
+        # actually don't since it could break some disks during formatting
+        # self.shutdown_prompt(Machines.piall)
 
         return
 
