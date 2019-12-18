@@ -892,9 +892,9 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
             return
 
-        ssh_connection = SSHUtil(username=SSH_SCMA_USER,
-                                 host=SSH_SCMA_HOST_IP,
-                                 private_key_path=SSH_SCMA_KEY_PATH,
+        ssh_connection = SSHUtil(username=SSH_PIALL_USER,
+                                 host=SSH_PIALL_HOST_IP,
+                                 private_key_path=SSH_PIALL_KEY_PATH,
                                  commands=ssh_i_am_door_command,
                                  timeout=5)
 
@@ -1126,6 +1126,9 @@ def main():
                         logout.start()
                     else:
                         handler.logout_help()
+
+                elif command[0] == "/door" or command[0] == "/door@weeelab_bot":
+                    handler.i_am_door()
 
                 else:
                     handler.unknown()
