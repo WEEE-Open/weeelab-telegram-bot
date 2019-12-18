@@ -16,7 +16,6 @@ Author: WEEE Open Team
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 # Modules
 import json
 from typing import Optional, List
@@ -171,6 +170,7 @@ class AcceptableQueriesLoFi(Enum):
     close = 'lofi_close'
     volume_plus = 'lofi_vol+'
     volume_down = 'lofi_vol-'
+
 
 class AcceptableQueriesLogout(Enum):
     yes = 'logout_yes'
@@ -758,7 +758,8 @@ as well.\nFor a list of the available commands type /help.', )
                     lofi_player.audio_set_volume(10)  # automatically turn up the volume by one notch
                 self.__edit_message(messge_id, "Playing... - current volume: " + str(volume), self.lofi_keyboard(True))
             else:  # == -1
-                self.__edit_message(messge_id, "Stream could not be started because of an error.", self.lofi_keyboard(playing))
+                self.__edit_message(messge_id, "Stream could not be started because of an error.",
+                                    self.lofi_keyboard(playing))
 
         elif query == AcceptableQueriesLoFi.pause:
             # there are no checks implemented for stop() in vlc.py
@@ -772,7 +773,8 @@ as well.\nFor a list of the available commands type /help.', )
             if volume == -1:
                 volume = self.lofi_player_last_volume
             if lofi_player.audio_set_volume(volume - 10) == 0:
-                self.__edit_message(messge_id, "Volume down 10% - current volume: " + str(volume-10), self.lofi_keyboard(playing))
+                self.__edit_message(messge_id, "Volume down 10% - current volume: " + str(volume - 10),
+                                    self.lofi_keyboard(playing))
                 if volume - 10 == 0:
                     self.lofi_player_last_volume = 0
                     lofi_player.stop()  # otherwise volume == -1
@@ -789,12 +791,15 @@ as well.\nFor a list of the available commands type /help.', )
                 if volume == 0:  # was muted, now resuming
                     if lofi_player.play() == 0:
                         lofi_player.audio_set_volume(10)
-                        self.__edit_message(messge_id, "Playing... - current volume: " + str(10), self.lofi_keyboard(True))
+                        self.__edit_message(messge_id, "Playing... - current volume: " + str(10),
+                                            self.lofi_keyboard(True))
                         return
                 if lofi_player.audio_set_volume(volume + 10) == 0:
-                    self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume+10), self.lofi_keyboard(playing))
+                    self.__edit_message(messge_id, "Volume up 10% - current volume: " + str(volume + 10),
+                                        self.lofi_keyboard(playing))
                 else:
-                    self.__edit_message(messge_id, "There was an error pumpin' up. Try hitting 'Play'.", self.lofi_keyboard(playing))
+                    self.__edit_message(messge_id, "There was an error pumpin' up. Try hitting 'Play'.",
+                                        self.lofi_keyboard(playing))
             else:  # == -1
                 self.__edit_message(messge_id, "The volume is already cranked up to 11.", self.lofi_keyboard(playing))
 
@@ -864,7 +869,6 @@ as well.\nFor a list of the available commands type /help.', )
             # give the user the option to shutdown the logout machine
             self.shutdown_prompt()
 
-
             return
 
     def __check_logout_ssh(self, ssh_connection, username: str):
@@ -878,7 +882,6 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
 
-
     def shutdown_prompt(self):
         message = "Do you want to shutdown the machine now?"
         reply_markup = [
@@ -887,7 +890,6 @@ as well.\nFor a list of the available commands type /help.', )
                                     callback_data=AcceptableQueriesLogout.no.value)]
         ]
         self.__send_inline_keyboard(message, reply_markup)
-
 
     def shutdown_callback(self, query, message_id: int, ssh_user: str, ssh_host_ip: str, ssh_key_path: str):
         shutdown_retry_times = 5
