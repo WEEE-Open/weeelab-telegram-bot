@@ -41,6 +41,10 @@ SSH_SCMA_USER = os.environ.get('SSH_SCMA_USER')  # foo
 SSH_SCMA_HOST_IP = os.environ.get('SSH_SCMA_HOST_IP')  # 10.20.30.40
 SSH_SCMA_KEY_PATH = os.environ.get('SSH_SCMA_KEY_PATH')  # /home/whatever/ssh_key
 
+SSH_PIALL_USER = os.environ.get('SSH_PIALL_USER')
+SSH_PIALL_HOST_IP = os.environ.get('SSH_PIALL_HOST_IP')
+SSH_PIALL_KEY_PATH = os.environ.get('SSH_PIALL_KEY_PATH')
+
 WOL_MACHINES = os.environ.get('WOL_MACHINES')  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
 if WOL_MACHINES is not None:
     WOL_MACHINES = __unpack_wol(WOL_MACHINES)
