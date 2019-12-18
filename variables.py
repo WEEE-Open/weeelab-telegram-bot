@@ -37,9 +37,9 @@ if LDAP_ADMIN_GROUPS is not None:
 
 INVITE_LINK = os.environ.get('INVITE_LINK')  # https://example.com/register.php?invite= (invite code will be appended, no spaces in invite code)
 
-SSH_USER = os.environ.get('SSH_USER')  # foo
-SSH_HOST_IP = os.environ.get('SSH_HOST_IP')  # 10.20.30.40
-SSH_KEY_PATH = os.environ.get('SSH_KEY_PATH')  # /home/whatever/ssh_key
+SSH_SCMA_USER = os.environ.get('SSH_SCMA_USER')  # foo
+SSH_SCMA_HOST_IP = os.environ.get('SSH_SCMA_HOST_IP')  # 10.20.30.40
+SSH_SCMA_KEY_PATH = os.environ.get('SSH_SCMA_KEY_PATH')  # /home/whatever/ssh_key
 
 WOL_MACHINES = os.environ.get('WOL_MACHINES')  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
 if WOL_MACHINES is not None:

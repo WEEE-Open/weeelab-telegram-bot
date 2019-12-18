@@ -837,9 +837,9 @@ as well.\nFor a list of the available commands type /help.', )
 
             # send commands
             command = str(ssh_command[0] + username + ssh_command[1] + '"' + logout_message + '"')
-            ssh_connection = SSHUtil(username=SSH_USER,
-                                     host=SSH_HOST_IP,
-                                     private_key_path=SSH_KEY_PATH,
+            ssh_connection = SSHUtil(username=SSH_SCMA_USER,
+                                     host=SSH_SCMA_HOST_IP,
+                                     private_key_path=SSH_SCMA_KEY_PATH,
                                      commands=command,
                                      timeout=5)
 
@@ -894,9 +894,9 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         if query == AcceptableQueriesLogout.yes:
-            ssh_connection = SSHUtil(username=SSH_USER,
-                                     host=SSH_HOST_IP,
-                                     private_key_path=SSH_KEY_PATH,
+            ssh_connection = SSHUtil(username=SSH_SCMA_USER,
+                                     host=SSH_SCMA_HOST_IP,
+                                     private_key_path=SSH_SCMA_KEY_PATH,
                                      commands=shutdown_command,
                                      timeout=5)
 
