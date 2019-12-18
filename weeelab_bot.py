@@ -1134,7 +1134,8 @@ def main():
                         handler.logout_help()
 
                 elif command[0] == "/door" or command[0] == "/door@weeelab_bot":
-                    handler.i_am_door()
+                    i_am_door = Thread(target=handler.i_am_door)
+                    i_am_door.start()
 
                 else:
                     handler.unknown()
