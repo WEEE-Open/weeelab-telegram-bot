@@ -909,6 +909,8 @@ as well.\nFor a list of the available commands type /help.', )
                 if ssh_connection.execute_command():
                     break
 
+        self.__send_message("IO. SONO. PORTA.")
+
         # give the user the option to shutdown the logout machine
         # actually don't since it could break some disks during formatting
         # self.shutdown_prompt(Machines.piall)
