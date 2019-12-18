@@ -944,7 +944,8 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("I did not understand that button press")
             return
 
-        if query == AcceptableQueriesShutdown.yes:
+        if query == AcceptableQueriesShutdown.logout_yes or \
+                query == AcceptableQueriesShutdown.i_am_door_yes:
             ssh_connection = SSHUtil(username=ssh_user,
                                      host=ssh_host_ip,
                                      private_key_path=ssh_key_path,
@@ -958,7 +959,8 @@ as well.\nFor a list of the available commands type /help.', )
                 else:
                     self.__edit_message(message_id, "There was an issue with the shutdown. Retrying...", None)
 
-        elif query == AcceptableQueriesShutdown.no:
+        elif query == AcceptableQueriesShutdown.logout_no or \
+                query == AcceptableQueriesShutdown.i_am_door_no:
             self.__edit_message(message_id, "Alright, we'll leave it alive. <i>For now.</i>", None)
 
     def unknown(self):
