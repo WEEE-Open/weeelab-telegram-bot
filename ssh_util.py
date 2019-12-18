@@ -62,6 +62,7 @@ class SSHUtil:
             # Connect to the server
             if self.password is None:
                 # this needs to be a PEM key (begins with RSA not OPENSSH)
+                # use "ssh-keygen -p -m PEM -f id_rsa_X" to convert OPENSSH to RSA
                 self.pkey = paramiko.RSAKey.from_private_key_file(self.pkey)
                 self.client.connect(hostname=self.host, port=self.port, username=self.username, pkey=self.pkey,
                                     timeout=self.timeout, allow_agent=False, look_for_keys=False)
