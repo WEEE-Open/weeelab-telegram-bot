@@ -862,13 +862,7 @@ as well.\nFor a list of the available commands type /help.', )
                         break
 
             # give the user the option to shutdown the logout machine
-            message = "Do you want to shutdown the machine now?"
-            reply_markup = [
-                [inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesLogout.yes.value)],
-                [inline_keyboard_button("No, it's crucial that it stays alive!",
-                                       callback_data=AcceptableQueriesLogout.no.value)]
-            ]
-            self.__send_inline_keyboard(message, reply_markup)
+            self.shutdown_prompt()
 
 
             return
@@ -883,6 +877,17 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
+
+
+    def shutdown_prompt(self):
+        message = "Do you want to shutdown the machine now?"
+        reply_markup = [
+            [inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesLogout.yes.value)],
+            [inline_keyboard_button("No, it's crucial that it stays alive!",
+                                    callback_data=AcceptableQueriesLogout.no.value)]
+        ]
+        self.__send_inline_keyboard(message, reply_markup)
+
 
     def shutdown_callback(self, query, message_id: int, ssh_user: str, ssh_host_ip: str, ssh_key_path: str):
         shutdown_retry_times = 5
