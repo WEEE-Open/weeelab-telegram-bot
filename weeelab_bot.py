@@ -177,6 +177,11 @@ class AcceptableQueriesLogout(Enum):
     no = 'logout_no'
 
 
+class Machines(Enum):
+    scma = 'scma'
+    piall = 'piall'
+
+
 def inline_keyboard_button(label: str, callback_data: str):
     return {"text": label, "callback_data": callback_data}
 
@@ -882,7 +887,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
 
-    def shutdown_prompt(self):
+    def shutdown_prompt(self, machine: str):
         message = "Do you want to shutdown the machine now?"
         reply_markup = [
             [inline_keyboard_button("Kill it with fire!", callback_data=AcceptableQueriesLogout.yes.value)],
