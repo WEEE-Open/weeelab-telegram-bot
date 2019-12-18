@@ -1145,6 +1145,8 @@ def main():
                     handler.lofi_callback(query, message_id)
                 elif query.startswith('logout_'):
                     handler.shutdown_callback(query, message_id, SSH_SCMA_USER, SSH_SCMA_HOST_IP, SSH_SCMA_KEY_PATH)
+                elif query.startswith('i_am_door_'):
+                    handler.shutdown_callback(query, message_id, SSH_PIALL_USER, SSH_PIALL_HOST_IP, SSH_PIALL_KEY_PATH)
                 else:
                     handler.unknown()
             else:
