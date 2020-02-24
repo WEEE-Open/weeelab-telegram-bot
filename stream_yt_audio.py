@@ -43,7 +43,7 @@ class LofiVlcPlayer:
     def __download_metadata(self):
         self.last_player_time = time()
         # lofi hip hop radio - beats to relax/study to by ChilledCow
-        url = "https://www.youtube.com/watch?v=hHW1oY26kxQ"
+        url = "https://www.youtube.com/watch?v=5qap5aO4i9A"
         # https://stackoverflow.com/a/49249893
         ydl_opts = {
             'format': 'bestaudio/best',
