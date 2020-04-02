@@ -227,14 +227,16 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             team_number = 249208
             url = f"https://stats.foldingathome.org/api/team/{team_number}"
             json_res = requests.get(url).json()
-            top_3 = "\n".join([f"{member['name']} with {member['credit']} points" for member in json_res['donors'][:3]])
+            top_3 = "\n".join([f"<b>{member['name']}</b> with <i>{member['credit']}</i> points"
+                               for member in json_res['donors'][:3]])
             text = f"Total Team Work Units: {json_res['wus']}\n" \
                    f"Rank: {json_res['rank']}/{json_res['total_teams']} " \
-                   f"-> top {round(json_res['rank']/json_res['total_teams']*100, 2)}%\n" \
+                   f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n\n" \
                    f"Top 3 members:\n{top_3}"
 
             bot.send_message(chat_id=WEEE_CHAT_ID,
-                             text=text)
+                             text=text,
+                             parse_mode='html')
 
         except Exception as e:  # TODO: specify any expected Exception class
             print(e)
