@@ -53,3 +53,4 @@ WOL_I_AM_DOOR = os.environ.get('WOL_I_AM_DOOR')
 
 MAX_WORK_DONE = int(os.environ.get('MAX_WORK_DONE'))  # 2000
 
+WEEE_CHAT_ID = int(os.environ.get('WEEE_CHAT_ID'))
