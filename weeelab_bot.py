@@ -219,6 +219,27 @@ def calculate_time_to_sleep(hour: int, minute: int = 0) -> int:
     return time_to_sleep
 
 
+def fah_ranker(bot: BotHandler, hour: int, minute: int):
+    while True:
+        try:
+            sleep(calculate_time_to_sleep(hour, minute))
+
+            team_number = 249208
+            url = f"https://stats.foldingathome.org/api/team/{team_number}"
+            json_res = requests.get(url).json()
+            top_3 = "\n".join([f"{member['name']} with {member['credit']} points" for member in json_res['donors'][:3]])
+            text = f"Total Team Work Units: {json_res['wus']}\n" \
+                   f"Rank: {json_res['rank']}/{json_res['total_teams']} " \
+                   f"-> top {round(json_res['rank']/json_res['total_teams']*100, 2)}%\n" \
+                   f"Top 3 members:\n{top_3}"
+
+            bot.send_message(chat_id=WEEE_CHAT_ID,
+                             text=text)
+
+        except:  # TODO: specify any expected Exception class
+            pass
+
+
 class CommandHandler:
     """
     Aggregates all the possible commands within one class.
@@ -1062,6 +1083,9 @@ def main():
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
     wol = WOL_MACHINES
+
+    fah_ranker_t = Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), 13, 37))
+    fah_ranker_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
 
