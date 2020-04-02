@@ -34,6 +34,7 @@ import requests  # send HTTP requests to Telegram server
 # noinspection PyUnresolvedReferences
 import owncloud
 import datetime
+from datetime import timedelta
 import traceback  # Print stack traces in logs
 import simpleaudio
 from stream_yt_audio import LofiVlcPlayer
@@ -186,6 +187,36 @@ class Machines(Enum):
 
 def inline_keyboard_button(label: str, callback_data: str):
     return {"text": label, "callback_data": callback_data}
+
+
+def calculate_time_to_sleep(hour: int, minute: int = 0) -> int:
+    """
+    Calculate time to sleep to perform an action at a given hour and minute
+    by e-caste
+    """
+    # hour is before given hour -> wait until today at given hour and minute
+    if int(datetime.datetime.now().time().strftime('%k')) < hour:
+        time_to_sleep = int(
+            (datetime.datetime.today().replace(hour=hour, minute=minute, second=0)
+             - datetime.datetime.now()).total_seconds())
+    # hour is equal to given hour
+    elif int(datetime.datetime.now().time().strftime('%k')) == hour:
+        # minute is before given minute -> wait until today at given time
+        if int(datetime.datetime.now().time().strftime('%M')) < minute:
+            time_to_sleep = int(
+                (datetime.datetime.today().replace(hour=hour, minute=minute, second=0)
+                 - datetime.datetime.now()).total_seconds())
+        # minute is after given minute -> wait until tomorrow at given time
+        else:
+            time_to_sleep = int(
+                (datetime.datetime.today().replace(hour=hour, minute=minute, second=0) + timedelta(days=1)
+                 - datetime.datetime.now()).total_seconds())
+    # hour is after given hour -> wait until tomorrow at given time
+    else:
+        time_to_sleep = int(
+            (datetime.datetime.today().replace(hour=hour, minute=minute, second=0) + timedelta(days=1)
+             - datetime.datetime.now()).total_seconds())
+    return time_to_sleep
 
 
 class CommandHandler:
