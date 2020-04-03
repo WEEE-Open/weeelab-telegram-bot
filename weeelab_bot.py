@@ -1100,8 +1100,16 @@ def main():
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
     wol = WOL_MACHINES
 
-    fah_ranker_t = Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), 13, 37))
-    fah_ranker_t.start()
+    fah_text_hours = [
+        (8, 0),
+        (13, 37),
+        (19, 0),
+        (23, 0)
+    ]
+    fah_ranker_ts = [Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), h, m))
+                     for h, m in fah_text_hours]
+    for t in fah_ranker_ts:
+        t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
 
