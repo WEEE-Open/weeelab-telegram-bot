@@ -227,16 +227,16 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             team_number = 249208
             url = f"https://stats.foldingathome.org/api/team/{team_number}"
             json_res = requests.get(url).json()
-            top_50 = "\n".join([f"<b>{member['name']}</b> with <i>{member['credit']}</i> points, "
+            top_40 = "\n".join([f"<b>{member['name']}</b> with <i>{member['credit']}</i> points, "
                                 f"<i>{member['wus']}</i> WUs%s"
                                 % f"""{f", rank <i>{member['rank']}</i>" if 'rank' in member else ""}"""
-                                for member in json_res['donors'][:50]])
+                                for member in json_res['donors'][:40]])
             text = f"Total Team Score: <b>{json_res['credit']}</b>" \
                    f"Total Team Work Units: <b>{json_res['wus']}</b>\n" \
                    f"Team Rank: {json_res['rank']}/{json_res['total_teams']} " \
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
                    f"Last update: {json_res['last']}\n\n" \
-                   f"Top members:\n{top_50}"
+                   f"Top members:\n{top_40}"
 
             bot.send_message(chat_id=WEEE_CHAT_ID,
                              text=text,
