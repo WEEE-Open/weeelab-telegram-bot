@@ -248,7 +248,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                    f"Last update: {json_res['last']}\n\n" \
                    f"Top members:\n{top_40}"
 
-            bot.send_message(chat_id=WEEE_CHAT_ID,
+            bot.send_message(chat_id=WEEE_FOLD_ID,
                              text=text,
                              parse_mode='HTML')
 
