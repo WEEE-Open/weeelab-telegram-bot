@@ -250,7 +250,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
 
             bot.send_message(chat_id=WEEE_CHAT_ID,
                              text=text,
-                             parse_mode='html')
+                             parse_mode='HTML')
 
         except Exception as e:  # TODO: specify any expected Exception class
             print(e)
