@@ -219,6 +219,15 @@ def calculate_time_to_sleep(hour: int, minute: int = 0) -> int:
     return time_to_sleep
 
 
+def human_readable_number(num: int) -> str:
+    """
+    e.g. human_readable_number(14832675) is 14,832,675
+    :param num: a big number
+    :return: a comma separated number string
+    """
+    return "{:,}".format(num)
+
+
 def fah_ranker(bot: BotHandler, hour: int, minute: int):
     while True:
         try:
@@ -227,9 +236,10 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             team_number = 249208
             url = f"https://stats.foldingathome.org/api/team/{team_number}"
             json_res = requests.get(url).json()
-            top_40 = "\n".join([f"<b>{member['name']}</b> with <i>{member['credit']}</i> points, "
-                                f"<i>{member['wus']}</i> WUs%s"
-                                % f"""{f", rank <i>{member['rank']}</i>" if 'rank' in member else ""}"""
+            top_40 = "\n".join([f"<b>{member['name']}</b> with <i>{human_readable_number(member['credit'])}</i> points,"
+                                f" <i>{member['wus']}</i> WUs%s"
+                                % f"""{f", rank <i>{human_readable_number(member['rank'])}</i>" 
+                                       if 'rank' in member else ""}"""
                                 for member in json_res['donors'][:40]])
             text = f"Total Team Score: <b>{json_res['credit']}</b>\n" \
                    f"Total Team Work Units: <b>{json_res['wus']}</b>\n" \
