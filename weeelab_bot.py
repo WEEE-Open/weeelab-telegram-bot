@@ -229,8 +229,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             json_res = requests.get(url).json()
             top_50 = "\n".join([f"<b>{member['name']}</b> with <i>{member['credit']}</i> points"
                                for member in json_res['donors'][:50]])
-            text = f"Total Team Work Units: {json_res['wus']}\n" \
-                   f"Rank: {json_res['rank']}/{json_res['total_teams']} " \
+            text = f"Total Team Score: <b>{json_res['credit']}</b>" \
+                   f"Total Team Work Units: <b>{json_res['wus']}</b>\n" \
+                   f"Team Rank: {json_res['rank']}/{json_res['total_teams']} " \
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n\n" \
                    f"Top members:\n{top_50}"
 
