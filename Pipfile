@@ -15,6 +15,7 @@ youtube_dl = "*"
 python_vlc = "*"
 paramiko = "*"
 pytarallo = "*"
+requests_html = "*"
 
 [requires]
 python_version = "3.7"
