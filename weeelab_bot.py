@@ -243,8 +243,8 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                                        if 'rank' in member else ""}"""
                                 for member in json_res['donors'][:40]])
 
-            text = f"Total Team Score: <b>{json_res['credit']}</b>\n" \
-                   f"Total Team Work Units: <b>{json_res['wus']}</b>\n" \
+            text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
+                   f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
                    f"Team Rank: {json_res['rank']} / {json_res['total_teams']} " \
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
                    f"Last update: {json_res['last']}\n\n" \
