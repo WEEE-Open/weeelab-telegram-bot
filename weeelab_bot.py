@@ -288,7 +288,8 @@ def fah_grapher(bot: BotHandler, hour: int, minute: int):
             url = f"https://folding.extremeoverclocking.com/graphs/production_day_total.php?s=&t={team_number}"
 
             img_enc_png = s.get(url).content
-            bot.send
+            bot.send_photo(chat_id=WEEE_FOLD_ID,
+                           photo=img_enc_png)
 
         except Exception as e:
             print(e)
