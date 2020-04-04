@@ -237,11 +237,11 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             url = f"https://stats.foldingathome.org/api/team/{team_number}"
             json_res = requests.get(url).json()
 
-            top_40 = "\n".join([f"<b>{member['name']}</b> with <i>{human_readable_number(member['credit'])}</i> points,"
-                                f" <i>{member['wus']}</i> WUs%s"
+            top_40 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
+                                f"<i>{human_readable_number(member['credit'])}</i> points, <i>{member['wus']}</i> WUs%s"
                                 % f"""{f", rank <i>{human_readable_number(member['rank'])}</i>" 
                                        if 'rank' in member else ""}"""
-                                for member in json_res['donors'][:40]])
+                                for i, member in enumerate(json_res['donors'][:40])])
 
             text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
