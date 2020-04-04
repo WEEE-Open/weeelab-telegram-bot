@@ -1140,7 +1140,7 @@ def main():
     wol = WOL_MACHINES
 
     fah_text_hours = [
-        (8, 0),
+        (9, 0),
         (13, 37),
         (19, 0),
         (23, 0)
@@ -1149,6 +1149,9 @@ def main():
                      for h, m in fah_text_hours]
     for t in fah_ranker_ts:
         t.start()
+
+    fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
+    fah_grapher_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
 
