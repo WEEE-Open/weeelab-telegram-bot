@@ -31,6 +31,7 @@ from ToLab import ToLab
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
 import requests  # send HTTP requests to Telegram server
+from requests_html import HTMLSession
 # noinspection PyUnresolvedReferences
 import owncloud
 import datetime
@@ -256,6 +257,22 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                              parse_mode='HTML')
 
         except Exception as e:  # TODO: specify any expected Exception class
+            print(e)
+
+
+def fah_grapher(bot: BotHandler, hour: int, minute: int):
+    while True:
+        try:
+            sleep(calculate_time_to_sleep(hour, minute))
+
+            team_number = 249208
+            s = HTMLSession()
+            url = f"https://folding.extremeoverclocking.com/graphs/production_day_total.php?s=&t={team_number}"
+
+            img_enc_png = s.get(url).content
+            bot.send
+
+        except Exception as e:
             print(e)
 
 
