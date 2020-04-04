@@ -1,3 +1,5 @@
+from datetime import date
+from threading import Lock
 from time import time
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Tuple
@@ -113,6 +115,8 @@ class Users:
 class Person:
     uid: str
     cn: str
+    dateofbirth: Optional[date]
+    dateofsafetytest: Optional[date]
     isadmin: bool
     nickname: Optional[str]
     tgid: Optional[int]
@@ -124,17 +128,26 @@ class People:
         self.last_update = 0
         self.tree = tree
         self.admin_groups = admin_groups
+        self.lock = Lock()
 
     def get(self, uid: str, conn: LdapConnection) -> Optional[Person]:
-        if time() - self.last_update > 3600:
-            with conn as c:
-                print("Sync people from LDAP")
-                self.__sync(c)
+        self.refresh_if_necessary(conn)
         uid = uid.lower()
         if uid in self.__people:
             return self.__people[uid]
         else:
             return None
+
+    def getAll(self, conn: LdapConnection):
+        self.refresh_if_necessary(conn)
+        return self.__people.values()
+
+    def refresh_if_necessary(self, conn):
+        with self.lock:
+            if time() - self.last_update > 3600:
+                with conn as c:
+                    # print("Sync people from LDAP")
+                    self.__sync(c)
 
     def delete_cache(self) -> int:
         busted = len(self.__people)
@@ -148,13 +161,27 @@ class People:
             'cn',
             'memberof',
             'telegramnickname',
-            'telegramid'
+            'telegramid',
+            'schacdateofbirth',
+            'safetytestdate',
+            'nsaccountlock',
         ))
 
         for dn, attributes in result:
+            dob = attributes['dateofbirth'][0].decode() if 'dateofbirth' in attributes else None
+            dost = attributes['dateofsafetytest'][0].decode() if 'dateofsafetytest' in attributes else None
+
+            if dob is not None:
+                dob = date(year=dob[:4], month=dob[4:6], day=dob[6:8])
+
+            if dost is not None:
+                dost = date(year=dost[:4], month=dost[4:6], day=dost[6:8])
+
             person = Person(
                 attributes['uid'][0].decode(),
                 attributes['cn'][0].decode(),
+                dob,
+                dost,
                 User.is_admin(self.admin_groups, attributes),
                 attributes['telegramnickname'][0].decode() if 'telegramnickname' in attributes else None,
                 int(attributes['telegramid'][0].decode()) if 'telegramid' in attributes else None,
