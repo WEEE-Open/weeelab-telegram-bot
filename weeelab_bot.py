@@ -110,6 +110,24 @@ class BotHandler:
             params['reply_markup'] = {"inline_keyboard": reply_markup}
         self.__do_post('sendMessage', params)
 
+    def send_photo(self, chat_id, photo, caption: str = None, parse_mode: str = 'HTML',
+                   disable_notification: bool = False, reply_markup=None):
+        """
+        method to send photos [ Telegram API -> sendPhoto ]
+        On success, the sent Message is returned.
+        """
+        params = {
+            'chat_id': chat_id,
+            'photo': photo,
+            'caption': caption,
+            'parse_mode': parse_mode,
+            'disable_notification': disable_notification,
+            'reply_markup': reply_markup
+        }
+        if reply_markup is not None:
+            params['reply_markup'] = {"inline_keyboard": reply_markup}
+        self.__do_post('sendPhoto', params)
+
     def edit_message(self, chat_id: int, message_id: int, text: Optional[str] = None, reply_markup=None,
                      parse_mode='HTML', disable_web_page_preview=True):
         params = {
