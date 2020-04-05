@@ -1086,7 +1086,14 @@ as well.\nFor a list of the available commands type /help.', )
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins.")
             return
+        uptime_out = f"<code>{run_shell_cmd('uptime')}</code"
+        # enable if you want to check network speed, it takes 30ish seconds to run though
+        # st_out = f"<code>{run_shell_cmd('speedtest')}</code"
+        free_h_out = f"<code>{run_shell_cmd('free -h')}</code"
+        df_h_root_out = f"<code>{run_shell_cmd('df -h /')}</code"
+        python_out = f"<code>{run_shell_cmd('pgrep -a python')}</code"
 
+        self.__send_message("\n\n".join([uptime_out, free_h_out, df_h_root_out, python_out]))
 
     def birthday_wisher(self):
         """
