@@ -1306,6 +1306,9 @@ def main():
                     i_am_door = Thread(target=handler.i_am_door)
                     i_am_door.start()
 
+                elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
+                    handler.status()
+
                 else:
                     handler.unknown()
 
