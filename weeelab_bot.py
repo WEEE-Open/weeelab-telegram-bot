@@ -44,6 +44,7 @@ from time import sleep
 from remote_commands import ssh_weeelab_command, shutdown_command, ssh_i_am_door_command
 from ssh_util import SSHUtil
 from threading import Thread
+from random import choice
 
 
 class BotHandler:
@@ -1076,6 +1077,29 @@ as well.\nFor a list of the available commands type /help.', )
                 query == AcceptableQueriesShutdown.i_am_door_no:
             self.__edit_message(message_id, "Alright, we'll leave it alive. <i>For now.</i>", None)
 
+    def birthday_wisher(self):
+        """
+        This function is not a command, but needs to be a CommandHandler method because it requires the list of people
+        in our team and their birthdays
+        """
+        while True:
+            try:
+                sleep(calculate_time_to_sleep(hour=10, minute=0))
+
+                birthday_people = set(f"<b>{p.cn}</b>"
+                                      if p.dateofbirth and p.dateofbirth == datetime.date.today() else None
+                                      for p in self.people.getAll(self.conn))
+                birthday_people.remove(None)
+
+                if birthday_people:
+                    birthday_msg = f"Oggi è il compleanno di {' e '.join(birthday_people)}! <code>AUGUREEE!</code>\n" \
+                                   f"{'🎂' * choice(range(69))}"
+                    self.bot.send_message(chat_id=WEEE_CHAT_ID,
+                                          text=birthday_msg)
+
+            except Exception as e:
+                print(e)
+
     def unknown(self):
         """
         Called when an unknown command is received
@@ -1157,6 +1181,9 @@ def main():
     # fah_grapher_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
+
+    birthday_wisher_t = Thread(target=handler.birthday_wisher)
+    birthday_wisher_t.start()
 
     while True:
         # call the function to check if there are new messages
