@@ -18,7 +18,7 @@ pytarallo = "*"
 requests_html = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [scripts]
 bot = "python -u weeelab_bot.py"
