@@ -31,7 +31,7 @@ from ToLab import ToLab
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
 import requests  # send HTTP requests to Telegram server
-from requests_html import HTMLSession
+# from requests_html import HTMLSession
 # noinspection PyUnresolvedReferences
 import owncloud
 import datetime
@@ -1150,8 +1150,8 @@ def main():
     for t in fah_ranker_ts:
         t.start()
 
-    fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
-    fah_grapher_t.start()
+    # fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
+    # fah_grapher_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
 
