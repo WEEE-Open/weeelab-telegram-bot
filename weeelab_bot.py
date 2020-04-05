@@ -45,7 +45,7 @@ from remote_commands import ssh_weeelab_command, shutdown_command, ssh_i_am_door
 from ssh_util import SSHUtil
 from threading import Thread
 from random import choice
-
+from subprocess import run, PIPE
 
 class BotHandler:
     """
@@ -297,6 +297,11 @@ def fah_grapher(bot: BotHandler, hour: int, minute: int):
 
         except Exception as e:
             print(e)
+
+
+def run_shell_cmd(cmd: str) -> str:
+    cmd = cmd.strip().replace('  ', ' ').split(' ')  # is now a list of strings
+    return run(cmd, stdout=PIPE).stdout.decode('utf-8')
 
 
 class CommandHandler:
@@ -1076,6 +1081,12 @@ as well.\nFor a list of the available commands type /help.', )
         elif query == AcceptableQueriesShutdown.logout_no or \
                 query == AcceptableQueriesShutdown.i_am_door_no:
             self.__edit_message(message_id, "Alright, we'll leave it alive. <i>For now.</i>", None)
+
+    def status(self):
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins.")
+            return
+
 
     def birthday_wisher(self):
         """
