@@ -256,6 +256,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             url = f"https://stats.foldingathome.org/api/team/{team_number}"
             json_res = requests.get(url).json()
 
+            if 'error' in json_res:
+                continue
+
             top_40 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
                                 f"<i>{human_readable_number(member['credit'])}</i> points, <i>{member['wus']}</i> WUs%s"
                                 % f"""{f", rank <i>{human_readable_number(member['rank'])}</i>" 
