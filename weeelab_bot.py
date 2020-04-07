@@ -96,7 +96,8 @@ class BotHandler:
             print("Failed to get updates: " + str(e))
             return None
 
-    def send_message(self, chat_id, text, parse_mode='HTML', disable_web_page_preview=True, reply_markup=None):
+    def send_message(self, chat_id, text, parse_mode='HTML', disable_notification: bool = False,
+                     disable_web_page_preview: bool = True, reply_markup=None):
         """
         method to send text messages [ Telegram API -> sendMessage ]
         On success, the sent Message is returned.
@@ -106,6 +107,7 @@ class BotHandler:
             'text': text,
             'parse_mode': parse_mode,
             'disable_web_page_preview': disable_web_page_preview,
+            'disable_notification': disable_notification
         }
         if reply_markup is not None:
             params['reply_markup'] = {"inline_keyboard": reply_markup}
