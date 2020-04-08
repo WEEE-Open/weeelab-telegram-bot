@@ -1121,6 +1121,32 @@ as well.\nFor a list of the available commands type /help.', )
             except Exception as e:
                 print(e)
 
+    def safety_test_reminder(self):
+        """
+        This function is not a command, but needs to be a CommandHandler method because it requires the list of people
+        in our team and their safety test dates
+        """
+        while True:
+            try:
+                # send notification early in the morning - worst case scenario, the test is at 8.30 a.m.
+                sleep(calculate_time_to_sleep(hour=7, minute=30))
+
+                test_people = []
+                for p in self.people.getAll(self.conn):
+                    if p.accountlocked and p.dateofsafetytest and p.dateofsafetytest == datetime.date.today():
+                        if p.tgid:
+                            test_people.append(f'<a href="tg://user?id={p.tgid}>{p.cn}</a>')
+                        else:
+                            test_people.append(p.cn)
+
+                if test_people:
+                    reminder_msg = f"⚠️⚠️⚠️\nOggi c'è il <b>test di sicurezza</b> di:\n{', '.join(test_people)}"
+                    self.bot.send_message(chat_id=WEEE_CHAT2_ID,
+                                          text=reminder_msg)
+
+            except Exception as e:
+                print(e)
+
     def unknown(self):
         """
         Called when an unknown command is received
