@@ -120,6 +120,7 @@ class Person:
     isadmin: bool
     nickname: Optional[str]
     tgid: Optional[int]
+    accountlocked: Optional[bool]
 
 
 class People:
@@ -185,6 +186,7 @@ class People:
                 User.is_admin(self.admin_groups, attributes),
                 attributes['telegramnickname'][0].decode() if 'telegramnickname' in attributes else None,
                 int(attributes['telegramid'][0].decode()) if 'telegramid' in attributes else None,
+                'nsaccountlocked' in attributes
             )
             self.__people[person.uid.lower()] = person
 
