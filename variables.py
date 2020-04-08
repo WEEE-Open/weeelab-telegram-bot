@@ -55,3 +55,4 @@ MAX_WORK_DONE = int(os.environ.get('MAX_WORK_DONE'))  # 2000
 
 WEEE_CHAT_ID = int(os.environ.get('WEEE_CHAT_ID'))
 WEEE_FOLD_ID = int(os.environ.get('WEEE_FOLD_ID'))
+WEEE_CHAT2_ID = int(os.environ.get('WEEE_CHAT2_ID'))
