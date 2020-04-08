@@ -169,14 +169,14 @@ class People:
         ))
 
         for dn, attributes in result:
-            dob = attributes['dateofbirth'][0].decode() if 'dateofbirth' in attributes else None
-            dost = attributes['dateofsafetytest'][0].decode() if 'dateofsafetytest' in attributes else None
+            dob = attributes['schacdateofbirth'][0].decode() if 'schacdateofbirth' in attributes else None
+            dost = attributes['safetytestdate'][0].decode() if 'safetytestdate' in attributes else None
 
             if dob is not None:
-                dob = date(year=dob[:4], month=dob[4:6], day=dob[6:8])
+                dob = date(year=int(dob[:4]), month=int(dob[4:6]), day=int(dob[6:8]))
 
             if dost is not None:
-                dost = date(year=dost[:4], month=dost[4:6], day=dost[6:8])
+                dost = date(year=int(dost[:4]), month=int(dost[4:6]), day=int(dost[6:8]))
 
             person = Person(
                 attributes['uid'][0].decode(),
