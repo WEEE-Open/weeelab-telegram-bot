@@ -1107,8 +1107,9 @@ as well.\nFor a list of the available commands type /help.', )
                 sleep(calculate_time_to_sleep(hour=10, minute=0))
 
                 birthday_people = set(f"<b>{p.cn}</b>"
-                                      if not p.accountlocked and
-                                      p.dateofbirth and p.dateofbirth == datetime.date.today() else None
+                                      if not p.accountlocked and p.dateofbirth and
+                                      (p.dateofbirth.month == datetime.date.today().month and
+                                       p.dateofbirth.day == datetime.date.today().day) else None
                                       for p in self.people.getAll(self.conn))
                 birthday_people.remove(None)
 
