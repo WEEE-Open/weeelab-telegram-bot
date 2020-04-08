@@ -1233,6 +1233,9 @@ def main():
     birthday_wisher_t = Thread(target=handler.birthday_wisher)
     birthday_wisher_t.start()
 
+    safety_test_reminder_t = Thread(target=handler.safety_test_reminder)
+    safety_test_reminder_t.start()
+
     while True:
         # call the function to check if there are new messages
         last_update = bot.get_last_update()
