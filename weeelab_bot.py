@@ -1118,6 +1118,7 @@ as well.\nFor a list of the available commands type /help.', )
                                    f"{'🎂' * choice(range(69, 420))}"
                     self.bot.send_message(chat_id=WEEE_CHAT_ID,
                                           text=birthday_msg)
+                    sleep(60)
 
             except Exception as e:
                 print(e)
@@ -1144,6 +1145,7 @@ as well.\nFor a list of the available commands type /help.', )
                     reminder_msg = f"⚠️⚠️⚠️\nOggi c'è il <b>test di sicurezza</b> di:\n{', '.join(test_people)}"
                     self.bot.send_message(chat_id=WEEE_CHAT2_ID,
                                           text=reminder_msg)
+                    sleep(60)
 
             except Exception as e:
                 print(e)
