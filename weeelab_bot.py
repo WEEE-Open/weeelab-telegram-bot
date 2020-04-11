@@ -1255,7 +1255,8 @@ def main():
                 # Leave scam channels where people add our bot randomly
                 chat_id = last_update['channel_post']['chat']['id']
                 print(bot.leave_chat(chat_id).text)
-            elif 'message' in last_update:
+            # see https://core.telegram.org/bots/api#message
+            elif 'message' in last_update and 'text' in last_update['message']:
                 # Handle private messages
                 command = last_update['message']['text'].split()
                 message_type = last_update['message']['chat']['type']
