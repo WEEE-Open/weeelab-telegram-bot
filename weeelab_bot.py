@@ -1220,8 +1220,7 @@ def main():
     fah_text_hours = [
         (9, 0),
         (13, 37),
-        (19, 0),
-        (23, 0)
+        (22, 0)
     ]
     fah_ranker_ts = [Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), h, m))
                      for h, m in fah_text_hours]
@@ -1255,6 +1254,7 @@ def main():
                 # Leave scam channels where people add our bot randomly
                 chat_id = last_update['channel_post']['chat']['id']
                 print(bot.leave_chat(chat_id).text)
+                
             # see https://core.telegram.org/bots/api#message
             elif 'message' in last_update and 'text' in last_update['message']:
                 # Handle private messages
