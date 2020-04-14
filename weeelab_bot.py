@@ -1115,7 +1115,8 @@ as well.\nFor a list of the available commands type /help.', )
                 birthday_people.remove(None)
 
                 if birthday_people:
-                    birthday_msg = f"Oggi è il compleanno di {' e '.join(birthday_people)}! <code>AugurEEE!!!</code>\n"\
+                    birthday_msg = f"{'🎂' * 42}\n\n"\
+                                f"Oggi è il compleanno di {' e '.join(birthday_people)}! <code>AugurEEE!!!</code>\n\n" \
                                    f"{'🎂' * 42}"
                     self.bot.send_message(chat_id=WEEE_CHAT_ID,
                                           text=birthday_msg)
