@@ -1106,7 +1106,9 @@ as well.\nFor a list of the available commands type /help.', )
             try:
                 sleep(calculate_time_to_sleep(hour=10, minute=0))
 
-                birthday_people = set(f"""{p.cn} {f' (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'
+                birthday_people = set(f"""{p.cn if '"' not in p.cn or not p.nickname
+                                                else p.cn.split('"')[0][:-1] + p.cn.split('"')[2]}
+                                      {f' (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'
                                       if p.tgid and p.nickname else ""}"""
                                       if not p.accountlocked and p.dateofbirth and
                                       (p.dateofbirth.month == datetime.date.today().month and
