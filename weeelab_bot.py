@@ -1107,7 +1107,8 @@ as well.\nFor a list of the available commands type /help.', )
                 sleep(calculate_time_to_sleep(hour=10, minute=0))
 
                 # if no nickname -> tag on cn
-                # else, if " in cn -> tag on
+                # else, if " in cn -> tag on quoted nickname between "double quotes" in cn
+                #       else -> tag on tag on telegram nickname between (parentheses) after cn
                 birthday_people = set(f"""{f'<b><a href="tg://user?id={p.tgid}">{p.cn}</a></b>' if not p.nickname
                                       else f'''{p.cn} (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'''
                                            if '"' not in p.cn
