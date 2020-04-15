@@ -1106,19 +1106,21 @@ as well.\nFor a list of the available commands type /help.', )
             try:
                 sleep(calculate_time_to_sleep(hour=10, minute=0))
 
-                birthday_people = set(f"""{p.cn if '"' not in p.cn or not p.nickname
-                                                else p.cn.split('"')[0][:-1] + p.cn.split('"')[2]}{f' (<b><a '
-                                      f'href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'
-                                      if p.tgid and p.nickname else ""}"""
-                                      if not p.accountlocked and p.dateofbirth and
-                                      (p.dateofbirth.month == datetime.date.today().month and
-                                       p.dateofbirth.day == datetime.date.today().day) else None
+                # if no nickname -> tag on cn
+                # else, if " in cn -> tag on
+                birthday_people = set(f"""{f'<b><a href="tg://user?id={p.tgid}">{p.cn}</a></b>' if not p.nickname
+                                      else f'''{p.cn} (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'''
+                                           if '"' not in p.cn
+                                           else f'''{p.cn.split('"')[0]}"<b><a href="tg://user?id={p.tgid}">{p.cn.split('"')[1]}</a></b>"{p.cn.split('"')[2]}'''}"""
+                                      if not p.accountlocked and p.tgid and p.dateofbirth and
+                                         (p.dateofbirth.month == datetime.date.today().month and
+                                          p.dateofbirth.day == datetime.date.today().day) else None
                                       for p in self.people.getAll(self.conn))
                 birthday_people.remove(None)
 
                 if birthday_people:
                     birthday_msg = f"{'🎂' * 42}\n\n" \
-                                f"Oggi è il compleanno di {' e '.join(birthday_people)}!\n<code>AugurEEE!!!</code>" \
+                                   f"Oggi è il compleanno di {' e '.join(birthday_people)}!\n<code>AugurEEE!!!</code>" \
                                    f"\n\n{'🎂' * 42}"
                     self.bot.send_message(chat_id=WEEE_CHAT_ID,
                                           text=birthday_msg)
