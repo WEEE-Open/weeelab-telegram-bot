@@ -257,9 +257,15 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
 
             team_number = 249208
             url = f"https://stats.foldingathome.org/api/team/{team_number}"
-            json_res = requests.get(url).json()
+            for _ in range(10):
+                response = requests.get(url)
+                json_res = response.json()
+                json_is_invalid = str(response.status_code).startswith('4') or 'error' in json_res
+                if json_is_invalid:
+                    sleep(1)
+                    continue
 
-            if 'error' in json_res:
+            if json_is_invalid:
                 continue
 
             top_20 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
