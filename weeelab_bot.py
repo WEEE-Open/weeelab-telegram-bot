@@ -260,8 +260,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             for _ in range(10):
                 response = requests.get(url)
                 json_res = response.json()
-                json_is_invalid = str(response.status_code).startswith('4') or 'error' in json_res
-                if json_is_invalid:
+                if str(response.status_code).startswith('4') or 'error' in json_res:
                     sleep(1)
                     continue
                 else:
