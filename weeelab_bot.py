@@ -262,11 +262,11 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             if 'error' in json_res:
                 continue
 
-            top_40 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
+            top_20 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
                                 f"<i>{human_readable_number(member['credit'])}</i> points, <i>{member['wus']}</i> WUs%s"
                                 % f"""{f", rank <i>{human_readable_number(member['rank'])}</i>" 
                                        if 'rank' in member else ""}"""
-                                for i, member in enumerate(json_res['donors'][:40])])
+                                for i, member in enumerate(json_res['donors'][:20])])
 
             text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
@@ -274,7 +274,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                    f"/ {human_readable_number(json_res['total_teams'])} " \
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
                    f"Last update: {json_res['last']}\n\n" \
-                   f"Top members:\n{top_40}"
+                   f"Top members:\n{top_20}"
 
             bot.send_message(chat_id=WEEE_FOLD_ID,
                              text=text,
