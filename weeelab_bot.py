@@ -264,8 +264,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                 if json_is_invalid:
                     sleep(1)
                     continue
-
-            if json_is_invalid:
+                else:
+                    break
+            else:
                 continue
 
             top_20 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
