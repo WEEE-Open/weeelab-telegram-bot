@@ -1103,6 +1103,20 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.__send_message("\n\n".join([uptime_out, free_h_out, df_h_root_out, python_out]))
 
+    @staticmethod
+    def __get_telegram_link_to_person(p: Person) -> str:
+        """
+        :param p: Person object from the team's LDAP
+        :return: Telegram-formatted string that links to the person's profile and tags them in a message
+        """
+        # if no nickname -> tag on cn
+        # else, if " in cn -> tag on quoted nickname between "double quotes" in cn
+        #       else -> tag on tag on telegram nickname between (parentheses) after cn
+        return f"""{f'<b><a href="tg://user?id={p.tgid}">{p.cn}</a></b>' if not p.nickname
+        else f'''{p.cn} (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'''
+        if '"' not in p.cn
+        else f'''{p.cn.split('"')[0]}"<b><a href="tg://user?id={p.tgid}">{p.cn.split('"')[1]}</a></b>"{p.cn.split('"')[2]}'''}"""
+
     def __sorted_birthday_people(self) -> List[Person]:
         """
         :return: list of people sorted by birth date
@@ -1131,20 +1145,6 @@ as well.\nFor a list of the available commands type /help.', )
                                f"in {(datetime.date(year=datetime.date.today().year, month=p.dateofbirth.month, day=p.dateofbirth.day) - datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=datetime.date.today().day)).days} day(s)"
                                for p in self.__next_birthday_people()])
         self.__send_message(f"The people who have a coming birthday 🎂 are:\n\n{bd_people}")
-
-    @staticmethod
-    def __get_telegram_link_to_person(p: Person) -> str:
-        """
-        :param p: Person object from the team's LDAP
-        :return: Telegram-formatted string that links to the person's profile and tags them in a message
-        """
-        # if no nickname -> tag on cn
-        # else, if " in cn -> tag on quoted nickname between "double quotes" in cn
-        #       else -> tag on tag on telegram nickname between (parentheses) after cn
-        return f"""{f'<b><a href="tg://user?id={p.tgid}">{p.cn}</a></b>' if not p.nickname
-                    else f'''{p.cn} (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'''
-                         if '"' not in p.cn
-                         else f'''{p.cn.split('"')[0]}"<b><a href="tg://user?id={p.tgid}">{p.cn.split('"')[1]}</a></b>"{p.cn.split('"')[2]}'''}"""
 
     def birthday_wisher(self):
         """
