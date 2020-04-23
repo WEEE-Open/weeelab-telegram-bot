@@ -1129,6 +1129,13 @@ as well.\nFor a list of the available commands type /help.', )
 
 
     def __get_telegram_link_to_person(self, p: Person) -> str:
+        """
+        :param p: Person object from the team's LDAP
+        :return: Telegram-formatted string that links to the person's profile and tags them in a message
+        """
+        # if no nickname -> tag on cn
+        # else, if " in cn -> tag on quoted nickname between "double quotes" in cn
+        #       else -> tag on tag on telegram nickname between (parentheses) after cn
         return f"""{f'<b><a href="tg://user?id={p.tgid}">{p.cn}</a></b>' if not p.nickname
                     else f'''{p.cn} (<b><a href="tg://user?id={p.tgid}">{p.nickname}</a></b>)'''
                          if '"' not in p.cn
@@ -1143,9 +1150,6 @@ as well.\nFor a list of the available commands type /help.', )
             try:
                 sleep(calculate_time_to_sleep(hour=10, minute=0))
 
-                # if no nickname -> tag on cn
-                # else, if " in cn -> tag on quoted nickname between "double quotes" in cn
-                #       else -> tag on tag on telegram nickname between (parentheses) after cn
                 birthday_people = set(self.__get_telegram_link_to_person(p)
                                       if not p.accountlocked and p.tgid and p.dateofbirth and
                                          (p.dateofbirth.month == datetime.date.today().month and
