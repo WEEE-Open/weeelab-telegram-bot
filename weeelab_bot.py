@@ -1205,7 +1205,8 @@ as well.\nFor a list of the available commands type /help.', )
                                  f"on {str(p.dateofsafetytest.day).zfill(2)}/{str(p.dateofsafetytest.month).zfill(2)}/{str(p.dateofsafetytest.year).zfill(4)} "
                                  f"in {(p.dateofsafetytest - datetime.date.today()).days} day(s)"
                                  for p in self.__next_test_people()])
-        self.__send_message(f"The people who have a coming safety test 🛠 are:\n\n{test_people}")
+        self.__send_message(f"The people who have a coming safety test 🛠 are:\n\n{test_people}"
+                            if test_people else "No safety tests planned at the moment.")
 
     def safety_test_reminder(self):
         """
