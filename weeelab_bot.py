@@ -1125,10 +1125,11 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins.")
             return
 
-        bd_people = '\n'.join([f"{self.__get_telegram_link_to_person(p)}" for p in self.__next_birthday_people()])
+        bd_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)}" for p in self.__next_birthday_people()])
         self.__send_message(f"The people who have a coming birthday 🎂 are:\n{bd_people}")
 
-    def __get_telegram_link_to_person(self, p: Person) -> str:
+    @staticmethod
+    def __get_telegram_link_to_person(p: Person) -> str:
         """
         :param p: Person object from the team's LDAP
         :return: Telegram-formatted string that links to the person's profile and tags them in a message
@@ -1150,7 +1151,7 @@ as well.\nFor a list of the available commands type /help.', )
             try:
                 sleep(calculate_time_to_sleep(hour=10, minute=0))
 
-                birthday_people = set(self.__get_telegram_link_to_person(p)
+                birthday_people = set(CommandHandler.__get_telegram_link_to_person(p)
                                       if not p.accountlocked and p.tgid and p.dateofbirth and
                                          (p.dateofbirth.month == datetime.date.today().month and
                                           p.dateofbirth.day == datetime.date.today().day) else None
