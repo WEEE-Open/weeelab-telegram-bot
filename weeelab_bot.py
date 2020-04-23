@@ -1240,7 +1240,8 @@ Note: the logout message cannot contain double quotes characters such as " """
 /logout <i>username</i> <i>description of what they've done</i> - Logout a user with weeelab
 /wol - Spawns a keyboard with machines an admin can Wake On LAN
 /door - sonoporta
-/status - Show host machine uptime, load, memory and disk usage"""
+/status - Show host machine uptime, load, memory and disk usage
+/nextbirthdays - Show next people who will have a birthday"""
         self.__send_message(help_message)
 
 
