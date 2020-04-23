@@ -1103,6 +1103,22 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.__send_message("\n\n".join([uptime_out, free_h_out, df_h_root_out, python_out]))
 
+    def __sorted_birthday_people(self, n: int) -> List[Person]:
+        """
+        :param n: number of people
+        :return list of n people with coming birthdays, sorted by birth date
+        """
+        return sorted([p for p in self.people.getAll(self.conn) if not p.accountlocked and p.dateofbirth],
+                      key=lambda p: datetime.datetime.strptime(f"{p.dateofbirth.month}-{p.dateofbirth.day}",
+                                                               '%m-%d').date())[:n]
+
+    def next_birthdays(self):
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins.")
+            return
+
+
+
     def birthday_wisher(self):
         """
         This function is not a command, but needs to be a CommandHandler method because it requires the list of people
