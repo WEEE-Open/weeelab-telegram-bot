@@ -1117,23 +1117,29 @@ as well.\nFor a list of the available commands type /help.', )
         if '"' not in p.cn
         else f'''{p.cn.split('"')[0]}"<b><a href="tg://user?id={p.tgid}">{p.cn.split('"')[1]}</a></b>"{p.cn.split('"')[2]}'''}"""
 
+    @staticmethod
+    def __get_next_birthday_of_person(p: Person) -> datetime.date:
+        t = datetime.date.today()
+        return datetime.date(year=t.year if (p.dateofbirth.month == t.month
+                                             and p.dateofbirth.day > t.day)
+                                            or p.dateofbirth.month > t.month
+                                         else t.year + 1,
+                             month=p.dateofbirth.month,
+                             day=p.dateofbirth.day) if p.dateofbirth else None
+
     def __sorted_birthday_people(self) -> List[Person]:
         """
         :return: list of people sorted by birth date
         """
         return sorted([p for p in self.people.getAll(self.conn) if not p.accountlocked and p.dateofbirth],
-                      key=lambda p: datetime.datetime.strptime(f"{p.dateofbirth.month}-{p.dateofbirth.day}",
-                                                               '%m-%d').date())
+                      key=lambda p: CommandHandler.__get_next_birthday_of_person(p))
 
     def __next_birthday_people(self, n: int = 3) -> List[Person]:
         """
         :param n: optional number of people (defaults to 3)
         :return: list of n people with coming birthdays, sorted by birth date
         """
-        return [p for p in self.__sorted_birthday_people()
-                if (p.dateofbirth.month == datetime.date.today().month
-                    and p.dateofbirth.day > datetime.date.today().day)
-                or (p.dateofbirth.month > datetime.date.today().month)][:n]
+        return self.__sorted_birthday_people()[:n]
 
     def next_birthdays(self):
         if not self.user.isadmin:
@@ -1142,7 +1148,7 @@ as well.\nFor a list of the available commands type /help.', )
 
         bd_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)} "
                                f"on {str(p.dateofbirth.day).zfill(2)}/{str(p.dateofbirth.month).zfill(2)} "
-                               f"in {(datetime.date(year=datetime.date.today().year, month=p.dateofbirth.month, day=p.dateofbirth.day) - datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=datetime.date.today().day)).days} day(s)"
+                               f"in {(CommandHandler.__get_next_birthday_of_person(p) - datetime.date.today()).days} day(s)"
                                for p in self.__next_birthday_people()])
         self.__send_message(f"The people who have a coming birthday 🎂 are:\n\n{bd_people}")
 
@@ -1197,7 +1203,7 @@ as well.\nFor a list of the available commands type /help.', )
 
         test_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)} "
                                  f"on {str(p.dateofsafetytest.day).zfill(2)}/{str(p.dateofsafetytest.month).zfill(2)}/{str(p.dateofsafetytest.year).zfill(4)} "
-                                 f"in {(datetime.date(year=p.dateofsafetytest.year, month=p.dateofsafetytest.month, day=p.dateofsafetytest.day) - datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=datetime.date.today().day)).days} day(s)"
+                                 f"in {(p.dateofsafetytest - datetime.date.today()).days} day(s)"
                                  for p in self.__next_test_people()])
         self.__send_message(f"The people who have a coming safety test 🛠 are:\n\n{test_people}")
 
