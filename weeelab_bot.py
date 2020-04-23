@@ -1428,6 +1428,9 @@ def main():
                 elif command[0] == "/nextbirthdays" or command[0] == "/nextbirthdays@weeelab_bot":
                     handler.next_birthdays()
 
+                elif command[0] == "/nexttests" or command[0] == "/nexttests@weeelab_bot":
+                    handler.next_tests()
+
                 else:
                     handler.unknown()
 
