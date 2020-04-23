@@ -1392,6 +1392,9 @@ def main():
                 elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
                     handler.status()
 
+                elif command[0] == "/nextbirthdays" or command[0] == "/nextbirthdays@weeelab_bot":
+                    handler.next_birthdays()
+
                 else:
                     handler.unknown()
 
