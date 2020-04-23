@@ -1105,16 +1105,28 @@ as well.\nFor a list of the available commands type /help.', )
 
     def __sorted_birthday_people(self) -> List[Person]:
         """
-        :return list of n people with coming birthdays, sorted by birth date
+        :return: list of people sorted by birth date
         """
         return sorted([p for p in self.people.getAll(self.conn) if not p.accountlocked and p.dateofbirth],
                       key=lambda p: datetime.datetime.strptime(f"{p.dateofbirth.month}-{p.dateofbirth.day}",
                                                                '%m-%d').date())
 
+    def __next_birthday_people(self, n: int = 3) -> List[Person]:
+        """
+        :param n: optional number of people (defaults to 3)
+        :return: list of n people with coming birthdays, sorted by birth date
+        """
+        return [p for p in self.__sorted_birthday_people()
+                if p.dateofbirth.month >= datetime.date.today().month
+                and p.dateofbirth.day >= datetime.date.today().day][:n]
+
     def next_birthdays(self):
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins.")
             return
+
+        bd_people = self.__next_birthday_people()
+
 
 
 
