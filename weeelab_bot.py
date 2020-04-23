@@ -1125,8 +1125,8 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Sorry, this is a feature reserved to admins.")
             return
 
-        bd_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)}" for p in self.__next_birthday_people()])
-        self.__send_message(f"The people who have a coming birthday 🎂 are:\n{bd_people}")
+        bd_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)} on {p.dateofbirth.day}/{p.dateofbirth.month}" for p in self.__next_birthday_people()])
+        self.__send_message(f"The people who have a coming birthday 🎂 are:\n\n{bd_people}")
 
     @staticmethod
     def __get_telegram_link_to_person(p: Person) -> str:
