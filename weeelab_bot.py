@@ -1117,8 +1117,9 @@ as well.\nFor a list of the available commands type /help.', )
         :return: list of n people with coming birthdays, sorted by birth date
         """
         return [p for p in self.__sorted_birthday_people()
-                if p.dateofbirth.month >= datetime.date.today().month
-                and p.dateofbirth.day >= datetime.date.today().day][:n]
+                if (p.dateofbirth.month == datetime.date.today().month
+                    and p.dateofbirth.day > datetime.date.today().day)
+                or (p.dateofbirth.month > datetime.date.today().month)][:n]
 
     def next_birthdays(self):
         if not self.user.isadmin:
