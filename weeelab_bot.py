@@ -1127,7 +1127,8 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         bd_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)} "
-                               f"on {str(p.dateofbirth.day).zfill(2)}/{str(p.dateofbirth.month).zfill(2)}"
+                               f"on {str(p.dateofbirth.day).zfill(2)}/{str(p.dateofbirth.month).zfill(2)} "
+                               f"in {(datetime.date(year=datetime.date.today().year, month=p.dateofbirth.month, day=p.dateofbirth.day) - datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=datetime.date.today().day)).days} day(s)"
                                for p in self.__next_birthday_people()])
         self.__send_message(f"The people who have a coming birthday 🎂 are:\n\n{bd_people}")
 
