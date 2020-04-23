@@ -1173,6 +1173,34 @@ as well.\nFor a list of the available commands type /help.', )
             except Exception as e:
                 print(e)
 
+    def __sorted_test_people(self) -> List[Person]:
+        """
+        :return: list of people sorted by safety test date
+        """
+        return sorted([p for p in self.people.getAll(self.conn) if not p.accountlocked and p.dateofsafetytest],
+                      key=lambda p: p.dateofsafetytest)
+
+    def __next_test_people(self) -> List[Person]:
+        """
+        :return: list of people with coming safety tests, sorted by date
+        """
+        return [p for p in self.__sorted_test_people()
+                if p.dateofsafetytest.year >= datetime.date.today().year
+                and ((p.dateofsafetytest.month == datetime.date.today().month
+                     and p.dateofsafetytest.day >= datetime.date.today().day)
+                     or (p.dateofsafetytest.month > datetime.date.today().month))]
+
+    def next_tests(self):
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins.")
+            return
+
+        test_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)} "
+                                 f"on {str(p.dateofsafetytest.day).zfill(2)}/{str(p.dateofsafetytest.month).zfill(2)}/{str(p.dateofsafetytest.year).zfill(4)} "
+                                 f"in {(datetime.date(year=p.dateofsafetytest.year, month=p.dateofsafetytest.month, day=p.dateofsafetytest.day) - datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=datetime.date.today().day)).days} day(s)"
+                                 for p in self.__next_test_people()])
+        self.__send_message(f"The people who have a coming safety test 🛠 are:\n\n{test_people}")
+
     def safety_test_reminder(self):
         """
         This function is not a command, but needs to be a CommandHandler method because it requires the list of people
