@@ -1126,7 +1126,7 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         bd_people = '\n'.join([f"{self.__get_telegram_link_to_person(p)}" for p in self.__next_birthday_people()])
-
+        self.__send_message(f"The people who have a coming birthday 🎂 are:\n{bd_people}")
 
     def __get_telegram_link_to_person(self, p: Person) -> str:
         """
