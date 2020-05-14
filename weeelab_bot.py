@@ -1306,8 +1306,8 @@ def main():
 
     fah_text_hours = [
         (9, 0),
-        (13, 37),
-        (22, 0)
+        # (13, 37),
+        # (22, 0)
     ]
     fah_ranker_ts = [Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), h, m))
                      for h, m in fah_text_hours]
