@@ -491,9 +491,9 @@ as well.\nFor a list of the available commands type /help.', )
                 msg += '\nAre you going, too? Tell everyone with /tolab.'
         else:
             if right_now.hour > 19:
-                msg += '\n\nAre you going to go the lab tomorrow? Tell everyone with /tolab.'
+                msg += '\n\nAre you going to the lab tomorrow? Tell everyone with /tolab.'
             elif not user_themself_inlab:
-                msg += '\n\nAre you going to go the lab later? Tell everyone with /tolab.'
+                msg += '\n\nAre you going to the lab later? Tell everyone with /tolab.'
 
         if len(inlab) > 0 and not user_themself_inlab:
             msg += "\nUse /ring for the bell, if you are at door 3."
