@@ -18,6 +18,7 @@ Author: WEEE Open Team
 
 # Modules
 import json
+from json import JSONDecodeError
 from typing import Optional, List
 
 from pytarallo.AuditEntry import AuditEntry, AuditChanges
@@ -267,6 +268,24 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                     break
             else:
                 continue
+
+            # save data to JSON
+            json_history = "fah_history.json"
+            json_history_content = {}
+            try:
+                with open(json_history, 'r') as inf:
+                    json_history_content = json.load(inf)
+                json_history_content[json_res['last']] = {donor: json_res['donors'][donor]['credit']
+                                                          for donor in json_res['donors']}
+                with open(json_history, 'w') as outf:
+                    json.dump(json_history_content, outf)
+
+            except TypeError as te:
+                print(te)
+            except JSONDecodeError as jde:
+                print(jde)
+            except FileNotFoundError as fnfe:
+                print(fnfe)
 
             top_20 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
                                 f"<i>{human_readable_number(member['credit'])}</i> points, <i>{member['wus']}</i> WUs%s"
