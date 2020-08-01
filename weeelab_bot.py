@@ -1078,6 +1078,9 @@ as well.\nFor a list of the available commands type /help.', )
         elif machine == Machines.piall:
             yes = AcceptableQueriesShutdown.i_am_door_yes.value
             no = AcceptableQueriesShutdown.i_am_door_no.value
+        else:
+            self.__send_message("That machine does not exist!")
+            return
 
         message = "Do you want to shutdown the machine now?"
         reply_markup = [
