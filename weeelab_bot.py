@@ -277,6 +277,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                 try:
                     with open(json_history, 'r') as inf:
                         json_history_content = json.load(inf)
+                        previous_snapshot_key = max(k for k, v in json_history_content.items())
+                        previous_score = sum(v for k, v in json_history_content[previous_snapshot_key].items())
+
                 except FileNotFoundError:
                     # create file if it doesn't exist
                     new_file = True
@@ -298,11 +301,15 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                                        if 'rank' in member else ""}"""
                                 for i, member in enumerate(json_res['donors'][:20])])
 
+            # calculate daily increase
+            delta = f"Daily increase: <b>{json_res['credit'] - previous_score}</b>\n" if not new_file else ""
+
             text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
                    f"Team Rank: {human_readable_number(json_res['rank'])} " \
                    f"/ {human_readable_number(json_res['total_teams'])} " \
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
+                   f"{delta}" \
                    f"Last update: {json_res['last']}\n\n" \
                    f"Top members:\n{top_20}"
 
