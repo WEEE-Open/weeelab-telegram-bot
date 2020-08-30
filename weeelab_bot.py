@@ -295,11 +295,11 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             except JSONDecodeError as jde:
                 print(jde)
 
-            top_20 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
+            top_10 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
                                 f"<i>{human_readable_number(member['credit'])}</i> points, <i>{member['wus']}</i> WUs%s"
                                 % f"""{f", rank <i>{human_readable_number(member['rank'])}</i>" 
                                        if 'rank' in member else ""}"""
-                                for i, member in enumerate(json_res['donors'][:20])])
+                                for i, member in enumerate(json_res['donors'][:10])])
 
             # calculate daily increase
             delta = f"Daily increase: <b>{json_res['credit'] - previous_score}</b>\n" if not new_file else ""
@@ -311,7 +311,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
                    f"{delta}" \
                    f"Last update: {json_res['last']}\n\n" \
-                   f"Top members:\n{top_20}"
+                   f"Top members:\n{top_10}"
 
             bot.send_message(chat_id=WEEE_FOLD_ID,
                              text=text,
