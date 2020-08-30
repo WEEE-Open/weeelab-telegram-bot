@@ -280,6 +280,22 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                         previous_snapshot_key = max(k for k, v in json_history_content.items())
                         previous_score = sum(v for k, v in json_history_content[previous_snapshot_key].items())
 
+                        donors_previous_score = {donor['name']: donor['credit']
+                                                 for donor in json_res['donors']}
+                        # associate daily increase to each name
+                        donors_daily_score = {name: donors_previous_score[name] - score
+                                              for name, score in json_history_content[previous_snapshot_key].items()}
+                        # sort by top score first
+                        top_3_donors_by_daily_score = {k: v
+                                                       for k, v in sorted(donors_daily_score.items(),
+                                                                          key=lambda item: item[1],
+                                                                          reverse=True)[:3]}
+                        top_3 = "\n".join([f"<code>#{i+1}</code> <b>{name}</b> with "
+                                           f"<i>{human_readable_number(score)}</i> points"
+                                           if score > 0 else ""
+                                           for i, (name, score) in
+                                           enumerate(top_3_donors_by_daily_score.items())])
+
                 except FileNotFoundError:
                     # create file if it doesn't exist
                     new_file = True
@@ -301,16 +317,19 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                                        if 'rank' in member else ""}"""
                                 for i, member in enumerate(json_res['donors'][:10])])
 
-            # calculate daily increase
             delta = f"Daily increase: <b>{json_res['credit'] - previous_score}</b>\n" if not new_file else ""
+            top_3_daily = ""
+            if not new_file:
+                top_3_daily = f"Daily MVPs:\n{top_3}" if top_3 else "No MVPs today since the score has not increased."
 
             text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
                    f"Team Rank: {human_readable_number(json_res['rank'])} " \
                    f"/ {human_readable_number(json_res['total_teams'])} " \
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
-                   f"{delta}" \
                    f"Last update: {json_res['last']}\n\n" \
+                   f"{delta}" \
+                   f"{top_3_daily}\n" \
                    f"Top members:\n{top_10}"
 
             bot.send_message(chat_id=WEEE_FOLD_ID,
