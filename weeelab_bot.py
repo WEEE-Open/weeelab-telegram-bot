@@ -320,7 +320,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             delta = f"Daily increase: <b>{json_res['credit'] - previous_score}</b>\n" if not new_file else ""
             top_3_daily = ""
             if not new_file:
-                top_3_daily = f"Daily MVPs:\n{top_3}" if top_3 else "No MVPs today since the score has not increased."
+                top_3_daily = f"Daily MVPs:\n{top_3}\n\n" if top_3 else "No MVPs today since the score has not increased."
 
             text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
@@ -329,7 +329,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                    f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
                    f"Last update: {json_res['last']}\n\n" \
                    f"{delta}" \
-                   f"{top_3_daily}\n" \
+                   f"{top_3_daily}" \
                    f"Top members:\n{top_10}"
 
             bot.send_message(chat_id=WEEE_FOLD_ID,
