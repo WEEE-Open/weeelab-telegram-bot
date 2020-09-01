@@ -317,7 +317,8 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                                        if 'rank' in member else ""}"""
                                 for i, member in enumerate(json_res['donors'][:10])])
 
-            delta = f"Daily increase: <b>{json_res['credit'] - previous_score}</b>\n" if not new_file else ""
+            delta = f"Daily increase: <b>{human_readable_number(json_res['credit'] - previous_score)}</b>\n" \
+                    if not new_file else ""
             top_3_daily = ""
             if not new_file:
                 top_3_daily = f"Daily MVPs:\n{top_3}\n\n" if top_3 else "No MVPs today since the score has not increased."
