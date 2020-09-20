@@ -1319,7 +1319,7 @@ Note: the logout message cannot contain double quotes characters such as " """
 /log - Show log of the day
 /log <i>n</i> - Show last <i>n</i> days worth of logs
 /stat - Show hours you've spent in lab
-/ring - ring the bell at the door
+/ring - Ring the bell at the door
 /item <i>code</i> - Show info about an item
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries
