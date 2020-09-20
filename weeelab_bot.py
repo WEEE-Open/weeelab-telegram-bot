@@ -1315,6 +1315,7 @@ Note: the logout message cannot contain double quotes characters such as " """
     def help(self):
         help_message = """Available commands and options:
 /inlab - Show the people in lab
+/tolab - Show other people when you are going to the lab
 /log - Show log of the day
 /log <i>n</i> - Show last <i>n</i> days worth of logs
 /stat - Show hours you've spent in lab
