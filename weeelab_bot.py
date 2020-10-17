@@ -292,9 +292,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                                                                           reverse=True)[:3]}
                         top_3 = "\n".join([f"<code>#{i+1}</code> <b>{name}</b> with "
                                            f"<i>{human_readable_number(score)}</i> points"
-                                           if score > 0 else ""
                                            for i, (name, score) in
-                                           enumerate(top_3_donors_by_daily_score.items())])
+                                           enumerate(top_3_donors_by_daily_score.items())
+                                           if score > 0])
 
                 except FileNotFoundError:
                     # create file if it doesn't exist
