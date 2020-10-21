@@ -199,7 +199,7 @@ class WeeelabLogs:
                 new_users = new_users + "{}{}{}: {}\n".format(name, surname, username, tid)
                 self.oc.put_file_contents(self.user_bot_path, new_users.encode('utf-8'))
             except (AttributeError, UnicodeEncodeError):
-                print("ERROR writing user.txt")
+                print("ERROR writing " + self.user_bot_path)
                 pass
 
     @staticmethod

@@ -872,8 +872,8 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             username = ""
 
-        if 'last_name' in self.__last_from['from']:
-            last_name = self.__last_from['from']['last_name']
+        if 'last_name' in self.__last_from:
+            last_name = self.__last_from['last_name']
         else:
             last_name = ""
 
