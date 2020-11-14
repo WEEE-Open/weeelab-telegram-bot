@@ -254,6 +254,9 @@ def human_readable_number(num: int) -> str:
 def fah_ranker(bot: BotHandler, hour: int, minute: int):
     while True:
         try:
+            # first sleep until 5am
+            sleep(calculate_time_to_sleep(hour=5, minute=0))
+            # then sleep until the given hour which is now computed correctly even in case of hour change
             sleep(calculate_time_to_sleep(hour, minute))
 
             team_number = 249208
