@@ -14,6 +14,9 @@ class LofiVlcPlayer:
         self.last_player_time = None
         pass
 
+    def player_exist(self):
+        return self.player is not None
+
     def get_player(self):
         if self.player is None:
             self.__create_new_player()

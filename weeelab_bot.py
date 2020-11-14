@@ -644,13 +644,16 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Nobody is in lab right now, I cannot ring the bell.")
             return
 
-        lofi_player = self.lofi_player.get_player()
-        if lofi_player.is_playing():
-            lofi_player.stop()
-            sleep(1)
-            wave_obj.play()
-            sleep(1)
-            lofi_player.play()
+        if self.lofi_player.player_exist():
+            lofi_player = self.lofi_player.get_player()
+            if lofi_player.is_playing():
+                lofi_player.stop()
+                sleep(1)
+                wave_obj.play()
+                sleep(1)
+                lofi_player.play()
+            else:
+                wave_obj.play()
         else:
             wave_obj.play()
 
