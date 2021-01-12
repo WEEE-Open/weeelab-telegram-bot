@@ -29,6 +29,7 @@ LDAP_SERVER = os.environ.get('LDAP_SERVER')  # ldap.example.com
 LDAP_USER = os.environ.get('LDAP_USER')  # cn=whatever,ou=whatever
 LDAP_PASS = os.environ.get('LDAP_PASS')  # foo
 LDAP_SUFFIX = os.environ.get('LDAP_SUFFIX')  # dc=weeeopen,dc=it
+LDAP_TREE_GROUPS = os.environ.get('LDAP_TREE_GROUPS')  # ou=Groups,dc=weeeopen,dc=it
 LDAP_TREE_PEOPLE = os.environ.get('LDAP_TREE_PEOPLE')  # ou=People,dc=weeeopen,dc=it
 LDAP_TREE_INVITES = os.environ.get('LDAP_TREE_INVITES')  # ou=Invites,dc=weeeopen,dc=it
 LDAP_ADMIN_GROUPS = os.environ.get('LDAP_ADMIN_GROUPS')  # ou=Group,dc=weeeopen,dc=it|ou=OtherGroup,dc=weeeopen,dc=it

@@ -1362,7 +1362,7 @@ def main():
         wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong.wav")
     else:
         wave_obj = simpleaudio.WaveObject.from_wave_file("weeedong_default.wav")
-    users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE, LDAP_TREE_INVITES)
+    users = Users(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE, LDAP_TREE_INVITES, LDAP_TREE_GROUPS)
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
     wol = WOL_MACHINES

@@ -51,11 +51,12 @@ class AccountNotCompletedError(BaseException):
 
 
 class Users:
-    def __init__(self, admin_groups: List[str], tree: str, invite_tree: str):
+    def __init__(self, admin_groups: List[str], tree: str, invite_tree: str, groups_tree: str):
         self.__users: Dict[int, User] = {}
         self.admin_groups = admin_groups
         self.tree = tree
         self.invite_tree = invite_tree
+        self.excluded_groups = [f"cn=NoBot,{groups_tree}"]
 
     def get(self, tgid, nickname: Optional[str], conn: LdapConnection):
         if not isinstance(tgid, int):
@@ -73,14 +74,15 @@ class Users:
             if user is not None:
                 try:
                     if user.need_update():
-                        user.update(c, self.admin_groups, True, nickname)
+                        user.update(c, self.admin_groups, self.excluded_groups, True, nickname)
                 except (AccountNotFoundError, AccountLockedError, DuplicateEntryError):
                     del self.__users[tgid]
                     user = None
 
             # Deleted stale user or didn't get it?
             if user is None:
-                user = User.search(tgid, nickname, self.admin_groups, c, self.tree, self.invite_tree)
+                user = User.search(tgid, nickname, self.admin_groups, self.excluded_groups, c, self.tree,
+                                   self.invite_tree)
                 self.__users[tgid] = user
 
         return user
@@ -183,7 +185,7 @@ class People:
                 attributes['cn'][0].decode(),
                 dob,
                 dost,
-                User.is_admin(self.admin_groups, attributes),
+                User.is_in_groups(self.admin_groups, attributes),
                 attributes['telegramnickname'][0].decode() if 'telegramnickname' in attributes else None,
                 int(attributes['telegramid'][0].decode()) if 'telegramid' in attributes else None,
                 'nsaccountlock' in attributes
@@ -213,12 +215,13 @@ class User:
     def need_update(self):
         return time() - self.last_update > 3600
 
-    def update(self, conn, admin_groups: List[str], also_nickname: bool, nickname: Optional[str] = None):
+    def update(self, conn, admin_groups: List[str], excluded_groups: List[str], also_nickname: bool, nickname: Optional[str] = None):
         """
         Update user (if cached result is old)
 
         :param conn: LDAP Connection
         :param admin_groups: Users that belong to these groups are considered admins
+        :param excluded_groups: Groups not allowed to use the bot
         :param also_nickname: Also update the nickname, if false the nickname parameter is ignored
         :param nickname: New nickname, will be updated if needed
         :return: attributes, dn
@@ -242,6 +245,10 @@ class User:
         dn, attributes = User.__extract_the_only_result(result)
         del result
 
+        isnotallowed = User.is_in_groups(excluded_groups, attributes)
+        if isnotallowed:
+            raise AccountNotFoundError()
+
         if 'nsaccountlock' in attributes:
             raise AccountLockedError()
 
@@ -250,19 +257,20 @@ class User:
         self.cn = attributes['cn'][0].decode()
         self.givenname = attributes['givenname'][0].decode()
         self.surname = attributes['surname'][0].decode()
-        self.isadmin = User.is_admin(admin_groups, attributes)
+        self.isadmin = User.is_in_groups(admin_groups, attributes)
         if also_nickname:
             if User.__get_stored_nickname(attributes) != nickname:
                 User.__update_nickname(dn, nickname, conn)
         self.__set_update_time()
 
     @staticmethod
-    def search(tgid: int, tgnick: Optional[str], admin_groups, conn, tree: str, invite_tree: str):
+    def search(tgid: int, tgnick: Optional[str], admin_groups: List[str], excluded_groups: List[str], conn, tree: str, invite_tree: str):
         """
         Get User from Telegram ID. Or nickname as a fallback, Also update nickname and ID if needed.
 
         :param conn: LDAP Connection
         :param invite_tree: Invites tree DN
+        :param excluded_groups: Groups not allowed to allowed to use the bot
         :param tgid: Telegram ID
         :param tgnick: Telegram nickname
         :param admin_groups: Users that belong to these groups are considered admins
@@ -279,10 +287,14 @@ class User:
             else:
                 attributes, dn = User.__search_by_nickname(conn, invite_tree, tgnick, tgid, tree)
 
+        isnotallowed = User.is_in_groups(excluded_groups, attributes)
+        if isnotallowed:
+            raise AccountNotFoundError()
+
         if 'nsaccountlock' in attributes:
             raise AccountLockedError()
 
-        isadmin = User.is_admin(admin_groups, attributes)
+        isadmin = User.is_in_groups(admin_groups, attributes)
         nickname = User.__get_stored_nickname(attributes)
 
         if nickname != tgnick:
@@ -370,11 +382,11 @@ class User:
         return nickname
 
     @staticmethod
-    def is_admin(admin_groups, attributes):
+    def is_in_groups(groups_list: List[str], attributes):
         if 'memberof' not in attributes:
             return False
         for group in attributes['memberof']:
-            if group.decode() in admin_groups:
+            if group.decode() in groups_list:
                 return True
         return False
 
