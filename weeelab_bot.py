@@ -27,7 +27,7 @@ from pytarallo.Tarallo import Tarallo
 
 from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
-    AccountNotFoundError, AccountNotCompletedError, User, Person
+    AccountNotFoundError, User, Person
 from ToLab import ToLab
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
@@ -439,11 +439,6 @@ class CommandHandler:
 If you're part of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a> add your user ID in the account management panel. 
 Your user ID is: <b>{self.__last_user_id}</b>"""
             self.__send_message(msg)
-        except AccountNotCompletedError as e:
-            self.__send_message("Oh, hi, long time no see! We switched to a new account management system, "
-                                "so you will need to complete your registration here before we can talk again:\n"
-                                f"{INVITE_LINK}{e.invite_code}\n"
-                                "Once you're done, ask an administrator to enable your account. Have a nice day!")
         return False
 
     def __send_message(self, message):

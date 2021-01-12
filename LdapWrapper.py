@@ -324,12 +324,7 @@ class User:
             'nsaccountlock'
         ))
         if len(result) == 0:
-            # TODO: this part can be removed, once every old user has signed up to the SSO
-            invite = User.__get_invite_from_tgid(tgid, invite_tree, conn)
-            if invite is None:
-                raise AccountNotFoundError()
-            else:
-                raise AccountNotCompletedError(invite)
+            raise AccountNotFoundError()
         if len(result) > 1:
             raise DuplicateEntryError(f"Telegram ID {tgid} associated to {len(result)} entries")
         dn, attributes = User.__extract_the_only_result(result)
@@ -361,17 +356,6 @@ class User:
         User.__update_id(dn, tgid, conn)
 
         return User.__search_by_tgid(conn, invite_tree, tgid, tree)
-
-    @staticmethod
-    def __get_invite_from_tgid(tgid: int, invite_tree: str, conn):
-        result = conn.search_s(invite_tree, ldap.SCOPE_SUBTREE, f"(&(inviteCode=*)(telegramId={tgid}))", ('*',))
-        if len(result) == 0:
-            return None
-        if len(result) > 1:
-            raise DuplicateEntryError(f"Telegram ID {tgid} associated to {len(result)} invites")
-        dn, attributes = User.__extract_the_only_result(result)
-        del result
-        return attributes['inviteCode'][0].decode()
 
     @staticmethod
     def __get_stored_nickname(attributes):
