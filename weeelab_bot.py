@@ -436,7 +436,8 @@ class CommandHandler:
             self.store_id()
             msg = f"""Sorry, you are not allowed to use this bot.
 
-If you're part of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a> add your user ID in the account management panel. 
+If you're part of <a href=\"http://weeeopen.polito.it/\">WEEE Open</a> add your user ID in the account management panel
+or ask an administrator to unlock your account.
 Your user ID is: <b>{self.__last_user_id}</b>"""
             self.__send_message(msg)
         return False
