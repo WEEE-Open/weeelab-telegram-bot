@@ -30,7 +30,7 @@ class Quotes:
                     author = self._normalize_author(author)
                     if author not in self.authors:
                         self.authors[author] = {}
-                    self.authors[author] += quote
+                    self.authors[author].append(quote)
 
         return self
 
