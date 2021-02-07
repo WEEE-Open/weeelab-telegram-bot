@@ -1,6 +1,6 @@
 # noinspection PyUnresolvedReferences
+from datetime import datetime
 import owncloud
-from _datetime import time
 from random import choice
 import json
 
@@ -13,6 +13,9 @@ def format_quote(json_quote):
         return quote, author, context
     return None, None, None
 
+def _timestamp_now() -> float:
+    return datetime.now().timestamp()
+
 class Quotes:
     def __init__(self, oc: owncloud, quotes_path: str):
         self.oc = oc
@@ -21,12 +24,12 @@ class Quotes:
         self.quotes = []
 
     def _download(self):
-        if self.quotes_last_download is not None and time() - self.quotes_last_download < 60*60*48:
+        if self.quotes_last_download is not None and _timestamp_now() - self.quotes_last_download < 60*60*48:
             return self
 
         self.quotes = json.loads(self.oc.get_file_contents(self.quotes_path).decode('utf-8'))
 
-        self.quotes_last_download = time()
+        self.quotes_last_download = _timestamp_now()
 
         print("Downloaded quotes")
 
