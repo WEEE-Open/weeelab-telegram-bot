@@ -29,6 +29,7 @@ from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
     AccountNotFoundError, User, Person
 from ToLab import ToLab
+from Quotes import Quotes
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
 import requests  # send HTTP requests to Telegram server
@@ -1365,6 +1366,7 @@ def main():
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
     wol = WOL_MACHINES
+    quotes = Quotes(oc, QUOTES_PATH)
 
     fah_text_hours = [
         (9, 0),

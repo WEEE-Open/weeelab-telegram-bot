@@ -8,7 +8,6 @@ import json
 class Quotes:
     def __init__(self, oc: owncloud, quotes_path: str):
         self.oc = oc
-        self.local_tz = pytz.timezone("Europe/Rome")
         self.quotes_path = quotes_path
         self.quotes_last_download = None
         self.quotes = []
