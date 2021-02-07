@@ -1512,7 +1512,7 @@ def main():
                 elif command[0] == "/quote" or command[0] == "/quote@weeelab_bot":
                     author = None
                     if len(command) > 1:
-                        author = command[1:].join(" ")
+                        author = " ".join(command[1:])
                     handler.quote(author)
 
                 elif command[0] == "/nextbirthdays" or command[0] == "/nextbirthdays@weeelab_bot":
