@@ -1,9 +1,17 @@
 # noinspection PyUnresolvedReferences
 import owncloud
-from _datetime import datetime, time
-import pytz
+from _datetime import time
+from random import choice
 import json
 
+def format_quote(json_quote):
+    quote = json_quote["quote"] if "quote" in json_quote else None
+    author = json_quote["author"] if "author" in json_quote else None
+    context = json_quote["context"] if "context" in json_quote else None
+
+    if author and quote:
+        return quote, author, context
+    return None, None, None
 
 class Quotes:
     def __init__(self, oc: owncloud, quotes_path: str):
@@ -21,6 +29,14 @@ class Quotes:
         self.quotes_last_download = time()
 
         return self
+
+    def get_random_quote(self):
+        return format_quote(choice(self.quotes))
+
+    def get_quote_at(self, pos: int):
+        if pos < 0 or pos >= len(self.quotes):
+            return None
+        return format_quote(self.quotes[pos])
 
     def delete_cache(self) -> int:
         lines = len(self.quotes)

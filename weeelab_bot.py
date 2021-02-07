@@ -46,7 +46,6 @@ from time import sleep
 from remote_commands import ssh_weeelab_command, shutdown_command, ssh_i_am_door_command
 from ssh_util import SSHUtil
 from threading import Thread
-from random import choice
 from subprocess import run, PIPE
 
 class BotHandler:
@@ -1069,6 +1068,16 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
 
+    def quote(self):
+        quote, author, context = self.quotes.get_random_quote()
+
+        if context:
+            context = ' ' + context
+        else:
+            context = ''
+
+        self.__send_message(f"{escape_all(quote)} - <i>{escape_all(author)}</i>{escape_all(context)}")
+
     def i_am_door(self):
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
@@ -1496,6 +1505,9 @@ def main():
 
                 elif command[0] == "/status" or command[0] == "/status@weeelab_bot":
                     handler.status()
+
+                elif command[0] == "/quote" or command[0] == "/quote@weeelab_bot":
+                    handler.quote()
 
                 elif command[0] == "/nextbirthdays" or command[0] == "/nextbirthdays@weeelab_bot":
                     handler.next_birthdays()
