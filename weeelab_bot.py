@@ -1068,8 +1068,11 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
 
-    def quote(self):
-        quote, author, context = self.quotes.get_random_quote()
+    def quote(self, author: Optional[str]):
+        quote, author, context = self.quotes.get_random_quote(author)
+
+        if quote is None:
+            self.__send_message("No quotes found 🙁")
 
         if context:
             context = ' ' + context
@@ -1507,7 +1510,10 @@ def main():
                     handler.status()
 
                 elif command[0] == "/quote" or command[0] == "/quote@weeelab_bot":
-                    handler.quote()
+                    author = None
+                    if len(command) > 1:
+                        author = command[1:].join(" ")
+                    handler.quote(author)
 
                 elif command[0] == "/nextbirthdays" or command[0] == "/nextbirthdays@weeelab_bot":
                     handler.next_birthdays()

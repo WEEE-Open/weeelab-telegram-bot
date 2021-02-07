@@ -1,5 +1,7 @@
 # noinspection PyUnresolvedReferences
 from datetime import datetime
+from typing import Optional
+
 import owncloud
 from random import choice
 import json
@@ -22,6 +24,7 @@ class Quotes:
         self.quotes_path = quotes_path
         self.quotes_last_download = None
         self.quotes = []
+        self.authors = {}
 
     def _download(self):
         if self.quotes_last_download is not None and _timestamp_now() - self.quotes_last_download < 60*60*48:
@@ -33,12 +36,28 @@ class Quotes:
 
         print("Downloaded quotes")
 
+        for quote in self.quotes:
+            if "author" in quote:
+                for author in quote["author"].split('/'):
+                    author: str
+                    author = author.strip().lower()
+                    if author not in self.authors:
+                        self.authors[author] = {}
+                    self.authors[author] += quote
+
         return self
 
-    def get_random_quote(self):
+    def get_random_quote(self, author: Optional[str]=None):
         self._download()
 
-        return format_quote(choice(self.quotes))
+        if author is None:
+            q = self.quotes
+        else:
+            q = self.authors.get(author.strip().lower(), {})
+            if len(q) <= 0:
+                return None, None, None
+
+        return format_quote(choice(q))
 
     def _get_quote_at(self, pos: int):
         if pos < 0 or pos >= len(self.quotes):
@@ -49,6 +68,7 @@ class Quotes:
         lines = len(self.quotes)
 
         self.quotes = []
+        self.authors = {}
         self.quotes_last_download = None
 
         return lines
