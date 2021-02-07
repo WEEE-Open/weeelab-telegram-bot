@@ -1073,6 +1073,7 @@ as well.\nFor a list of the available commands type /help.', )
 
         if quote is None:
             self.__send_message("No quotes found 🙁")
+            return
 
         if context:
             context = ' ' + context
