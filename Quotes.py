@@ -20,7 +20,7 @@ class Quotes:
         self.quotes_last_download = None
         self.quotes = []
 
-    def get_quotes(self):
+    def _download(self):
         if self.quotes_last_download is not None and time() - self.quotes_last_download < 60*60*48:
             return self
 
@@ -28,12 +28,16 @@ class Quotes:
 
         self.quotes_last_download = time()
 
+        print("Downloaded quotes")
+
         return self
 
     def get_random_quote(self):
+        self._download()
+
         return format_quote(choice(self.quotes))
 
-    def get_quote_at(self, pos: int):
+    def _get_quote_at(self, pos: int):
         if pos < 0 or pos >= len(self.quotes):
             return None
         return format_quote(self.quotes[pos])
