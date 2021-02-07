@@ -380,10 +380,12 @@ class CommandHandler:
                  users: Users,
                  people: People,
                  conn: LdapConnection,
-                 wol: dict):
+                 wol: dict,
+                 quotes: Quotes):
         self.bot = bot
         self.tarallo = tarallo
         self.logs = logs
+        self.quotes = quotes
         self.tolab_db = tolab
         self.users = users
         self.people = people
@@ -857,6 +859,7 @@ as well.\nFor a list of the available commands type /help.', )
         users = self.users.delete_cache()
         people = self.people.delete_cache()
         logs = self.logs.delete_cache()
+        quotes = self.quotes.delete_cache()
         self.__send_message("All caches busted! 💥\n"
                             f"Users: deleted {users} entries\n"
                             f"People: deleted {people} entries\n"
@@ -1376,7 +1379,7 @@ def main():
     # fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
     # fah_grapher_t.start()
 
-    handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol)
+    handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol, quotes)
 
     birthday_wisher_t = Thread(target=handler.birthday_wisher)
     birthday_wisher_t.start()
