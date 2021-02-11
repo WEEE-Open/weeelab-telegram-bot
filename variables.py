@@ -18,6 +18,7 @@ OC_PWD = os.environ.get('OC_PWD')  # OwnCloud password
 LOG_PATH = os.environ.get('LOG_PATH')
 TOLAB_PATH = os.environ.get('TOLAB_PATH')
 QUOTES_PATH = os.environ.get('QUOTES_PATH')
+DEMOTIVATIONAL_PATH = os.environ.get('DEMOTIVATIONAL_PATH')
 # base path
 LOG_BASE = os.environ.get('LOG_BASE')
 # path of the file to store bot users in OwnCloud (/folder/file.txt)

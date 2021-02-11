@@ -6,22 +6,21 @@ import owncloud
 from random import choice
 import json
 class Quotes:
-    def __init__(self, oc: owncloud, quotes_path: str):
+    def __init__(self, oc: owncloud, quotes_path: str, demotivational_path: str):
         self.oc = oc
         self.quotes_path = quotes_path
-        self.quotes_last_download = None
+        self.demotivational_path = demotivational_path
+
         self.quotes = []
         self.authors = {}
+        self.demotivational = []
 
     def _download(self):
         if self.quotes_last_download is not None and self._timestamp_now() - self.quotes_last_download < 60*60*48:
             return self
 
         self.quotes = json.loads(self.oc.get_file_contents(self.quotes_path).decode('utf-8'))
-
         self.quotes_last_download = self._timestamp_now()
-
-        print("Downloaded quotes")
 
         for quote in self.quotes:
             if "author" in quote:
@@ -31,6 +30,15 @@ class Quotes:
                     if author not in self.authors:
                         self.authors[author] = []
                     self.authors[author].append(quote)
+
+        return self
+
+    def _download_demotivational(self):
+        if self.demotivational_last_download is not None and self._timestamp_now() - self.demotivational_last_download < 60*60*48:
+            return self
+
+        self.demotivational = self.oc.get_file_contents(self.demotivational_path).decode('utf-8').split("\n")
+        self.demotivational_last_download = self._timestamp_now()
 
         return self
 
@@ -49,6 +57,14 @@ class Quotes:
                 return None, None, None
 
         return self._format_quote(choice(q))
+
+    def get_demotivational_quote(self):
+        self._download_demotivational()
+
+        if len(self.demotivational) <= 0:
+            return None
+
+        return choice(self.demotivational)
 
     @staticmethod
     def _normalize_author(author):

@@ -1082,6 +1082,15 @@ as well.\nFor a list of the available commands type /help.', )
 
         self.__send_message(f"{escape_all(quote)} - <i>{escape_all(author)}</i>{escape_all(context)}")
 
+    def motivami(self):
+        quote = self.quotes.get_demotivational_quote()
+
+        if quote is None:
+            self.__send_message("No demotivational quotes found 🙁")
+            return
+
+        self.__send_message(escape_all(quote))
+
     def i_am_door(self):
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
@@ -1379,7 +1388,7 @@ def main():
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
     wol = WOL_MACHINES
-    quotes = Quotes(oc, QUOTES_PATH)
+    quotes = Quotes(oc, QUOTES_PATH, DEMOTIVATIONAL_PATH)
 
     fah_text_hours = [
         (9, 0),
@@ -1515,6 +1524,9 @@ def main():
                     if len(command) > 1:
                         author = " ".join(command[1:])
                     handler.quote(author)
+
+                elif command[0] == "/motivami" or command[0] == "/motivami@weeelab_bot":
+                    handler.motivami()
 
                 elif command[0] == "/nextbirthdays" or command[0] == "/nextbirthdays@weeelab_bot":
                     handler.next_birthdays()
