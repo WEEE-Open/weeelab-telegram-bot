@@ -15,6 +15,9 @@ class Quotes:
         self.authors = {}
         self.demotivational = []
 
+        self.quotes_last_download = None
+        self.demotivational_last_download = None
+
     def _download(self):
         if self.quotes_last_download is not None and self._timestamp_now() - self.quotes_last_download < 60*60*48:
             return self
@@ -91,6 +94,8 @@ class Quotes:
 
         self.quotes = []
         self.authors = {}
+        self.demotivational = []
         self.quotes_last_download = None
+        self.demotivational_last_download = None
 
         return lines

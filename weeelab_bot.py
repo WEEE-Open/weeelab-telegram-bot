@@ -863,7 +863,8 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_message("All caches busted! 💥\n"
                             f"Users: deleted {users} entries\n"
                             f"People: deleted {people} entries\n"
-                            f"Logs: deleted {logs} lines")
+                            f"Logs: deleted {logs} lines\n"
+                            f"Quotes: deleted {quotes} lines")
 
     def exception(self, exception: str):
         msg = f"I tried to do that, but an exception occurred: {exception}"
