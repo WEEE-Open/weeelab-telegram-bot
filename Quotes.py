@@ -85,6 +85,7 @@ class Quotes:
         return self._format_quote(random.choice(q))
 
     def get_quote_for_game(self, uid: str):
+        self._download()
 
         answers = random.sample(self.authors_for_game, 4)
 
