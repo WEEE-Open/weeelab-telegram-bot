@@ -928,8 +928,8 @@ as well.\nFor a list of the available commands type /help.', )
                 if total == 0:
                     self.__send_message(f"You never played the game.")
                     return
-                right_percent = right / total
-                wrong_percent = wrong / total
+                right_percent = right * 100 / total
+                wrong_percent = wrong * 100 / total
                 self.__send_message(f"You answered {total} questions.\nRight: {right} ({right_percent:2.1f}%)\nWrong: {wrong} ({wrong_percent:2.1f}%)")
             else:
                 self.unknown()
