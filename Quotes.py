@@ -45,7 +45,7 @@ class Quotes:
                         authors_count_for_game[author] += 1
 
         for author in authors_count_for_game:
-            if authors_count_for_game[author] > 5:
+            if authors_count_for_game[author] <= 5:
                 del self.authors_for_game[author]
         print(f"There are {len(self.authors_for_game)} authors for THE GAME")
 
