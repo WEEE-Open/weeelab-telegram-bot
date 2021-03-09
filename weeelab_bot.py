@@ -895,10 +895,17 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_inline_keyboard("Who do I wake up?", buttons)
 
     def game(self):
-        buttons = []
         quote, context, answers = self.quotes.get_quote_for_game(self.user.uid)
-        for answer in answers:
-            buttons.append([inline_keyboard_button(answer, 'game_' + answer.strip(" "))])
+        buttons = [
+            [
+               inline_keyboard_button(answers[0], 'game_' + answers[0].strip(" ")),
+               inline_keyboard_button(answers[1], 'game_' + answers[1].strip(" ")),
+            ],
+            [
+               inline_keyboard_button(answers[2], 'game_' + answers[2].strip(" ")),
+               inline_keyboard_button(answers[3], 'game_' + answers[3].strip(" ")),
+            ],
+        ]
 
         if context:
             context = ' ' + context
@@ -1584,7 +1591,7 @@ def main():
                 elif query.startswith('i_am_door_'):
                     handler.shutdown_callback(query, message_id, SSH_PIALL_USER, SSH_PIALL_HOST_IP, SSH_PIALL_KEY_PATH)
                 elif query.startswith('game_'):
-                    handler.game_callaback(query, message_id)
+                    handler.game_callback(query, message_id)
                 else:
                     handler.unknown()
             else:
