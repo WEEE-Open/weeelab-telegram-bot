@@ -76,6 +76,27 @@ class BotHandler:
             "Bad command or file name.\nDo you know what's good? /history",
             "Bad command or file name.\nDo you know what's good? /tolab",
         ]
+        self.game_questions_last = -1
+        self.game_questions = [
+            "Who said this?",
+            "Guess the author",
+            "Guess the author!",
+            "Who wants to be a millionaire?",
+            "Who's the author?",
+            "Who said this magnificent quote?",
+            "Who said this memorable quote?",
+            "Who said this famous quote?",
+            "Who said this one?",
+            "Who said this?",
+            "Who said it?",
+            "Who said it first?",
+            "Who said this first?",
+            "Who's the author of this memorable quote?",
+            "Guess the disagio",
+            "Ah, this famous quote - who said it?",
+            "Do you know this one?",
+            "Do you know who said this one?",
+        ]
 
     def get_updates(self, timeout=120):
         """
@@ -183,6 +204,11 @@ class BotHandler:
         self.unknown_command_messages_last %= len(self.unknown_command_messages)
         return self.unknown_command_messages[self.unknown_command_messages_last]
 
+    @property
+    def game_question(self):
+        self.game_questions_last += 1
+        self.game_questions_last %= len(self.game_questions)
+        return self.game_questions[self.game_questions_last]
 
 def escape_all(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
@@ -908,11 +934,11 @@ as well.\nFor a list of the available commands type /help.', )
         ]
 
         if context:
-            context = ' ' + context
+            context = ' - <i>' + escape_all(context) + '</i>'
         else:
             context = ''
 
-        self.__send_inline_keyboard(f"Who said this?\n\n{escape_all(quote)} - _____ on {escape_all(context)}", buttons)
+        self.__send_inline_keyboard(f"{self.bot.game_question}\n\n{escape_all(quote)}{context}", buttons)
 
     def lofi(self):
         # check if stream is playing to show correct button
@@ -1031,10 +1057,10 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("I somehow forgot the question, sorry")
             return
         elif result is True:
-            self.__send_message("🏆 You're winner! 🏆")
+            self.__send_message("🏆 You're winner! 🏆\nAnother one? /game")
             return
         else:
-            self.__send_message(f"Nope, that quote was from {result}")
+            self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
 
     def logout(self, words):
         if not self.user.isadmin:
