@@ -15,7 +15,7 @@ class Quotes:
         self.quotes = []
         self.game = {}
         self.authors = {}
-        self.authors_for_game = []
+        self.authors_for_game = {}
         self.demotivational = []
 
         self.quotes_last_download = None
@@ -33,16 +33,18 @@ class Quotes:
             if "author" in quote:
                 for author in quote["author"].split('/'):
                     author: str
+                    author_not_normalized = author.strip()
                     author = self._normalize_author(author)
+                    self.authors_for_game[author] = author_not_normalized
                     if author not in self.authors:
                         self.authors[author] = []
                         authors_count_for_game[author] = 0
                     self.authors[author].append(quote)
                     authors_count_for_game[author] += 1
 
-        for k in authors_count_for_game:
-            if authors_count_for_game[k] > 5:
-                self.authors_for_game.append(k)
+        for author in authors_count_for_game:
+            if authors_count_for_game[author] > 5:
+                del self.authors_for_game[author]
         print(f"There are {len(self.authors_for_game)} authors for THE GAME")
 
         return self
@@ -87,9 +89,13 @@ class Quotes:
     def get_quote_for_game(self, uid: str):
         self._download()
 
-        answers = random.sample(self.authors_for_game, 4)
+        answers = random.sample(self.authors_for_game.keys(), 4)
 
-        quote, author_printable, context = self.get_random_quote(answers[0])
+        author_printable = '/'
+        while '/' in author_printable:
+            quote, author_printable, context = self.get_random_quote(answers[0])
+        for i in range(0, 4):
+            answers[i] = self.authors_for_game[answers[i]]
         random.shuffle(answers)
 
         self._init_game(uid)
@@ -97,6 +103,8 @@ class Quotes:
         self.game[uid]["current_author"] = author_printable
         self._save_game()
 
+        # since author_printable = '/', they're bound
+        # noinspection PyUnboundLocalVariable
         return quote, context, answers
 
     def _init_game(self, uid: str):

@@ -934,7 +934,7 @@ as well.\nFor a list of the available commands type /help.', )
         ]
 
         if context:
-            context = ' - <i>' + escape_all(context) + '</i>'
+            context = ' - <i>[author]</i> ' + escape_all(context)
         else:
             context = ''
 
