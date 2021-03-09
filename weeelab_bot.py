@@ -898,12 +898,12 @@ as well.\nFor a list of the available commands type /help.', )
         quote, context, answers = self.quotes.get_quote_for_game(self.user.uid)
         buttons = [
             [
-               inline_keyboard_button(answers[0], 'game_' + answers[0].strip(" ")),
-               inline_keyboard_button(answers[1], 'game_' + answers[1].strip(" ")),
+               inline_keyboard_button(answers[0], 'game_' + Quotes.normalize_author_for_game(answers[0])),
+               inline_keyboard_button(answers[1], 'game_' + Quotes.normalize_author_for_game(answers[1])),
             ],
             [
-               inline_keyboard_button(answers[2], 'game_' + answers[2].strip(" ")),
-               inline_keyboard_button(answers[3], 'game_' + answers[3].strip(" ")),
+               inline_keyboard_button(answers[2], 'game_' + Quotes.normalize_author_for_game(answers[2])),
+               inline_keyboard_button(answers[3], 'game_' + Quotes.normalize_author_for_game(answers[3])),
             ],
         ]
 

@@ -89,13 +89,12 @@ class Quotes:
 
         answers = random.sample(self.authors_for_game, 4)
 
-        the_author = answers[0]
-        quote, _, context = self.get_random_quote(the_author)
+        quote, author_printable, context = self.get_random_quote(answers[0])
         random.shuffle(answers)
 
         self._init_game(uid)
 
-        self.game[uid]["current_author"] = the_author
+        self.game[uid]["current_author"] = author_printable
         self._save_game()
 
         return quote, context, answers
@@ -110,7 +109,7 @@ class Quotes:
 
         if self.game[uid]["current_author"] is None:
             return None
-        elif self.game[uid]["current_author"] == self._normalize_author_game(answer):
+        elif self._normalize_author(self.game[uid]["current_author"]).strip(" ") == answer:
             self.game[uid]["current_author"] = None
             self.game[uid]["right"] += 1
             self._save_game()
@@ -121,10 +120,6 @@ class Quotes:
             self.game[uid]["wrong"] += 1
             self._save_game()
             return right_author
-
-    @staticmethod
-    def _normalize_author_game(answer):
-        return answer.strip(" ")
 
     def get_demotivational_quote(self):
         self._download_demotivational()
@@ -138,6 +133,10 @@ class Quotes:
     def _normalize_author(author):
         author = ''.join(filter(str.isalnum, author.strip().lower()))
         return author
+
+    @staticmethod
+    def normalize_author_for_game(author):
+        return Quotes._normalize_author(author).strip(" ")
 
     @staticmethod
     def _format_quote(json_quote):
