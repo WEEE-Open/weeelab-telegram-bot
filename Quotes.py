@@ -88,6 +88,11 @@ class Quotes:
 
         return self._format_quote(random.choice(q))
 
+    def get_game_stats(self, uid: str):
+        self._init_game(uid)
+
+        return self.game[uid]["right"], self.game[uid]["wrong"]
+
     def get_quote_for_game(self, uid: str):
         self._download()
 

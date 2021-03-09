@@ -920,25 +920,38 @@ as well.\nFor a list of the available commands type /help.', )
             buttons.append([inline_keyboard_button(machine, 'wol_' + machine)])
         self.__send_inline_keyboard("Who do I wake up?", buttons)
 
-    def game(self):
-        quote, context, answers = self.quotes.get_quote_for_game(self.user.uid)
-        buttons = [
-            [
-               inline_keyboard_button(answers[0], 'game_' + Quotes.normalize_author_for_game(answers[0])),
-               inline_keyboard_button(answers[1], 'game_' + Quotes.normalize_author_for_game(answers[1])),
-            ],
-            [
-               inline_keyboard_button(answers[2], 'game_' + Quotes.normalize_author_for_game(answers[2])),
-               inline_keyboard_button(answers[3], 'game_' + Quotes.normalize_author_for_game(answers[3])),
-            ],
-        ]
-
-        if context:
-            context = ' - <i>[author]</i> ' + escape_all(context)
+    def game(self, param=None):
+        if param:
+            if param == "stat" or param == "stats" or param == "statistics":
+                right, wrong = self.quotes.get_game_stats(self.user.uid)
+                total = right + wrong
+                if total == 0:
+                    self.__send_message(f"You never played the game.")
+                    return
+                right_percent = right / total
+                wrong_percent = wrong / total
+                self.__send_message(f"You answered {total} questions.\nRight: {right} ({right_percent:2.1f}%)\nWrong: {wrong} ({wrong_percent:2.1f}%)")
+            else:
+                self.unknown()
         else:
-            context = ''
+            quote, context, answers = self.quotes.get_quote_for_game(self.user.uid)
+            buttons = [
+                [
+                   inline_keyboard_button(answers[0], 'game_' + Quotes.normalize_author_for_game(answers[0])),
+                   inline_keyboard_button(answers[1], 'game_' + Quotes.normalize_author_for_game(answers[1])),
+                ],
+                [
+                   inline_keyboard_button(answers[2], 'game_' + Quotes.normalize_author_for_game(answers[2])),
+                   inline_keyboard_button(answers[3], 'game_' + Quotes.normalize_author_for_game(answers[3])),
+                ],
+            ]
 
-        self.__send_inline_keyboard(f"{self.bot.game_question}\n\n{escape_all(quote)}{context}", buttons)
+            if context:
+                context = ' - <i>[author]</i> ' + escape_all(context)
+            else:
+                context = ''
+
+            self.__send_inline_keyboard(f"{self.bot.game_question}\n\n{escape_all(quote)}{context}", buttons)
 
     def lofi(self):
         # check if stream is playing to show correct button
@@ -1564,7 +1577,10 @@ def main():
                     handler.wol()
 
                 elif command[0] == "/game" or command[0] == "/game@weeelab_bot":
-                    handler.game()
+                    if len(command) > 1:
+                        handler.game(command[1])
+                    else:
+                        handler.game()
 
                 elif command[0] == "/logout" or command[0] == "/logout@weeelab_bot":
                     if len(command) > 1:
