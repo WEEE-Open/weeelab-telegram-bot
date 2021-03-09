@@ -96,13 +96,21 @@ class Quotes:
     def get_quote_for_game(self, uid: str):
         self._download()
 
-        answers = random.sample(self.authors_for_game.keys(), 4)
+        # Random quote from an allowed author
+        quote, author_printable, context = self.get_random_quote()
+        author_normalized = self._normalize_author(author_printable)
+        while author_normalized not in self.authors_for_game.keys():
+            quote, author_printable, context = self.get_random_quote()
 
-        author_printable = '/'
-        while '/' in author_printable:
-            quote, author_printable, context = self.get_random_quote(answers[0])
+        # 3 other possibilites
+        answers = random.sample(set(filter(lambda x : x != author_normalized, self.authors_for_game.keys())), 3)
+        # plus the right one
+        answers.append(author_normalized)
+
+        # Make them all printable
         for i in range(0, 4):
             answers[i] = self.authors_for_game[answers[i]]
+        # Shuffle
         random.shuffle(answers)
 
         self._init_game(uid)
