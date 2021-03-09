@@ -921,7 +921,7 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_inline_keyboard("Who do I wake up?", buttons)
 
     def game(self, param=None):
-        if param:
+        if param is not None:
             if param == "stat" or param == "stats" or param == "statistics":
                 right, wrong = self.quotes.get_game_stats(self.user.uid)
                 total = right + wrong
