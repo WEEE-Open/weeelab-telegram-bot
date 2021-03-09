@@ -894,6 +894,19 @@ as well.\nFor a list of the available commands type /help.', )
             buttons.append([inline_keyboard_button(machine, 'wol_' + machine)])
         self.__send_inline_keyboard("Who do I wake up?", buttons)
 
+    def game(self):
+        buttons = []
+        quote, context, answers = self.quotes.get_quote_for_game(self.user.uid)
+        for answer in answers:
+            buttons.append([inline_keyboard_button(answer, 'game_' + answer.strip(" "))])
+
+        if context:
+            context = ' ' + context
+        else:
+            context = ''
+
+        self.__send_inline_keyboard(f"Who said this?\n\n{escape_all(quote)} - _____ on {escape_all(context)}", buttons)
+
     def lofi(self):
         # check if stream is playing to show correct button
         if not self.user_is_in_lab(self.user.uid) and not self.user.isadmin:
@@ -1003,6 +1016,18 @@ as well.\nFor a list of the available commands type /help.', )
             return
         Wol.send(mac)
         self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
+
+    def game_callback(self, query: str, message_id: int):
+        answer = query.split('_', 1)[1]
+        result = self.quotes.answer_game(self.user.uid, answer)
+        if result is None:
+            self.__send_message("I somehow forgot the question, sorry")
+            return
+        elif result is True:
+            self.__send_message("🏆 You're winner! 🏆")
+            return
+        else:
+            self.__send_message(f"Nope, that quote was from {result}")
 
     def logout(self, words):
         if not self.user.isadmin:
@@ -1389,7 +1414,7 @@ def main():
     people = People(LDAP_ADMIN_GROUPS, LDAP_TREE_PEOPLE)
     conn = LdapConnection(LDAP_SERVER, LDAP_USER, LDAP_PASS)
     wol = WOL_MACHINES
-    quotes = Quotes(oc, QUOTES_PATH, DEMOTIVATIONAL_PATH)
+    quotes = Quotes(oc, QUOTES_PATH, DEMOTIVATIONAL_PATH, QUOTES_GAME_PATH)
 
     fah_text_hours = [
         (9, 0),
@@ -1505,6 +1530,9 @@ def main():
                 elif command[0] == "/wol" or command[0] == "/wol@weeelab_bot":
                     handler.wol()
 
+                elif command[0] == "/game" or command[0] == "/game@weeelab_bot":
+                    handler.game()
+
                 elif command[0] == "/logout" or command[0] == "/logout@weeelab_bot":
                     if len(command) > 1:
                         # handler.logout(command[1:])
@@ -1555,6 +1583,8 @@ def main():
                     handler.shutdown_callback(query, message_id, SSH_SCMA_USER, SSH_SCMA_HOST_IP, SSH_SCMA_KEY_PATH)
                 elif query.startswith('i_am_door_'):
                     handler.shutdown_callback(query, message_id, SSH_PIALL_USER, SSH_PIALL_HOST_IP, SSH_PIALL_KEY_PATH)
+                elif query.startswith('game_'):
+                    handler.game_callaback(query, message_id)
                 else:
                     handler.unknown()
             else:

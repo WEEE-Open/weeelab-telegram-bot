@@ -3,16 +3,19 @@ from datetime import datetime
 from typing import Optional
 
 import owncloud
-from random import choice
+import random
 import json
 class Quotes:
-    def __init__(self, oc: owncloud, quotes_path: str, demotivational_path: str):
+    def __init__(self, oc: owncloud, quotes_path: str, demotivational_path: str, games_path: str):
         self.oc = oc
         self.quotes_path = quotes_path
+        self.game_path = games_path
         self.demotivational_path = demotivational_path
 
         self.quotes = []
+        self.game = {}
         self.authors = {}
+        self.authors_for_game = []
         self.demotivational = []
 
         self.quotes_last_download = None
@@ -25,6 +28,7 @@ class Quotes:
         self.quotes = json.loads(self.oc.get_file_contents(self.quotes_path).decode('utf-8'))
         self.quotes_last_download = self._timestamp_now()
 
+        authors_count_for_game = {}
         for quote in self.quotes:
             if "author" in quote:
                 for author in quote["author"].split('/'):
@@ -32,7 +36,14 @@ class Quotes:
                     author = self._normalize_author(author)
                     if author not in self.authors:
                         self.authors[author] = []
+                        authors_count_for_game[author] = 0
                     self.authors[author].append(quote)
+                    authors_count_for_game[author] += 1
+
+        for k in authors_count_for_game:
+            if authors_count_for_game[k] > 5:
+                self.authors_for_game.append(k)
+        print(f"There are {len(self.authors_for_game)} authors for THE GAME")
 
         return self
 
@@ -42,6 +53,18 @@ class Quotes:
 
         self.demotivational = self.oc.get_file_contents(self.demotivational_path).decode('utf-8').split("\n")
         self.demotivational_last_download = self._timestamp_now()
+
+        return self
+
+    def _download_game(self):
+        if len(self.game) <= 0:
+            try:
+                self.game = json.loads(self.oc.get_file_contents(self.game_path).decode('utf-8'))
+            except owncloud.owncloud.HTTPResponseError as e:
+                if e.status_code == 404:
+                    self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=1).encode('utf-8'))
+                else:
+                    raise e
 
         return self
 
@@ -59,7 +82,48 @@ class Quotes:
             if len(q) <= 0:
                 return None, None, None
 
-        return self._format_quote(choice(q))
+        return self._format_quote(random.choice(q))
+
+    def get_quote_for_game(self, uid: str):
+
+        answers = random.sample(self.authors_for_game, 4)
+
+        the_author = answers[0]
+        quote, _, context = self.get_random_quote(the_author)
+        random.shuffle(answers)
+
+        self._init_game(uid)
+
+        self.game[uid]["current_author"] = the_author
+        self._save_game()
+
+        return quote, context, answers
+
+    def _init_game(self, uid: str):
+        self._download_game()
+        if uid not in self.game:
+            self.game[uid] = {"current_author": None, "right": 0, "wrong": 0}
+
+    def answer_game(self, uid: str, answer: str):
+        self._init_game(uid)
+
+        if self.game[uid]["current_author"] is None:
+            return None
+        elif self.game[uid]["current_author"] == self._normalize_author_game(answer):
+            self.game[uid]["current_author"] = None
+            self.game[uid]["right"] += 1
+            self._save_game()
+            return True
+        else:
+            right_author = self.game[uid]["current_author"]
+            self.game[uid]["current_author"] = None
+            self.game[uid]["wrong"] += 1
+            self._save_game()
+            return right_author
+
+    @staticmethod
+    def _normalize_author_game(answer):
+        return answer.strip(" ")
 
     def get_demotivational_quote(self):
         self._download_demotivational()
@@ -67,7 +131,7 @@ class Quotes:
         if len(self.demotivational) <= 0:
             return None
 
-        return choice(self.demotivational)
+        return random.choice(self.demotivational)
 
     @staticmethod
     def _normalize_author(author):
@@ -90,12 +154,18 @@ class Quotes:
         return self._format_quote(self.quotes[pos])
 
     def delete_cache(self) -> int:
-        lines = len(self.quotes)
+        lines = len(self.quotes) + len(self.game)
 
         self.quotes = []
         self.authors = {}
+        self.game = {}
+        self.authors_for_game = []
         self.demotivational = []
         self.quotes_last_download = None
         self.demotivational_last_download = None
 
         return lines
+
+    def _save_game(self):
+        if len(self.game) > 0:
+            self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=1).encode('utf-8'))
