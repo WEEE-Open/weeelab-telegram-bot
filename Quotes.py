@@ -31,7 +31,8 @@ class Quotes:
         authors_count_for_game = {}
         for quote in self.quotes:
             if "author" in quote:
-                for author in quote["author"].split('/'):
+                parts = quote["author"].split('/')
+                for author in parts:
                     author: str
                     author_not_normalized = author.strip()
                     author = self._normalize_author(author)
@@ -40,7 +41,8 @@ class Quotes:
                         self.authors[author] = []
                         authors_count_for_game[author] = 0
                     self.authors[author].append(quote)
-                    authors_count_for_game[author] += 1
+                    if len(parts) == 1:
+                        authors_count_for_game[author] += 1
 
         for author in authors_count_for_game:
             if authors_count_for_game[author] > 5:
