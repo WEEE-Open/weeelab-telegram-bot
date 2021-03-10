@@ -16,6 +16,7 @@ class Quotes:
         self.game = {}
         self.authors = {}
         self.authors_for_game = {}
+        self.authors_weights_for_game = {}
         self.demotivational = []
 
         self.quotes_last_download = None
@@ -36,17 +37,20 @@ class Quotes:
                     author: str
                     author_not_normalized = author.strip()
                     author = self._normalize_author(author)
-                    self.authors_for_game[author] = author_not_normalized
                     if author not in self.authors:
                         self.authors[author] = []
-                        authors_count_for_game[author] = 0
+                        # dicts also keep insertion order from Python 3.7, which is important later
+                        self.authors_for_game[author] = author_not_normalized
+                        self.authors_weights_for_game[author] = 0
                     self.authors[author].append(quote)
-                    if len(parts) == 1:
-                        authors_count_for_game[author] += 1
+                    if len(parts) == 1 and ("game" not in quote or quote["game"] != False):
+                        self.authors_weights_for_game[author] += 1
 
-        for author in authors_count_for_game:
-            if authors_count_for_game[author] <= 5:
+        for author in self.authors_weights_for_game:
+            if self.authors_weights_for_game[author] <= 5:
                 del self.authors_for_game[author]
+                del self.authors_weights_for_game[author]
+
         print(f"There are {len(self.authors_for_game)} authors for THE GAME: {self.authors_for_game.values()}")
 
         return self
@@ -84,7 +88,7 @@ class Quotes:
         else:
             q = self.authors.get(self._normalize_author(author), {})
             if len(q) <= 0:
-                return None, None, None
+                return None, None, None, None
 
         return self._format_quote(random.choice(q))
 
@@ -97,14 +101,18 @@ class Quotes:
         self._download()
 
         # Random quote from an allowed author
-        quote, author_printable, context = self.get_random_quote()
+        quote, author_printable, context, game = self.get_random_quote()
         author_normalized = self._normalize_author(author_printable)
-        while author_normalized not in self.authors_for_game.keys():
-            quote, author_printable, context = self.get_random_quote()
+        while author_normalized not in self.authors_for_game.keys() or not game:
+            quote, author_printable, context, game = self.get_random_quote()
             author_normalized = self._normalize_author(author_printable)
 
         # 3 other possibilites
-        answers = random.sample(set(filter(lambda x : x != author_normalized, self.authors_for_game.keys())), 3)
+        answers = random.sample(
+            list(filter(lambda x : x != author_normalized, self.authors_for_game.keys())),
+            3,
+            counts=list(filter(lambda x : x != author_normalized, self.authors_weights_for_game.keys()))
+        )
         # plus the right one
         answers.append(author_normalized)
 
@@ -167,10 +175,11 @@ class Quotes:
         quote = json_quote["quote"] if "quote" in json_quote else None
         author = json_quote["author"] if "author" in json_quote else None
         context = json_quote["context"] if "context" in json_quote else None
+        game = True if "game" in json_quote and json_quote["game"] != False else False
 
         if author and quote:
-            return quote, author, context
-        return None, None, None
+            return quote, author, context, game
+        return None, None, None, None
 
     def _get_quote_at(self, pos: int):
         if pos < 0 or pos >= len(self.quotes):
