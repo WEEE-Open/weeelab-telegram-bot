@@ -46,7 +46,8 @@ class Quotes:
                     if len(parts) == 1 and ("game" not in quote or quote["game"] != False):
                         self.authors_weights_for_game[author] += 1
 
-        for author in self.authors_weights_for_game:
+        loop_on_this = list(self.authors_weights_for_game.keys())
+        for author in loop_on_this:
             if self.authors_weights_for_game[author] <= 5:
                 del self.authors_for_game[author]
                 del self.authors_weights_for_game[author]
