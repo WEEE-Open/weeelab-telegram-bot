@@ -951,7 +951,7 @@ as well.\nFor a list of the available commands type /help.', )
             else:
                 context = ''
 
-            self.__send_inline_keyboard(f"{self.bot.game_question}\n\n{escape_all(quote)}{context}", buttons)
+            self.__send_inline_keyboard(f"{escape_all(quote)}{context}\n\n<i>{self.bot.game_question}</i>", buttons)
 
     def lofi(self):
         # check if stream is playing to show correct button
