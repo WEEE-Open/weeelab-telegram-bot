@@ -47,7 +47,7 @@ class Quotes:
         for author in authors_count_for_game:
             if authors_count_for_game[author] <= 5:
                 del self.authors_for_game[author]
-        print(f"There are {len(self.authors_for_game)} authors for THE GAME")
+        print(f"There are {len(self.authors_for_game)} authors for THE GAME: {self.authors_for_game.values()}")
 
         return self
 
@@ -101,6 +101,7 @@ class Quotes:
         author_normalized = self._normalize_author(author_printable)
         while author_normalized not in self.authors_for_game.keys():
             quote, author_printable, context = self.get_random_quote()
+            author_normalized = self._normalize_author(author_printable)
 
         # 3 other possibilites
         answers = random.sample(set(filter(lambda x : x != author_normalized, self.authors_for_game.keys())), 3)
