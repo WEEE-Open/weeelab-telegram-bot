@@ -125,7 +125,7 @@ class Quotes:
         self._init_game(uid)
 
         self.game[uid]["current_author"] = author_printable
-        self._save_game()
+        #self._save_game()
 
         # since author_printable = '/', they're bound
         # noinspection PyUnboundLocalVariable
@@ -201,4 +201,5 @@ class Quotes:
 
     def _save_game(self):
         if len(self.game) > 0:
-            self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=1).encode('utf-8'))
+            # indent=0 to at least have some lines, instead of no newline at all
+            self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=0, separators=(',', ':')).encode('utf-8'))
