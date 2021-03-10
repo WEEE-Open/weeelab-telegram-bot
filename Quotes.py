@@ -125,11 +125,7 @@ class Quotes:
             author_normalized = self._normalize_author(author_printable)
 
         # 3 other possibilites
-        answers = random.sample(
-            list(filter(lambda x : x != author_normalized, self.authors_for_game.keys())),
-            3,
-            counts=list(map(lambda k : self.authors_weights_for_game[k], list(filter(lambda k : k != author_normalized, self.authors_weights_for_game))))
-        )
+        answers = Quotes._random_choices_without_replacement(dict(filter(lambda el : el[0] != author_normalized, self.authors_weights_for_game.items())), 3)
         # plus the right one
         answers.append(author_normalized)
 
