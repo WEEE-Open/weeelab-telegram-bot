@@ -5,6 +5,8 @@ from typing import Optional
 import owncloud
 import random
 import json
+import bisect
+
 class Quotes:
     def __init__(self, oc: owncloud, quotes_path: str, demotivational_path: str, games_path: str):
         self.oc = oc
@@ -97,6 +99,20 @@ class Quotes:
         self._init_game(uid)
 
         return self.game[uid]["right"], self.game[uid]["wrong"]
+
+    @staticmethod
+    def _random_choices_without_replacement(l: dict, n: int):
+        # Some incredibly efficient algorithms exist: https://stackoverflow.com/q/352670
+        # Every one of them requires some external library or doesn't work properly in this case for some reason
+        l = l.copy()
+        res = []
+        for _ in range(n):
+            # noinspection PyTypeChecker
+            this = random.choices(list(l.keys()), weights=l.values())
+            this = this[0]
+            res.append(this)
+            del l[this]
+        return res
 
     def get_quote_for_game(self, uid: str):
         self._download()
