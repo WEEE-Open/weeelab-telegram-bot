@@ -112,7 +112,7 @@ class Quotes:
         answers = random.sample(
             list(filter(lambda x : x != author_normalized, self.authors_for_game.keys())),
             3,
-            counts=list(filter(lambda x : x != author_normalized, self.authors_weights_for_game.keys()))
+            counts=list(map(lambda k : self.authors_weights_for_game[k], list(filter(lambda k : k != author_normalized, self.authors_weights_for_game))))
         )
         # plus the right one
         answers.append(author_normalized)
