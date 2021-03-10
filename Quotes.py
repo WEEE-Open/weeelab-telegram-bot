@@ -176,7 +176,10 @@ class Quotes:
         quote = json_quote["quote"] if "quote" in json_quote else None
         author = json_quote["author"] if "author" in json_quote else None
         context = json_quote["context"] if "context" in json_quote else None
-        game = True if "game" in json_quote and json_quote["game"] != False else False
+
+        game = True
+        if "game" in json_quote:
+            game = json_quote["game"]
 
         if author and quote:
             return quote, author, context, game
