@@ -1141,7 +1141,7 @@ as well.\nFor a list of the available commands type /help.', )
         return
 
     def quote(self, author: Optional[str]):
-        quote, author, context = self.quotes.get_random_quote(author)
+        quote, author, context, _ = self.quotes.get_random_quote(author)
 
         if quote is None:
             self.__send_message("No quotes found 🙁")
