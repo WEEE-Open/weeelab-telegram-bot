@@ -5,7 +5,6 @@ from typing import Optional
 import owncloud
 import random
 import json
-import bisect
 
 class Quotes:
     def __init__(self, oc: owncloud, quotes_path: str, demotivational_path: str, games_path: str):
@@ -208,7 +207,7 @@ class Quotes:
         self.quotes = []
         self.authors = {}
         self.game = {}
-        self.authors_for_game = []
+        self.authors_for_game = {}
         self.demotivational = []
         self.quotes_last_download = None
         self.demotivational_last_download = None
