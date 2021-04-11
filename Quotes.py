@@ -53,7 +53,7 @@ class Quotes:
                 del self.authors_for_game[author]
                 del self.authors_weights_for_game[author]
 
-        print(f"There are {len(self.authors_for_game)} authors for THE GAME: {self.authors_for_game.values()}")
+        print(f"There are {len(self.authors_for_game)} authors for THE GAME: {', '.join(self.authors_for_game.values())}")
 
         return self
 
