@@ -286,7 +286,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             sleep(calculate_time_to_sleep(hour, minute))
 
             team_number = 249208
-            url = f"https://stats.foldingathome.org/api/team/{team_number}"
+            url = f"https://api2.foldingathome.org/team/{team_number}/members"
             for _ in range(10):
                 response = requests.get(url)
                 json_res = response.json()
@@ -304,6 +304,8 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             new_file = False
             try:
                 try:
+                    # TODO: well, they have completely broken the compatibility with the current code. we'll need to fix
+                    # the issue they have introduced in the future
                     with open(json_history, 'r') as inf:
                         json_history_content = json.load(inf)
                         previous_snapshot_key = max(k for k, v in json_history_content.items())
@@ -1469,8 +1471,8 @@ def main():
     ]
     fah_ranker_ts = [Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), h, m))
                      for h, m in fah_text_hours]
-    for t in fah_ranker_ts:
-        t.start()
+    # for t in fah_ranker_ts:  # TODO: uncomment this when fah_ranker is compatible with the new APIs
+    #     t.start()
 
     # fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
     # fah_grapher_t.start()
