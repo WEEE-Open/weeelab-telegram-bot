@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d61e6eeb1544a060e7799053de3517588ff6847380a7e48defd01a1b7b5b89e7"
+            "sha256": "cabaaeab5408eac8cd6fcca50cf1ff087b54d869b49d026cd6820f18f08c8cee"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -207,11 +207,11 @@
         },
         "pytarallo": {
             "hashes": [
-                "sha256:93d008c23ec9167d68250fb4c77d6cb136476ba8fc8425303c163caece99a902",
-                "sha256:cf5b16a24e4cd9fe36a1b62d05cdcec14c603a44158cb5d9a276f4a16479c2e6"
+                "sha256:e5c20e9a88b7651f1ac18471102b32769d7e0e05566ad0f18d5c6a8470185c9e",
+                "sha256:eb7f2917092c4febc1a95e4fb696fa3297a6698bfe01f34f438cacb46e74fb99"
             ],
             "index": "pypi",
-            "version": "==2.3"
+            "version": "==2.3.1"
         },
         "python-ldap": {
             "hashes": [
