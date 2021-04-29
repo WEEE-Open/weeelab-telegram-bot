@@ -61,7 +61,8 @@ class WeeelabLogs:
     def get_old_logs(self):
         today = datetime.date.today()
         prev_month = today.month - 1
-        if prev_month == 12:
+        if prev_month == 0:
+            prev_month = 12
             prev_year = today.year - 1
         else:
             prev_year = today.year
@@ -86,6 +87,12 @@ class WeeelabLogs:
                 month = 1
                 year += 1
             if year >= max_year and month > max_month:
+                # We're past the target year/month, go back by one
+                # when storing this as the last downloaded one
+                month -= 1
+                if month == 0:
+                    month = 12
+                    year -= 1
                 break
 
             filename = self.log_base + "log" + str(year) + str(month).zfill(2) + ".txt"
