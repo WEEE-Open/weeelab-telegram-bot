@@ -1302,7 +1302,7 @@ as well.\nFor a list of the available commands type /help.', )
         """
         :return: list of people sorted by birth date
         """
-        return sorted([p for p in self.people.getAll(self.conn) if not p.accountlocked and p.dateofbirth],
+        return sorted([p for p in self.people.get_all(self.conn) if not p.accountlocked and p.dateofbirth],
                       key=lambda p: CommandHandler.__get_next_birthday_of_person(p))
 
     def __next_birthday_people(self, n: int = 3) -> List[Person]:
@@ -1336,7 +1336,7 @@ as well.\nFor a list of the available commands type /help.', )
                                       if not p.accountlocked and p.tgid and p.dateofbirth and
                                          (p.dateofbirth.month == datetime.date.today().month and
                                           p.dateofbirth.day == datetime.date.today().day) else None
-                                      for p in self.people.getAll(self.conn))
+                                      for p in self.people.get_all(self.conn))
                 birthday_people.remove(None)
 
                 if birthday_people:
@@ -1354,7 +1354,7 @@ as well.\nFor a list of the available commands type /help.', )
         """
         :return: list of people sorted by safety test date
         """
-        return sorted([p for p in self.people.getAll(self.conn) if not p.accountlocked and p.dateofsafetytest],
+        return sorted([p for p in self.people.get_all(self.conn) if not p.accountlocked and p.dateofsafetytest],
                       key=lambda p: p.dateofsafetytest)
 
     def __next_test_people(self) -> List[Person]:
@@ -1390,7 +1390,7 @@ as well.\nFor a list of the available commands type /help.', )
                 sleep(calculate_time_to_sleep(hour=7, minute=30))
 
                 test_people = []
-                for p in self.people.getAll(self.conn):
+                for p in self.people.get_all(self.conn):
                     if p.accountlocked and p.dateofsafetytest and p.dateofsafetytest == datetime.date.today():
                         if p.tgid:
                             test_people.append(CommandHandler.__get_telegram_link_to_person(p))

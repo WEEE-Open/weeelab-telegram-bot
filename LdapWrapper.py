@@ -1,6 +1,7 @@
 from datetime import date
 from threading import Lock
 from time import time
+# noinspection PyUnresolvedReferences
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Tuple
 import ldap
@@ -81,8 +82,7 @@ class Users:
 
             # Deleted stale user or didn't get it?
             if user is None:
-                user = User.search(tgid, nickname, self.admin_groups, self.excluded_groups, c, self.tree,
-                                   self.invite_tree)
+                user = User.search(tgid, nickname, self.admin_groups, self.excluded_groups, c, self.tree)
                 self.__users[tgid] = user
 
         return user
@@ -143,7 +143,7 @@ class People:
         else:
             return None
 
-    def getAll(self, conn: LdapConnection):
+    def get_all(self, conn: LdapConnection):
         self.refresh_if_necessary(conn)
         return self.__people.values()
 
@@ -175,8 +175,8 @@ class People:
         ))
 
         for dn, attributes in result:
-            dob = self._schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
-            dost = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
+            dob = self.schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
+            dost = self.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
 
             person = Person(
                 attributes['uid'][0].decode(),
@@ -195,7 +195,7 @@ class People:
         self.last_update = time()
 
     @staticmethod
-    def _schac_to_date(schac_date):
+    def schac_to_date(schac_date):
         return date(year=int(schac_date[:4]), month=int(schac_date[4:6]), day=int(schac_date[6:8]))
 
 # noinspection PyAttributeOutsideInit
@@ -207,6 +207,8 @@ class User:
     cn: str
     givenname: str
     surname: str
+    signedsir: bool
+    dateofsafetytest: Optional[date]
     isadmin: bool
     nickname: Optional[str]
 
@@ -271,12 +273,11 @@ class User:
         self.__set_update_time()
 
     @staticmethod
-    def search(tgid: int, tgnick: Optional[str], admin_groups: List[str], excluded_groups: List[str], conn, tree: str, invite_tree: str):
+    def search(tgid: int, tgnick: Optional[str], admin_groups: List[str], excluded_groups: List[str], conn, tree: str):
         """
         Get User from Telegram ID. Or nickname as a fallback, Also update nickname and ID if needed.
 
         :param conn: LDAP Connection
-        :param invite_tree: Invites tree DN
         :param excluded_groups: Groups not allowed to allowed to use the bot
         :param tgid: Telegram ID
         :param tgnick: Telegram nickname
@@ -287,12 +288,12 @@ class User:
         print(f"Search {tgid}")
         tgid = int(tgid)  # Safety measure
         try:
-            attributes, dn = User.__search_by_tgid(conn, invite_tree, tgid, tree)
+            attributes, dn = User.__search_by_tgid(conn, tgid, tree)
         except AccountNotFoundError as e:
             if tgnick is None:
                 raise e
             else:
-                attributes, dn = User.__search_by_nickname(conn, invite_tree, tgnick, tgid, tree)
+                attributes, dn = User.__search_by_nickname(conn, tgnick, tgid, tree)
 
         isnotallowed = User.is_in_groups(excluded_groups, attributes)
         if isnotallowed:
@@ -307,15 +308,24 @@ class User:
         if nickname != tgnick:
             User.__update_nickname(dn, tgnick, conn)
         # self.__set_update_time() done in __post_init___
-        return User(dn, tgid, attributes['uid'][0].decode(), attributes['cn'][0].decode(), attributes['givenname'][0].decode(), attributes['sn'][0].decode(), isadmin, tgnick)
+        return User(
+            dn,
+            tgid,
+            attributes['uid'][0].decode(),
+            attributes['cn'][0].decode(),
+            attributes['givenname'][0].decode(),
+            attributes['sn'][0].decode(),
+            People.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None,
+            'signedsir' in attributes and attributes['signedsir'][0].decode() == "true",
+            isadmin,
+            tgnick)
 
     @staticmethod
-    def __search_by_tgid(conn, invite_tree, tgid, tree) -> Tuple[Dict, str]:
+    def __search_by_tgid(conn, tgid, tree) -> Tuple[Dict, str]:
         """
         Get attributes from a Telegram ID
 
         :param conn: LDAP Connection
-        :param invite_tree: Invites tree DN
         :param tgid: Telegram ID
         :param tree: Users tree DN
         :return: attributes, dn
@@ -327,6 +337,8 @@ class User:
             'sn',
             'memberof',
             'telegramnickname',
+            'safetytestdate',
+            'signedsir'
             'telegramid',
             'nsaccountlock'
         ))
@@ -339,13 +351,12 @@ class User:
         return attributes, dn
 
     @staticmethod
-    def __search_by_nickname(conn, invite_tree, tgnick: str, tgid: int, tree) -> Tuple[Dict, str]:
+    def __search_by_nickname(conn, tgnick: str, tgid: int, tree) -> Tuple[Dict, str]:
         """
         Search a user by nickname IF Telegram ID is not set.
         If found, update their Telegram ID, search again by ID and return the usual attributes.
 
         :param conn: LDAP Connection
-        :param invite_tree: Invites tree DN
         :param tgnick: Telegram nickname
         :param tgid: Telegram ID
         :param tree: Users tree DN
@@ -362,7 +373,7 @@ class User:
         dn = result[0][0]
         User.__update_id(dn, tgid, conn)
 
-        return User.__search_by_tgid(conn, invite_tree, tgid, tree)
+        return User.__search_by_tgid(conn, tgid, tree)
 
     @staticmethod
     def __get_stored_nickname(attributes):
