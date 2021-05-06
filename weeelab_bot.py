@@ -606,22 +606,25 @@ as well.\nFor a list of the available commands type /help.', )
             if time is None:
                 # Delete previous entry via Telegram ID
                 self.tolab_db.delete_entry(self.user.tgid)
-                # TODO: add random messages (changing constantly like the "unknown command" ones),
-                # like "but why?", "I'm sorry to hear that", "hope you have fun elsewhere", etc...
                 self.__send_message(f"Ok, you aren't going to the lab, I've taken note.")
             else:
+                sir_message = ""
+                if not self.user.signedsir and self.user.dateofsafetytest is not None:
+                    sir_message = "\nRemember to sign the SIR when you get there!"
+
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
                 if days <= 0:
                     self.__send_message(
                         f"I took note that you'll go to the lab at {time}. Use <i>/tolab no</i> to cancel. Check if "
-                        f"anybody else is coming with /inlab")
+                        f"anybody else is coming with /inlab.{sir_message}")
                 elif days == 1:
                     self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel. "
-                                        f"Check if anyone else is coming with /inlab")
+                                        f"Check if anyone else is coming with /inlab{sir_message}")
                 else:
+                    last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
                     self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to "
-                                        f"cancel. Check if anyone else is coming with /inlab "
-                                        f"\nMark it down on your calendar!")
+                                        f"cancel. Check if anyone else is coming with /inlab"
+                                        f"{last_message}")
         except Exception as e:
             self.__send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())

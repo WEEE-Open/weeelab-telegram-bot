@@ -175,14 +175,8 @@ class People:
         ))
 
         for dn, attributes in result:
-            dob = attributes['schacdateofbirth'][0].decode() if 'schacdateofbirth' in attributes else None
-            dost = attributes['safetytestdate'][0].decode() if 'safetytestdate' in attributes else None
-
-            if dob is not None:
-                dob = date(year=int(dob[:4]), month=int(dob[4:6]), day=int(dob[6:8]))
-
-            if dost is not None:
-                dost = date(year=int(dost[:4]), month=int(dost[4:6]), day=int(dost[6:8]))
+            dob = self._schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
+            dost = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
 
             person = Person(
                 attributes['uid'][0].decode(),
@@ -199,6 +193,10 @@ class People:
             self.__people[person.uid.lower()] = person
 
         self.last_update = time()
+
+    @staticmethod
+    def _schac_to_date(schac_date):
+        return date(year=int(schac_date[:4]), month=int(schac_date[4:6]), day=int(schac_date[6:8]))
 
 # noinspection PyAttributeOutsideInit
 @dataclass
@@ -241,6 +239,7 @@ class User:
             'memberof',
             'telegramnickname',
             'telegramid',
+            'signedsir',
             'nsaccountlock'
         ))
         if len(result) == 0:
@@ -263,6 +262,8 @@ class User:
         self.cn = attributes['cn'][0].decode()
         self.givenname = attributes['givenname'][0].decode()
         self.surname = attributes['surname'][0].decode()
+        self.dateofsafetytest = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
+        self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true"
         self.isadmin = User.is_in_groups(admin_groups, attributes)
         if also_nickname:
             if User.__get_stored_nickname(attributes) != nickname:
