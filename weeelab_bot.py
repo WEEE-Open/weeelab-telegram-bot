@@ -851,6 +851,7 @@ as well.\nFor a list of the available commands type /help.', )
                 msg += f"----------------------------\n"
                 for feature in item.product.features:
                     msg += f"{feature}: {item.product.features[feature]}\n"
+            msg += f'\n<a href="{self.tarallo.url}/item/{item.code}">View on Tarallo</a>'
 
             self.__send_message(msg)
         except ItemNotFoundError:
