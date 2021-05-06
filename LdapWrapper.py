@@ -122,6 +122,8 @@ class Person:
     isadmin: bool
     nickname: Optional[str]
     tgid: Optional[int]
+    haskey: bool
+    signedsir: bool
     accountlocked: Optional[bool]
 
 
@@ -167,6 +169,8 @@ class People:
             'telegramid',
             'schacdateofbirth',
             'safetytestdate',
+            'haskey',
+            'signedsir',
             'nsaccountlock',
         ))
 
@@ -188,7 +192,9 @@ class People:
                 User.is_in_groups(self.admin_groups, attributes),
                 attributes['telegramnickname'][0].decode() if 'telegramnickname' in attributes else None,
                 int(attributes['telegramid'][0].decode()) if 'telegramid' in attributes else None,
-                'nsaccountlock' in attributes
+                'haskey' in attributes and attributes['haskey'][0].decode() == "true",
+                'signedsir' in attributes and attributes['signedsir'][0].decode() == "true",
+                'nsaccountlock' in attributes,
             )
             self.__people[person.uid.lower()] = person
 

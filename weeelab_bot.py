@@ -512,10 +512,17 @@ as well.\nFor a list of the available commands type /help.', )
         person = self.people.get(username, self.conn)
         user_id = None if person is None or person.tgid is None else person.tgid  # This is unreadable. Deal with it.
         display_name = CommandHandler.try_get_display_name(username, person)
+
+        haskey = chr(128273) if person.haskey else ""
+
+        sir = ""
+        if self.user.isadmin and person.dateofsafetytest is not None and not person.signedsir:
+            sir = f" (Remember to sign the SIR! {chr(128221)})"
+
         if user_id is None:
-            return f'\n- {display_name}{other}'
+            return f'\n- {display_name}{haskey}{other}{sir}'
         else:
-            return f'\n- <a href="tg://user?id={user_id}">{display_name}</a>{other}'
+            return f'\n- <a href="tg://user?id={user_id}">{display_name}</a>{haskey}{other}{sir}'
 
     @staticmethod
     def try_get_display_name(username: str, person: Optional[Person]):
