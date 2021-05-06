@@ -748,8 +748,12 @@ as well.\nFor a list of the available commands type /help.', )
                     # Are you an admin? Then go on!
                     person = self.people.get(target_username, self.conn)
                     if person is None:
-                        target_username = None
-                        self.__send_message('No statistics for the given user. Have you typed it correctly?')
+                        # Downloads them only if needed
+                        self.logs.get_old_logs()
+                        self.logs.get_log()
+                        if not self.logs.user_exists_in_logs(target_username):
+                            target_username = None
+                            self.__send_message('No statistics for the given user. Have you typed it correctly?')
                     else:
                         target_username = person.uid
                 else:

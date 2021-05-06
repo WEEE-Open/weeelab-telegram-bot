@@ -115,6 +115,21 @@ class WeeelabLogs:
         self.old_logs_month = month
         self.old_logs_year = year
 
+    def user_exists_in_logs(self, username):
+        # noinspection PyUnusedLocal
+        line: WeeelabLine
+        for line in self.log:
+            if line.username == username:
+                return True
+
+        # noinspection PyUnusedLocal
+        line: WeeelabLine
+        for line in self.old_log:
+            if line.username == username:
+                return True
+
+        return False
+
     def count_time_user(self, username):
         """
         Count time spent in lab for this user
