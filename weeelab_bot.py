@@ -847,6 +847,11 @@ as well.\nFor a list of the available commands type /help.', )
             msg = f'Item <b>{item.code}</b>\nLocation: {location}\n\n'
             for feature in item.features:
                 msg += f"{feature}: {item.features[feature]}\n"
+            if item.product is not None:
+                msg += f"----------------------------\n"
+                for feature in item.product.features:
+                    msg += f"{feature}: {item.product.features[feature]}\n"
+
             self.__send_message(msg)
         except ItemNotFoundError:
             self.__send_message(f'Item {item} not found.')
