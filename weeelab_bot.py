@@ -212,6 +212,7 @@ class BotHandler:
         self.game_questions_last %= len(self.game_questions)
         return self.game_questions[self.game_questions_last]
 
+
 def escape_all(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
@@ -324,9 +325,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                         daily = True
                         json_history_content = json.load(inf)
                         previous_snapshot_key = max(k for k, v in json_history_content.items())
-                        previous_score = sum(v for k, v in json_history_content[previous_snapshot_key].items())
 
-                        donors_previous_score = {_fah_get(donor, 'name'): _fah_get(donor, 'score') for donor in json_res}
+                        donors_previous_score = {_fah_get(donor, 'name'): _fah_get(donor, 'score')
+                                                 for donor in json_res}
                         # associate daily increase to each name
                         donors_daily_score = {name: donors_previous_score[name] - score
                                               for name, score in json_history_content[previous_snapshot_key].items()}
@@ -378,7 +379,8 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
 
             top_3_daily = ""
             if not new_file:
-                top_3_daily = f"Daily MVPs:\n{top_3}\n\n" if top_3 else "No MVPs today since the score has not increased."
+                top_3_daily = f"Daily MVPs:\n{top_3}\n\n" if top_3\
+                    else "No MVPs today since the score has not increased."
 
             text = f"Total Team Score: <b>{human_readable_number(total_credit)}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(total_wus)}</b>\n" \
@@ -613,14 +615,14 @@ as well.\nFor a list of the available commands type /help.', )
             msg += "\nUse /ring for the bell, if you are at door 3."
         self.__send_message(msg)
 
-    def tolab(self, time: str, day: str = None):
+    def tolab(self, the_time: str, day: str = None):
         try:
-            time = self._tolab_parse_time(time)
+            the_time = self._tolab_parse_time(the_time)
         except ValueError:
             self.__send_message("Use correct time format, e.g. 10:30, or <i>no</i> to cancel")
             return
 
-        if time is not None:
+        if the_time is not None:
             try:
                 day = self._tolab_parse_day(day)
             except ValueError:
@@ -629,7 +631,7 @@ as well.\nFor a list of the available commands type /help.', )
 
         # noinspection PyBroadException
         try:
-            if time is None:
+            if the_time is None:
                 # Delete previous entry via Telegram ID
                 self.tolab_db.delete_entry(self.user.tgid)
                 self.__send_message(f"Ok, you aren't going to the lab, I've taken note.")
@@ -638,17 +640,18 @@ as well.\nFor a list of the available commands type /help.', )
                 if not self.user.signedsir and self.user.dateofsafetytest is not None:
                     sir_message = "\nRemember to sign the SIR when you get there!"
 
-                days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, time, day)
+                days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, the_time, day)
                 if days <= 0:
                     self.__send_message(
-                        f"I took note that you'll go to the lab at {time}. Use <i>/tolab no</i> to cancel. Check if "
+                        f"I took note that you'll go to the lab at {the_time}. "
+                        f"Use <i>/tolab no</i> to cancel. Check if "
                         f"anybody else is coming with /inlab.{sir_message}")
                 elif days == 1:
-                    self.__send_message(f"So you'll go the lab at {time} tomorrow. Use <i>/tolab no</i> to cancel. "
+                    self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use <i>/tolab no</i> to cancel. "
                                         f"Check if anyone else is coming with /inlab{sir_message}")
                 else:
                     last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
-                    self.__send_message(f"So you'll go the lab at {time} in {days} days. Use <i>/tolab no</i> to "
+                    self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use <i>/tolab no</i> to "
                                         f"cancel. Check if anyone else is coming with /inlab"
                                         f"{last_message}")
         except Exception as e:
@@ -656,30 +659,30 @@ as well.\nFor a list of the available commands type /help.', )
             print(traceback.format_exc())
 
     @staticmethod
-    def _tolab_parse_time(time: str):
+    def _tolab_parse_time(the_time: str):
         """
         Parse time and coerce it into a standard format
 
-        :param time: Time string, provided by the user
+        :param the_time: Time string, provided by the user
         :return: Time in HH:mm format, or None if "no"
         """
-        if time == "no":
+        if the_time == "no":
             return None
-        elif len(time) == 1 and time.isdigit():
-            return f"0{time}:00"
-        elif len(time) == 2 and time.isdigit() and 0 <= int(time) <= 23:
-            return f"{time}:00"
-        elif len(time) == 4 and time[0].isdigit() and time[2:4].isdigit() and 0 <= int(time[2:4]) <= 59:
-            if time[1] == '.':
-                return ':'.join(time.split('.'))
-            elif time[1] == ':':
-                return time
-        elif len(time) == 5 and time[0:2].isdigit() and time[3:4].isdigit():
-            if time[2] == '.':
-                time = ':'.join(time.split('.'))
-            if time[2] == ':':
-                if 0 <= int(time[0:2]) <= 23 and 0 <= int(time[3:5]) <= 59:
-                    return time
+        elif len(the_time) == 1 and the_time.isdigit():
+            return f"0{the_time}:00"
+        elif len(the_time) == 2 and the_time.isdigit() and 0 <= int(the_time) <= 23:
+            return f"{the_time}:00"
+        elif len(the_time) == 4 and the_time[0].isdigit() and the_time[2:4].isdigit() and 0 <= int(the_time[2:4]) <= 59:
+            if the_time[1] == '.':
+                return ':'.join(the_time.split('.'))
+            elif the_time[1] == ':':
+                return the_time
+        elif len(the_time) == 5 and the_time[0:2].isdigit() and the_time[3:4].isdigit():
+            if the_time[2] == '.':
+                the_time = ':'.join(the_time.split('.'))
+            if the_time[2] == ':':
+                if 0 <= int(the_time[0:2]) <= 23 and 0 <= int(the_time[3:5]) <= 59:
+                    return the_time
 
         raise ValueError
 
@@ -910,11 +913,11 @@ as well.\nFor a list of the available commands type /help.', )
             rank = sorted(rank.items(), key=lambda x: x[1], reverse=True)
 
             n = 0
-            for (rival, time) in rank:
+            for (rival, the_time) in rank:
                 entry = self.people.get(rival, self.conn)
                 if entry is not None:
                     n += 1
-                    time_hh, time_mm = self.logs.mm_to_hh_mm(time)
+                    time_hh, time_mm = self.logs.mm_to_hh_mm(the_time)
                     display_user = CommandHandler.try_get_display_name(rival, self.people.get(rival, self.conn))
                     if entry.isadmin:
                         msg += f'{n}) [{time_hh}:{time_mm}] <b>{display_user}</b>\n'
@@ -978,7 +981,8 @@ as well.\nFor a list of the available commands type /help.', )
                     return
                 right_percent = right * 100 / total
                 wrong_percent = wrong * 100 / total
-                self.__send_message(f"You answered {total} questions.\nRight: {right} ({right_percent:2.1f}%)\nWrong: {wrong} ({wrong_percent:2.1f}%)")
+                self.__send_message(f"You answered {total} questions.\n"
+                                    f"Right: {right} ({right_percent:2.1f}%)\nWrong: {wrong} ({wrong_percent:2.1f}%)")
             else:
                 self.unknown()
         else:
@@ -1111,6 +1115,7 @@ as well.\nFor a list of the available commands type /help.', )
         Wol.send(mac)
         self.__edit_message(message_id, f"Waking up {machine} ({mac}) from its slumber...", None)
 
+    # noinspection PyUnusedLocal
     def game_callback(self, query: str, message_id: int):
         answer = query.split('_', 1)[1]
         result = self.quotes.answer_game(self.user.uid, answer)
@@ -1323,10 +1328,7 @@ as well.\nFor a list of the available commands type /help.', )
     @staticmethod
     def __get_next_birthday_of_person(p: Person) -> datetime.date:
         t = datetime.date.today()
-        return datetime.date(year=t.year if (p.dateofbirth.month == t.month
-                                             and p.dateofbirth.day > t.day)
-                                            or p.dateofbirth.month > t.month
-                                         else t.year + 1,
+        return datetime.date(year=t.year if (p.dateofbirth.month == t.month and p.dateofbirth.day > t.day) or p.dateofbirth.month > t.month else t.year + 1,
                              month=p.dateofbirth.month,
                              day=p.dateofbirth.day) if p.dateofbirth else None
 
@@ -1351,7 +1353,8 @@ as well.\nFor a list of the available commands type /help.', )
 
         bd_people = '\n'.join([f"{CommandHandler.__get_telegram_link_to_person(p)} "
                                f"on {str(p.dateofbirth.day).zfill(2)}/{str(p.dateofbirth.month).zfill(2)} "
-                               f"in {(CommandHandler.__get_next_birthday_of_person(p) - datetime.date.today()).days} day(s)"
+                               f"in {(CommandHandler.__get_next_birthday_of_person(p) - datetime.date.today()).days} "
+                               f"day(s)"
                                for p in self.__next_birthday_people()])
         self.__send_message(f"The people who have a coming birthday 🎂 are:\n\n{bd_people}")
 
@@ -1510,18 +1513,18 @@ def main():
     wol = WOL_MACHINES
     quotes = Quotes(oc, QUOTES_PATH, DEMOTIVATIONAL_PATH, QUOTES_GAME_PATH)
 
-    fah_text_hours = [
-        (9, 0),
-        # (13, 37),
-        # (22, 0)
-    ]
-    fah_ranker_ts = [Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), h, m))
-                     for h, m in fah_text_hours]
-    # for t in fah_ranker_ts:  # TODO: uncomment this when fah_ranker is compatible with the new APIs
+    # fah_text_hours = [
+    #     (9, 0),
+    #     # (13, 37),
+    #     # (22, 0)
+    # ]
+    # fah_ranker_ts = [Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), h, m))
+    #                  for h, m in fah_text_hours]
+    # for t in fah_ranker_ts:
     #     t.start()
 
-    # fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
-    # fah_grapher_t.start()
+    fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
+    fah_grapher_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol, quotes)
 
