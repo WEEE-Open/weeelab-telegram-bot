@@ -355,11 +355,15 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             except JSONDecodeError as jde:
                 print(jde)
 
-            top_10 = "\n".join([f"<code>#{i+1}</code> <b>{_fah_get(member, 'name')}</b> with "
-                                f"<i>{human_readable_number(_fah_get(member, 'score'))}</i> points"
-                                f", <i>{_fah_get(member, 'wus')}</i> WUs"
-                                f", rank <i>{human_readable_number(_fah_get(member, 'rank'))}</i>"
-                                for i, member in enumerate(json_res[:10])])
+            top_10 = []
+            for i, member in enumerate(json_res[:10]):
+                this_top_10 = f"<code>#{i+1}</code> <b>{_fah_get(member, 'name')}</b> with "
+                this_top_10 += f"<i>{human_readable_number(_fah_get(member, 'score'))}</i> points"
+                this_top_10 += f", <i>{_fah_get(member, 'wus')}</i> WUs"
+                if _fah_get(member, 'rank') is not None:
+                    this_top_10 += f", rank <i>{human_readable_number(_fah_get(member, 'rank'))}</i>"
+                top_10.append(this_top_10)
+            top_10 = "\n".join(top_10)
 
             total_credit = 0
             total_wus = 0
