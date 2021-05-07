@@ -37,6 +37,7 @@ import requests  # send HTTP requests to Telegram server
 # noinspection PyUnresolvedReferences
 import owncloud
 import datetime
+import time
 from datetime import timedelta
 import traceback  # Print stack traces in logs
 import simpleaudio
@@ -47,6 +48,7 @@ from remote_commands import ssh_weeelab_command, shutdown_command, ssh_i_am_door
 from ssh_util import SSHUtil
 from threading import Thread
 from subprocess import run, PIPE
+
 
 class BotHandler:
     """
@@ -286,7 +288,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             sleep(calculate_time_to_sleep(hour, minute))
 
             team_number = 249208
-            url = f"https://api2.foldingathome.org/team/{team_number}/members"
+            url = f"https://api.foldingathome.org/team/{team_number}/members"
             for _ in range(10):
                 response = requests.get(url)
                 json_res = response.json()
@@ -298,21 +300,33 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             else:
                 continue
 
+            json_fields = dict(zip(json_res[0], range(0, len(json_res))))
+            del json_res[0]
+
+            def _fah_get(json_list, name: str):
+                pos = json_fields.get(name, -1)
+                if pos < 0:
+                    return None
+                if pos >= len(json_list):
+                    return None
+                return json_list[pos]
+
+            last = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+
             # save data to JSON
             json_history = "fah_history.json"
             json_history_content = {}
             new_file = False
+            daily = False
             try:
                 try:
-                    # TODO: well, they have completely broken the compatibility with the current code. we'll need to fix
-                    # the issue they have introduced in the future
                     with open(json_history, 'r') as inf:
+                        daily = True
                         json_history_content = json.load(inf)
                         previous_snapshot_key = max(k for k, v in json_history_content.items())
                         previous_score = sum(v for k, v in json_history_content[previous_snapshot_key].items())
 
-                        donors_previous_score = {donor['name']: donor['credit']
-                                                 for donor in json_res['donors']}
+                        donors_previous_score = {_fah_get(donor, 'name'): _fah_get(donor, 'score') for donor in json_res}
                         # associate daily increase to each name
                         donors_daily_score = {name: donors_previous_score[name] - score
                                               for name, score in json_history_content[previous_snapshot_key].items()}
@@ -332,8 +346,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                     new_file = True
 
                 # insert new snapshot in JSON
-                json_history_content[json_res['last']] = {donor['name']: donor['credit']
-                                                          for donor in json_res['donors']}
+                json_history_content[last] = {_fah_get(donor, 'name'): _fah_get(donor, 'score') for donor in json_res}
                 with open(json_history, 'w') as outf:
                     json.dump(json_history_content, outf)
 
@@ -342,28 +355,37 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             except JSONDecodeError as jde:
                 print(jde)
 
-            top_10 = "\n".join([f"<code>#{i+1}</code> <b>{member['name']}</b> with "
-                                f"<i>{human_readable_number(member['credit'])}</i> points, <i>{member['wus']}</i> WUs%s"
-                                % f"""{f", rank <i>{human_readable_number(member['rank'])}</i>" 
-                                       if 'rank' in member else ""}"""
-                                for i, member in enumerate(json_res['donors'][:10])])
+            top_10 = "\n".join([f"<code>#{i+1}</code> <b>{_fah_get(member, 'name')}</b> with "
+                                f"<i>{human_readable_number(_fah_get(member, 'score'))}</i> points"
+                                f", <i>{_fah_get(member, 'wus')}</i> WUs"
+                                f", rank <i>{human_readable_number(_fah_get(member, 'rank'))}</i>"
+                                for i, member in enumerate(json_res[:10])])
 
-            delta = f"Daily increase: <b>{human_readable_number(json_res['credit'] - previous_score)}</b>\n" \
-                    if not new_file else ""
+            total_credit = 0
+            total_wus = 0
+            for member in json_res:
+                total_credit += _fah_get(member, 'score')
+                total_wus += _fah_get(member, 'wus')
+
+            delta = ""
+            if daily:
+                delta = f"Daily increase: <b>{human_readable_number(sum(donors_daily_score.values()))}</b>\n" \
+                        if not new_file else ""
+
             top_3_daily = ""
             if not new_file:
                 top_3_daily = f"Daily MVPs:\n{top_3}\n\n" if top_3 else "No MVPs today since the score has not increased."
 
-            text = f"Total Team Score: <b>{human_readable_number(json_res['credit'])}</b>\n" \
-                   f"Total Team Work Units: <b>{human_readable_number(json_res['wus'])}</b>\n" \
-                   f"Team Rank: {human_readable_number(json_res['rank'])} " \
-                   f"/ {human_readable_number(json_res['total_teams'])} " \
-                   f"-> top <b>{round(json_res['rank']/json_res['total_teams']*100, 2)}%</b>\n" \
-                   f"Last update: {json_res['last']}\n\n" \
+            text = f"Total Team Score: <b>{human_readable_number(total_credit)}</b>\n" \
+                   f"Total Team Work Units: <b>{human_readable_number(total_wus)}</b>\n" \
+                   f"Team Rank: dunno, we need another API request " \
+                   f"/ some amount of teams " \
+                   f"-> top <b>{round(100/99999*100, 2)}%</b>\n" \
+                   f"Last update: {last}\n\n" \
                    f"{delta}" \
                    f"{top_3_daily}" \
                    f"Top members:\n{top_10}\n\n" \
-                   f'See all the stats <a href="{url.replace("api/", "")}">here</a>'
+                   f'See all the stats <a href="https://stats.foldingathome.org/team/{team_number}">here</a>'
 
             bot.send_message(chat_id=WEEE_FOLD_ID,
                              text=text,
