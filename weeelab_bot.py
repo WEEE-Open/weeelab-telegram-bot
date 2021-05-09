@@ -401,21 +401,21 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             print(e)
 
 
-def fah_grapher(bot: BotHandler, hour: int, minute: int):
-    while True:
-        try:
-            sleep(calculate_time_to_sleep(hour, minute))
-
-            team_number = 249208
-            s = HTMLSession()
-            url = f"https://folding.extremeoverclocking.com/graphs/production_day_total.php?s=&t={team_number}"
-
-            img_enc_png = s.get(url).content
-            bot.send_photo(chat_id=WEEE_FOLD_ID,
-                           photo=img_enc_png)
-
-        except Exception as e:
-            print(e)
+# def fah_grapher(bot: BotHandler, hour: int, minute: int):
+#     while True:
+#         try:
+#             sleep(calculate_time_to_sleep(hour, minute))
+#
+#             team_number = 249208
+#             s = HTMLSession()
+#             url = f"https://folding.extremeoverclocking.com/graphs/production_day_total.php?s=&t={team_number}"
+#
+#             img_enc_png = s.get(url).content
+#             bot.send_photo(chat_id=WEEE_FOLD_ID,
+#                            photo=img_enc_png)
+#
+#         except Exception as e:
+#             print(e)
 
 
 def run_shell_cmd(cmd: str) -> str:
@@ -1523,8 +1523,10 @@ def main():
     # for t in fah_ranker_ts:
     #     t.start()
 
-    fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
-    fah_grapher_t.start()
+    # fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
+    # fah_grapher_t.start()
+    fah_ranker_t = Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), 9, 0))
+    fah_ranker_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol, quotes)
 
