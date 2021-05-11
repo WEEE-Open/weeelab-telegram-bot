@@ -290,10 +290,17 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
 
             team_number = 249208
             url = f"https://api.foldingathome.org/team/{team_number}/members"
+            url_team_info = f"https://api.foldingathome.org/team/{team_number}"
+            url_total_team_count = "https://api.foldingathome.org/team/count"
             for _ in range(10):
-                response = requests.get(url)
-                json_res = response.json()
-                if str(response.status_code).startswith('4') or 'error' in json_res:
+                res = requests.get(url)
+                json_res = res.json()
+                res_info = requests.get(url_team_info)
+                json_res_info = res_info.json()
+                res_count = requests.get(url_total_team_count)
+                json_res_count = res_count.json()
+                if any(str(sc).startswith('4') for sc in (res.status_code, res_info.status_code, res_count.status_code)) \
+                        or any('error' in j for j in (json_res, json_res_info, json_res_count)):
                     sleep(1)
                     continue
                 else:
@@ -384,9 +391,9 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
 
             text = f"Total Team Score: <b>{human_readable_number(total_credit)}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(total_wus)}</b>\n" \
-                   f"Team Rank: dunno, we need another API request " \
-                   f"/ some amount of teams " \
-                   f"-> top <b>{round(100/99999*100, 2)}%</b>\n" \
+                   f"Team Rank: {human_readable_number(json_res_info['rank'])} " \
+                   f"/ {human_readable_number(json_res_count)} " \
+                   f"-> top <b>{round(json_res_info['rank']/json_res_count*100, 2)}%</b>\n" \
                    f"Last update: {last}\n\n" \
                    f"{delta}" \
                    f"{top_3_daily}" \
