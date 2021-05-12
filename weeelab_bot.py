@@ -300,7 +300,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
                 res_count = requests.get(url_total_team_count)
                 json_res_count = res_count.json()
                 if any(str(sc).startswith('4') for sc in (res.status_code, res_info.status_code, res_count.status_code)) \
-                        or any('error' in j for j in (json_res, json_res_info, json_res_count)):
+                        or any('error' in j for j in (json_res, json_res_info)):
                     sleep(1)
                     continue
                 else:
