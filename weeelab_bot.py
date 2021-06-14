@@ -892,9 +892,21 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message(msg)
         except ItemNotFoundError:
             self.__send_message(f'Item {item} not found.')
-        except AuthenticationError:
-            self.__send_message('Sorry, cannot authenticate with T.A.R.A.L.L.O.')
-        except RuntimeError:
+        except (RuntimeError, AuthenticationError):
+            fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.response.status_code)}).'
+            self.__send_message(fail_msg)
+
+    def item_location(self, item):
+        try:
+            item = self.tarallo.get_item(item, 0)
+            location = ' → '.join(item.location)
+            msg = f'Item <b>{item.code}</b>\nLocation: {location}\n'
+            msg += f'\n<a href="{self.tarallo.url}/item/{item.code}">View on Tarallo</a>'
+
+            self.__send_message(msg)
+        except ItemNotFoundError:
+            self.__send_message(f'Item {item} not found.')
+        except (RuntimeError, AuthenticationError):
             fail_msg = f'Sorry, an error has occurred (HTTP status: {str(self.tarallo.response.status_code)}).'
             self.__send_message(fail_msg)
 
@@ -1594,6 +1606,12 @@ def main():
                         handler.item_command_error('item')
                     else:
                         handler.item_info(command[1])
+
+                elif command[0] == "/location" or command[0] == "/location@weeelab_bot":
+                    if len(command) < 2:
+                        handler.item_command_error('location')
+                    else:
+                        handler.item_location(command[1])
 
                 elif command[0] == "/log" or command[0] == "/log@weeelab_bot":
                     if len(command) > 1:
