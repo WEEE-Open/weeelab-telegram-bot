@@ -35,7 +35,8 @@ class WeeelabLogs:
         log_lines = log_file.splitlines()
 
         for line in log_lines:
-            self.log.append(WeeelabLine(line))
+            if len(line.strip()) > 0:
+                self.log.append(WeeelabLine(line))
 
         # store the date of the last update of the log file,
         # the data is in UTC so we convert it to local timezone
@@ -102,7 +103,8 @@ class WeeelabLogs:
                 log_lines = log_file.splitlines()
 
                 for line in log_lines:
-                    self.old_log.append(WeeelabLine(line))
+                    if len(line.strip()) > 0:
+                        self.old_log.append(WeeelabLine(line))
             except owncloud.owncloud.HTTPResponseError:
                 print(f"Failed downloading {filename}, will try again next time")
                 # Roll back to the previous month, since that's the last we have
