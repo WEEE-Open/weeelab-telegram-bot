@@ -1394,8 +1394,13 @@ as well.\nFor a list of the available commands type /help.', )
                 birthday_people.remove(None)
 
                 if birthday_people:
+                    compleanno = "compleanno"
+                    for birthday_person in birthday_people:
+                        if 'palmi' in birthday_person.lower():
+                            compleanno = "genetliaco"
+
                     birthday_msg = f"{'🎂' * 42}\n\n" \
-                                   f"Oggi è il compleanno di {' e '.join(birthday_people)}!\n<code>AugurEEE!!!</code>" \
+                                   f"Oggi è il {compleanno} di {' e '.join(birthday_people)}!\n<code>AugurEEE!!!</code>" \
                                    f"\n\n{'🎂' * 42}"
                     self.bot.send_message(chat_id=WEEE_CHAT_ID,
                                           text=birthday_msg)
