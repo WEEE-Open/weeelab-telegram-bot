@@ -651,14 +651,14 @@ as well.\nFor a list of the available commands type /help.', )
                 if days <= 0:
                     self.__send_message(
                         f"I took note that you'll go to the lab at {the_time}. "
-                        f"Use <i>/tolab no</i> to cancel. Check if "
+                        f"Use /tolab_no to cancel. Check if "
                         f"anybody else is coming with /inlab.{sir_message}")
                 elif days == 1:
-                    self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use <i>/tolab no</i> to cancel. "
+                    self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use /tolab_no to cancel. "
                                         f"Check if anyone else is coming with /inlab{sir_message}")
                 else:
                     last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
-                    self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use <i>/tolab no</i> to "
+                    self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use /tolab_no to "
                                         f"cancel. Check if anyone else is coming with /inlab"
                                         f"{last_message}")
         except Exception as e:
@@ -1639,6 +1639,9 @@ def main():
                         handler.tolab(command[1], command[2])
                     else:
                         handler.tolab_help()
+
+                elif command[0] == "/tolab_no" or command[0] == "/tolab_no@weeelab_bot":
+                    handler.tolab("no")
 
                 elif command[0] == "/ring":
                     handler.ring(wave_obj)
