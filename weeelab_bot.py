@@ -37,6 +37,7 @@ import requests  # send HTTP requests to Telegram server
 # noinspection PyUnresolvedReferences
 import owncloud
 import datetime
+import random
 import time
 from datetime import timedelta
 import traceback  # Print stack traces in logs
@@ -1399,12 +1400,18 @@ as well.\nFor a list of the available commands type /help.', )
                         if 'palmi' in birthday_person.lower():
                             compleanno = "genetliaco"
 
-                    birthday_msg = f"{'🎂' * 42}\n\n" \
-                                   f"Oggi è il {compleanno} di {' e '.join(birthday_people)}!\n<code>AugurEEE!!!</code>" \
-                                   f"\n\n{'🎂' * 42}"
+                    birthday_decoration = random.choice(('🎂' * 42, '🎂🎉' * 21))
+                    birthday_wishes = random.choice(
+                        ('AugurEEE!!!', 'Auguriii!!!', 'Tante angurieee! 🍉🍉', 'Mega-auguriii!')
+                    )
+
+                    birthday_msg = f"{birthday_decoration}\n\n" \
+                                   f"Oggi è il {compleanno} di {' e '.join(birthday_people)}!\n" \
+                                   f"{birthday_wishes}" \
+                                   f"\n\n{birthday_decoration}"
                     self.bot.send_message(chat_id=WEEE_CHAT_ID,
                                           text=birthday_msg)
-                    sleep(60)
+                    sleep(60)  # TODO: do we need this?
 
             except Exception as e:
                 print(e)
