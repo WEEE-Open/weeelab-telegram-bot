@@ -1576,7 +1576,15 @@ def main():
                 # Leave scam channels where people add our bot randomly
                 chat_id = last_update['channel_post']['chat']['id']
                 print(bot.leave_chat(chat_id).text)
-                
+
+            # Ignore edited messages
+            elif 'edited_message' in last_update:
+                continue
+
+            # Ignore images, stickers and stuff like that
+            elif 'message' in last_update and 'text' not in last_update['message']:
+                continue
+
             # see https://core.telegram.org/bots/api#message
             elif 'message' in last_update and 'text' in last_update['message']:
                 # Handle private messages
