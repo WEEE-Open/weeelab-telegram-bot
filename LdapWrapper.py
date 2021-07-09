@@ -15,7 +15,7 @@ class LdapConnection:
         self.server = server
 
     def __enter__(self):
-        print("Connecting to LDAP")
+        # print("Connecting to LDAP")
         self.conn = ldap.initialize(f"ldap://{self.server}:389")
         self.conn.protocol_version = ldap.VERSION3
         self.conn.start_tls_s()
@@ -25,7 +25,7 @@ class LdapConnection:
         return self.conn
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        print("Disconnecting from LDAP")
+        # print("Disconnecting from LDAP")
         self.conn.unbind_s()
 
 
@@ -285,7 +285,7 @@ class User:
         :param tree: Users tree DN
         :return: attributes, dn
         """
-        print(f"Search {tgid}")
+        # print(f"Search {tgid}")
         tgid = int(tgid)  # Safety measure
         try:
             attributes, dn = User.__search_by_tgid(conn, tgid, tree)
