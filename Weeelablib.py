@@ -104,7 +104,7 @@ class WeeelabLogs:
 
                 for line in log_lines:
                     if len(line.strip()) > 0:
-                        gself.old_log.append(WeeelabLine(line))
+                        self.old_log.append(WeeelabLine(line))
             except owncloud.owncloud.HTTPResponseError:
                 print(f"Failed downloading {filename}, will try again next time")
                 # Roll back to the previous month, since that's the last we have
