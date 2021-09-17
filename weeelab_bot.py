@@ -620,7 +620,7 @@ as well.\nFor a list of the available commands type /help.', )
                 msg += '\n\nAre you going to the lab later? Tell everyone with /tolab.'
 
         if len(inlab) > 0 and not user_themself_inlab:
-            msg += "\nUse /ring for the bell, if you are at door 3."
+            msg += "\n\nUse /ring for the bell, if you are at door 3."
         self.__send_message(msg)
 
     def tolab(self, the_time: str, day: str = None):
