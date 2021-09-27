@@ -52,7 +52,7 @@ SSH_PIALL_KEY_PATH = os.environ.get('SSH_PIALL_KEY_PATH')
 WOL_MACHINES = os.environ.get('WOL_MACHINES')  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
 if WOL_MACHINES is not None:
     WOL_MACHINES = __unpack_wol(WOL_MACHINES)
-WOL_LOGOUT = os.environ.get('WOL_LOGOUT')  # 00:0a:0b:0c:0d:0e
+WOL_WEEELAB = os.environ.get('WOL_WEEELAB')  # 00:0a:0b:0c:0d:0e
 WOL_I_AM_DOOR = os.environ.get('WOL_I_AM_DOOR')
 
 MAX_WORK_DONE = int(os.environ.get('MAX_WORK_DONE'))  # 2000
