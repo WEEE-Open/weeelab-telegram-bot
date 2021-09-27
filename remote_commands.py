@@ -1,10 +1,10 @@
 ssh_weeelab_command = {
     'logout': [
-        "weeelab -o",
-        "-m"
+        "weeelab -o ",
+        "-m "
     ],
     'login': [
-        "weeelab -i",
+        "weeelab -i ",
     ]
 }
 
