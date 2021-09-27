@@ -227,8 +227,8 @@ class AcceptableQueriesLoFi(Enum):
 
 
 class AcceptableQueriesShutdown(Enum):
-    logout_yes = 'logout_yes'
-    logout_no = 'logout_no'
+    weeelab_yes = 'weeelab_yes'
+    weeelab_no = 'weeelab_no'
     i_am_door_yes = "i_am_door_yes"
     i_am_door_no = "i_am_door_no"
 
@@ -1172,7 +1172,7 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         # send commands
-        command = str(ssh_weeelab_command[0] + username + ssh_weeelab_command[1] + '"' + logout_message + '"')
+        command = str(ssh_weeelab_command['logout'][0] + username + ssh_weeelab_command['logout'][1] + '"' + logout_message + '"')
         ssh_connection = SSHUtil(username=SSH_SCMA_USER,
                                  host=SSH_SCMA_HOST_IP,
                                  private_key_path=SSH_SCMA_KEY_PATH,
@@ -1181,12 +1181,12 @@ as well.\nFor a list of the available commands type /help.', )
 
         # SSH worked, check return code
         if ssh_connection.execute_command():
-            self.__check_logout_ssh(ssh_connection, username)
+            self.__check_weeelab_ssh(ssh_connection, username, 'Logout')
 
         # SSH didn't work
         else:
             # wol always exits with 0, cannot check if it worked
-            Wol.send(WOL_LOGOUT)
+            Wol.send(WOL_WEEELAB)
             self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
                                 "I'll reach out to you when I've completed the logout process.")
             # boot time is around 115 seconds
@@ -1194,7 +1194,7 @@ as well.\nFor a list of the available commands type /help.', )
             while True:
                 sleep(10)
                 if ssh_connection.execute_command():
-                    self.__check_logout_ssh(ssh_connection, username)
+                    self.__check_weeelab_ssh(ssh_connection, username, 'Logout')
                     break
 
         # give the user the option to shutdown the logout machine
@@ -1202,13 +1202,51 @@ as well.\nFor a list of the available commands type /help.', )
 
         return
 
-    def __check_logout_ssh(self, ssh_connection, username: str):
+    def login(self, words):
+        if not self.user.isadmin:
+            self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your login.")
+            return
+
+        username = words[0]
+
+        # send commands
+        command = str(ssh_weeelab_command['login'][0] + username)
+        ssh_connection = SSHUtil(username=SSH_SCMA_USER,
+                                 host=SSH_SCMA_HOST_IP,
+                                 private_key_path=SSH_SCMA_KEY_PATH,
+                                 commands=command,
+                                 timeout=5)
+
+        # SSH worked, check return code
+        if ssh_connection.execute_command():
+            self.__check_weeelab_ssh(ssh_connection, username, 'Login')
+
+        # SSH didn't work
+        else:
+            # wol always exits with 0, cannot check if it worked
+            Wol.send(WOL_WEEELAB)
+            self.__send_message("Sent wol command. Waiting a couple minutes until it's completed.\n"
+                                "I'll reach out to you when I've completed the login process.")
+            # boot time is around 115 seconds
+            # check instead of guessing when the machine has finished booting
+            while True:
+                sleep(10)
+                if ssh_connection.execute_command():
+                    self.__check_weeelab_ssh(ssh_connection, username, 'Login')
+                    break
+
+        # give the user the option to shutdown the logout machine
+        self.shutdown_prompt(Machines.scma)
+
+        return
+
+    def __check_weeelab_ssh(self, ssh_connection, username: str, action: str):
         # weeelab logout worked
         if ssh_connection.return_code == 0:
-            self.__send_message("Logout for " + username + " completed!")
+            self.__send_message(action + " for " + username + " completed!")
         # weeelab logout didn't work
         elif ssh_connection.return_code == 3:
-            self.__send_message("Logout didn't work. Try checking the parameters you've sent me.")
+            self.__send_message(action + " didn't work. Try checking the parameters you've sent me.")
         else:
             self.__send_message("Unexpected weeelab return code. Please check what happened.")
         return
@@ -1274,8 +1312,8 @@ as well.\nFor a list of the available commands type /help.', )
             return
 
         if machine == Machines.scma:
-            yes = AcceptableQueriesShutdown.logout_yes.value
-            no = AcceptableQueriesShutdown.logout_no.value
+            yes = AcceptableQueriesShutdown.weeelab_yes.value
+            no = AcceptableQueriesShutdown.weeelab_no.value
         elif machine == Machines.piall:
             yes = AcceptableQueriesShutdown.i_am_door_yes.value
             no = AcceptableQueriesShutdown.i_am_door_no.value
@@ -1299,7 +1337,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message("I did not understand that button press")
             return
 
-        if query == AcceptableQueriesShutdown.logout_yes or \
+        if query == AcceptableQueriesShutdown.weeelab_yes or \
                 query == AcceptableQueriesShutdown.i_am_door_yes:
             ssh_connection = SSHUtil(username=ssh_user,
                                      host=ssh_host_ip,
@@ -1314,7 +1352,7 @@ as well.\nFor a list of the available commands type /help.', )
                 else:
                     self.__edit_message(message_id, "There was an issue with the shutdown. Retrying...", None)
 
-        elif query == AcceptableQueriesShutdown.logout_no or \
+        elif query == AcceptableQueriesShutdown.weeelab_no or \
                 query == AcceptableQueriesShutdown.i_am_door_no:
             self.__edit_message(message_id, "Alright, we'll leave it alive. <i>For now.</i>", None)
 
@@ -1495,6 +1533,13 @@ Note: the username <b>must</b> be a single word with no spaces in between.\n\
 Note: the logout message cannot contain double quotes characters such as " """
         self.__send_message(help_message)
 
+    def login_help(self):
+        help_message = """
+Use /login followed by a username to login that user via weeelab.\n\n\
+An example would be: /logout asd.asdoni\n\
+Note: the username <b>must</b> be a single word with no spaces in between.\n"""
+        self.__send_message(help_message)
+
     def help(self):
         help_message = """Available commands and options:
 /inlab - Show the people in lab
@@ -1516,6 +1561,7 @@ Note: the logout message cannot contain double quotes characters such as " """
 /top all - Show a list of top users by hours spent
 /deletecache - Delete caches (reload logs and users)
 /logout <i>username</i> <i>description of what they've done</i> - Logout a user with weeelab
+/login <i>username</i> - Login a user with weeelab
 /wol - Spawns a keyboard with machines an admin can Wake On LAN
 /door - sonoporta
 /status - Show host machine uptime, load, memory and disk usage
@@ -1690,6 +1736,13 @@ def main():
                         logout.start()
                     else:
                         handler.logout_help()
+                
+                elif command[0] == "/login" or command[0] == "/login@weeelab_bot":
+                    if len(command) == 2:
+                        login = Thread(target=handler.login, args=(command[1:],))
+                        login.start()
+                    else:
+                        handler.login_help()
 
                 elif command[0] == "/door" or command[0] == "/door@weeelab_bot":
                     i_am_door = Thread(target=handler.i_am_door)
