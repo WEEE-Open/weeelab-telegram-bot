@@ -1164,20 +1164,20 @@ as well.\nFor a list of the available commands type /help.', )
 
     def tolab_callback(self, query: str, message_id: int):
         data = query.split(":")
-        if data[0] == 'hour':
-            self.__send_message(f"Time set to {query.data.split(':')[1]}:00. See you inlab!")
-        elif data[0] == 'forward_month':
-            calendar = Tolab_Calendar(data[1]).make()
+        if data[1] == 'hour':
+            self.__send_message(f"Time set to {query.data.split(':')[2]}:00. See you inlab!")
+        elif data[1] == 'forward_month':
+            calendar = Tolab_Calendar(data[2]).make()
             self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
-        elif data[0] == 'backward_month':
-            calendar = Tolab_Calendar(data[1]).make()
+        elif data[1] == 'backward_month':
+            calendar = Tolab_Calendar(data[2]).make()
             self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
         elif query.data == 'cancel_tolab':
             for idx, session in enumerate(active_sessions):
                 if session['id'] == self.__last_chat_id:
                     del active_sessions[idx]
             self.__send_message("Tolab canceled.")
-        elif data[0] != ' ' and data[0] != 'None':
+        elif data[1] != ' ' and data[1] != 'None':
             self.__send_message("Now, send a message with the hour you're going to lab")
 
     def logout(self, words):
@@ -1820,6 +1820,8 @@ def main():
                     handler.shutdown_callback(query, message_id, SSH_PIALL_USER, SSH_PIALL_HOST_IP, SSH_PIALL_KEY_PATH)
                 elif query.startswith('game_'):
                     handler.game_callback(query, message_id)
+                elif query.startswith('tolab:'):
+                    handler.tolab_callback(query, message_id)
                 else:
                     handler.unknown()
             else:
