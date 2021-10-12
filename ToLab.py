@@ -178,7 +178,7 @@ class Tolab_Calendar:
         for row in dates:
             week = []
             for date in row:
-                week.append(InlineKeyboardButton(date, callback_data=f"{date}:{month}"))
+                week.append(inline_keyboard_button(date, callback_data=f"{date}:{month}"))
             keyboard.append(week)
         keyboard.append([
             inline_keyboard_button(label="⬅️", callback_data=f"backward_month:{self.month_offset-1}:"),
