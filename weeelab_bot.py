@@ -1176,9 +1176,9 @@ as well.\nFor a list of the available commands type /help.', )
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Select a date", reply_markup=calendar)
         elif data[1] == 'cancel_tolab':
-            for idx, session in enumerate(active_sessions):
-                if session['id'] == self.__last_chat_id:
-                    del active_sessions[idx]
+            for idx, session in enumerate(self.bot.active_sessions):
+                if session == self.__last_chat_id:
+                    del self.bot.active_sessions[idx]
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Tolab canceled.")
         elif data[1] != ' ' and data[1] != 'None':
