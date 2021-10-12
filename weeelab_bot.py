@@ -1168,11 +1168,13 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message(f"Time set to {query.data.split(':')[2]}:00. See you inlab!")
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
-            self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Select a date", reply_markup=calendar)
+            #self.__send_inline_keyboard(message=, markup=calendar)
         elif data[1] == 'backward_month':
             calendar = Tolab_Calendar(data[2]).make()
             self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
-        elif query.data == 'cancel_tolab':
+        elif data[1] == 'cancel_tolab':
             for idx, session in enumerate(active_sessions):
                 if session['id'] == self.__last_chat_id:
                     del active_sessions[idx]
