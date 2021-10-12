@@ -1165,22 +1165,26 @@ as well.\nFor a list of the available commands type /help.', )
     def tolab_callback(self, query: str, message_id: int):
         data = query.split(":")
         if data[1] == 'hour':
-            self.__send_message(f"Time set to {query.data.split(':')[2]}:00. See you inlab!")
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Time set to {query.data.split(':')[2]}:00. See you inlab!")
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Select a date", reply_markup=calendar)
-            #self.__send_inline_keyboard(message=, markup=calendar)
         elif data[1] == 'backward_month':
             calendar = Tolab_Calendar(data[2]).make()
-            self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Select a date", reply_markup=calendar)
         elif data[1] == 'cancel_tolab':
             for idx, session in enumerate(active_sessions):
                 if session['id'] == self.__last_chat_id:
                     del active_sessions[idx]
-            self.__send_message("Tolab canceled.")
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Tolab canceled.")
         elif data[1] != ' ' and data[1] != 'None':
-            self.__send_message("Now, send a message with the hour you're going to lab")
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Now, send a message with the hour you're going to lab 🕐")
+
 
     def logout(self, words):
         if not self.user.isadmin:
