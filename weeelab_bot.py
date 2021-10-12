@@ -669,9 +669,11 @@ as well.\nFor a list of the available commands type /help.', )
 
     def tolabGui(self):
         calendar = Tolab_Calendar().make()
-        for idx, session in enumerate(self.bot.active_sessions):
+        idx = 0
+        for session in self.bot.active_sessions:
             if self.__last_chat_id == session['id']:
                 break
+            idx += 1
         if (idx+1) != len(self.bot.active_sessions):
             self.bot.active_sessions.append(self.__last_chat_id)
         self.__send_inline_keyboard(message=f"Select a date",
