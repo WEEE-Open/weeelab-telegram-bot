@@ -1834,8 +1834,8 @@ def main():
                     handler.game_callback(query, message_id)
                 elif query.startswith('tolab:'):
                     handler.tolab_callback(query, message_id)
-                elif tolab_chat_id in handler.get_tolab_chat_ids():
-                    handler.tolab_callback(query, message_id)
+                #elif tolab_chat_id in handler.get_tolab_chat_ids():
+                 #   handler.tolab_callback(query, message_id)
                 else:
                     handler.unknown()
             else:
