@@ -101,6 +101,7 @@ class BotHandler:
             "Do you know who said this one?",
         ]
         self.active_sessions = []
+        self.message_ids = []
 
     def get_updates(self, timeout=120):
         """
@@ -679,8 +680,8 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_inline_keyboard(message=f"Select a date",
                                     markup=calendar)
 
-    def get_tolab_chat_ids(self):
-        return self.bot.active_sessions
+    def get_tolab_message_ids(self):
+        return self.bot.message_ids
 
     @staticmethod
     def _tolab_parse_time(the_time: str):
@@ -1165,6 +1166,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
 
     def tolab_callback(self, query: str, message_id: int):
+        self.bot.message_ids.append(message_id)
         data = query.split(":")
         if data[1] == 'hour':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
@@ -1653,6 +1655,8 @@ def main():
     safety_test_reminder_t = Thread(target=handler.safety_test_reminder)
     safety_test_reminder_t.start()
 
+    tolab_message_ids = []
+
     while True:
         # call the function to check if there are new messages
         last_update = bot.get_last_update()
@@ -1830,7 +1834,7 @@ def main():
                     handler.game_callback(query, message_id)
                 elif query.startswith('tolab:'):
                     handler.tolab_callback(query, message_id)
-                elif chat_id in handler.get_tolab_chat_ids():
+                elif message_id in handler.get_tolab_message_ids():
                     handler.tolab_callback(query, message_id)
                 else:
                     handler.unknown()
