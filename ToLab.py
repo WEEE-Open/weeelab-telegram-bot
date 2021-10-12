@@ -185,7 +185,7 @@ class Tolab_Calendar:
             inline_keyboard_button(label="❌", callback_data="cancel_tolab"),
             inline_keyboard_button(label="➡️", callback_data=f"forward_month:{self.month_offset+1}")
         ])
-
+        print(keyboard)
         return keyboard
 
     def set_calendar(self):
