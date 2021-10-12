@@ -669,7 +669,7 @@ as well.\nFor a list of the available commands type /help.', )
 
     def tolabGui(self):
         calendar = Tolab_Calendar().make()
-        for idx, session in eumerate(self.bot.active_sessions):
+        for idx, session in enumerate(self.bot.active_sessions):
             if self.__last_chat_id == session['id']:
                 break
         if (idx+1) != len(self.bot.active_sessions):
