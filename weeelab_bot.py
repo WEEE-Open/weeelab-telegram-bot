@@ -1721,7 +1721,7 @@ def main():
                     elif len(command) >= 3:
                         handler.tolab(command[1], command[2])
                     else:
-                        handler.tolabGui
+                        handler.tolabGui()
 
                 elif command[0] == "/tolab_no" or command[0] == "/tolab_no@weeelab_bot":
                     handler.tolab("no")
