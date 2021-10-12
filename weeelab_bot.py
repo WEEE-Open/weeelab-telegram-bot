@@ -674,9 +674,8 @@ as well.\nFor a list of the available commands type /help.', )
                 break
         if (idx+1) != len(self.bot.active_sessions):
             self.bot.active_sessions.append(self.__last_chat_id)
-        self.bot.send_message(chat_id=self.__last_chat_id,
-                              text=f"Select a date",
-                              reply_markup=calendar)
+        self.__send_inline_keyboard(message=f"Select a date",
+                                    markup=calendar)
 
 
     @staticmethod
