@@ -28,7 +28,7 @@ from pytarallo.Tarallo import Tarallo
 from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
     AccountNotFoundError, User, Person
-from ToLab import ToLab
+from ToLab import ToLab, Tolab_Calendar
 from Quotes import Quotes
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
@@ -100,6 +100,7 @@ class BotHandler:
             "Do you know this one?",
             "Do you know who said this one?",
         ]
+        self.active_sessions = []
 
     def get_updates(self, timeout=120):
         """
@@ -666,6 +667,18 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
 
+    def tolabGui(self):
+        calendar = Tolab_Calendar().make()
+        for idx, session in eumerate(self.bot.active_sessions):
+            if self.__last_chat_id == session['id']
+                break
+        if (idx+1) != len(self.bot.active_sessions):
+            self.bot.active_sessions.append(self.__last_chat_id)
+        self.bot.send_message(chat_id=self.__last_chat_id,
+                              text=f"Select a date",
+                              reply_markup=calendar)
+
+
     @staticmethod
     def _tolab_parse_time(the_time: str):
         """
@@ -1147,6 +1160,24 @@ as well.\nFor a list of the available commands type /help.', )
             return
         else:
             self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
+
+    def tolab_callback(self, query: str, message_id: int):
+        data = query.split(":")
+        if data[0] == 'hour':
+            self.__send_message(f"Time set to {query.data.split(':')[1]}:00. See you inlab!")
+        elif data[0] == 'forward_month':
+            calendar = Tolab_Calendar(data[1]).make()
+            self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
+        elif data[0] == 'backward_month':
+            calendar = Tolab_Calendar(data[1]).make()
+            self.__send_inline_keyboard(message=f"Select a date", markup=calendar)
+        elif query.data == 'cancel_tolab':
+            for idx, session in enumerate(active_sessions):
+                if session['id'] == self.__last_chat_id:
+                    del active_sessions[idx]
+            self.__send_message("Tolab canceled.")
+        elif data[0] != ' ' and data[0] != 'None':
+            self.__send_message("Now, send a message with the hour you're going to lab")
 
     def logout(self, words):
         if not self.user.isadmin:
@@ -1691,7 +1722,7 @@ def main():
                     elif len(command) >= 3:
                         handler.tolab(command[1], command[2])
                     else:
-                        handler.tolab_help()
+                        handler.tolabGui
 
                 elif command[0] == "/tolab_no" or command[0] == "/tolab_no@weeelab_bot":
                     handler.tolab("no")

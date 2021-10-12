@@ -1,6 +1,9 @@
 from _datetime import datetime, timedelta
 import json
 import pytz
+import calendar
+from datetime import datetime
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 class ToLab:
@@ -150,3 +153,55 @@ class ToLab:
             # Save it in local timezone format, because who cares
             entry["tolab"] = datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
         self.oc.put_file_contents(self.tolab_path, json.dumps(serializable, indent=2).encode('utf-8'))
+
+
+class Tolab_Calendar:
+    def __init__(self, month_offset=0):
+        time = datetime.now().timetuple()
+        self.day = time.tm_mday
+        self.month = time.tm_mon
+        self.year = time.tm_year
+
+        self.month_offset = int(month_offset)
+
+    def make(self):
+        month , days, dates = self.set_calendar()
+        keyboard = []
+        col_names = []
+        keyboard.append([InlineKeyboardButton(month, callback_data="None")])
+        for d in days:
+            col_names.append(InlineKeyboardButton(d, callback_data="None"))
+        keyboard.append(col_names)
+        for row in dates:
+            week = []
+            for date in row:
+                week.append(InlineKeyboardButton(date, callback_data=f"{date}:{month}"))
+            keyboard.append(week)
+        keyboard.append([
+            InlineKeyboardButton("⬅️", callback_data=f"backward_month:{self.month_offset-1}:"),
+            InlineKeyboardButton("❌", callback_data="cancel_tolab"),
+            InlineKeyboardButton("➡️", callback_data=f"forward_month:{self.month_offset+1}")
+        ])
+
+        return InlineKeyboardMarkup(keyboard)
+
+    def set_calendar(self):
+        self.month = (self.month + self.month_offset)
+        year_offset = int((self.month - 1)/12)
+        self.month = ((self.month - 1) % 12) + 1
+        rows = calendar.month(self.year + year_offset, self.month, 2, 1).splitlines()
+        month = rows[0].strip()
+        days = rows[1].split(" ")
+        dates = rows[2:]
+        for row, d in enumerate(dates):
+            d = d.strip(" ")
+            d = d.split()
+            if len(d) != 7:
+                if d[0] == '1':
+                    for i in range(7 - len(d)):
+                        d.insert(0, " ")
+                else:
+                    for i in range(7 - len(d)):
+                        d.append(" ")
+            dates[row] = d
+        return month, days, dates
