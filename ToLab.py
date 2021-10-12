@@ -3,7 +3,11 @@ import json
 import pytz
 import calendar
 from datetime import datetime
-from weeelab_bot import inline_keyboard_button
+
+
+def inline_keyboard_button(label: str, callback_data: str):
+    return {"text": label, "callback_data": callback_data}
+
 
 class ToLab:
     def __init__(self, oc, tolab_path: str):
