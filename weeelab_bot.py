@@ -680,8 +680,8 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_inline_keyboard(message=f"Select a date",
                                     markup=calendar)
 
-    def get_tolab_message_ids(self):
-        return self.bot.message_ids
+    def get_tolab_chat_ids(self):
+        return self.bot.active_sessions
 
     @staticmethod
     def _tolab_parse_time(the_time: str):
@@ -1821,7 +1821,11 @@ def main():
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
                 message_id = last_update['callback_query']['message']['message_id']
+                tolab_chat_id = last_update['id']
 
+                print(f"tolab_chat_id: {tolab_chat_id}")
+                print(f"get_tolab_chat_ids: {handler.get_tolab_chat_ids()}")
+                
                 if query.startswith('wol_'):
                     handler.wol_callback(query, message_id)
                 elif query.startswith('lofi_'):
@@ -1834,7 +1838,8 @@ def main():
                     handler.game_callback(query, message_id)
                 elif query.startswith('tolab:'):
                     handler.tolab_callback(query, message_id)
-                elif message_id in handler.get_tolab_message_ids():
+                elif tolab_chat_id in handler.get_tolab_chat_ids():
+
                     handler.tolab_callback(query, message_id)
                 else:
                     handler.unknown()
