@@ -1813,7 +1813,8 @@ def main():
 
                 else:
                     print(f"{handler.get_tolab_user_ids()}")
-                    user_id = last_update['callback_query']['from']['id']
+                    print(f"{last_update}")
+                    user_id = None
                     if user_id in handler.get_tolab_user_ids():
                         handler.tolab_callback(query, message_id, user_id)
                     else:
