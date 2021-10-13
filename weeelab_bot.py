@@ -1160,6 +1160,7 @@ as well.\nFor a list of the available commands type /help.', )
 
     def tolab_callback(self, query: str, message_id: int, user_id: int):
         data = query.split(":")
+        print(f"tolab_callback_data: {data}")
         if data[1] == 'hour':
             print("Sono arrivato fino a qui ma mi rompo asd")
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
