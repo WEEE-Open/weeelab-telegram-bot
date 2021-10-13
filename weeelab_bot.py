@@ -1813,9 +1813,9 @@ def main():
 
                 else:
                     print(f"{handler.get_tolab_user_ids()}")
-                    print(f"user_id: {last_update}")
+                    print(f"user_id: {last_update['message']['from']['id']}")
                     user_id = last_update['message']['from']['id']
-                    message_id = last_update['message']['id']
+                    message_id = last_update['message']['message_id']
 
                     if user_id in handler.get_tolab_user_ids():
                         handler.tolab_callback(command[0], message_id, user_id)
