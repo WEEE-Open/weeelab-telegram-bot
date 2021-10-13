@@ -1194,7 +1194,7 @@ as well.\nFor a list of the available commands type /help.', )
                 self.bot.active_sessions.append([user_id, message_id, ''])
                 return
         # This is horrendous but it werks
-        self.bot.active_sessions.append([user_id, message_id])
+        self.bot.active_sessions.append([user_id, message_id, ''])
         print(f"Saved user id for tolab: {user_id}")
 
     def logout(self, words):
