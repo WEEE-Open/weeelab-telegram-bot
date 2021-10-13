@@ -1817,10 +1817,9 @@ def main():
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
                 message_id = last_update['callback_query']['message']['message_id']
+                user_id = last_update['from']['id']
 
-
-                print(f"last_update: {last_update}")
-                print(f"get_tolab_chat_ids: {handler.get_tolab_chat_ids()}")
+                print(f"last_update: {user_id}")
 
                 if query.startswith('wol_'):
                     handler.wol_callback(query, message_id)
@@ -1835,7 +1834,7 @@ def main():
                 elif query.startswith('tolab:'):
                     handler.tolab_callback(query, message_id)
                 #elif tolab_chat_id in handler.get_tolab_chat_ids():
-                 #   handler.tolab_callback(query, message_id)
+                    #handler.tolab_callback(query, message_id)
                 else:
                     handler.unknown()
             else:
