@@ -1815,6 +1815,7 @@ def main():
                     handler.next_tests()
 
                 else:
+                    flag = True
                     user_id = last_update['message']['from']['id']
                     active_sessions = handler.get_tolab_active_sessions()
                     print(f"active_sessions: {active_sessions}")
@@ -1823,8 +1824,10 @@ def main():
                         print("asd")
                         if user_id in session:
                             handler.tolab_callback(f"hour:{command[0]}", session[1], user_id)
-                            return
-                    handler.unknown()
+                            flag = False
+                            break
+                    if flag:
+                        handler.unknown()
 
             elif 'callback_query' in last_update:
                 authorized = handler.read_user_from_callback(last_update)
