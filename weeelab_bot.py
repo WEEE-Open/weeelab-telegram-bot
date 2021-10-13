@@ -1816,7 +1816,7 @@ def main():
                     print(f"user_id: {last_update['message']['from']['id']}")
                     user_id = last_update['message']['from']['id']
                     if user_id in handler.get_tolab_user_ids():
-                        handler.tolab_callback(query, message_id, user_id)
+                        handler.tolab_callback(command[0], message_id, user_id)
                     else:
                         handler.unknown()
 
