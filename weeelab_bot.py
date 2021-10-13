@@ -1159,6 +1159,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
 
     def tolab_callback(self, query: str, message_id: int, user_id: int):
+        # PLEASE, do not touch anything if you're not absolutely sure about what are you doing. Thanks
         data = query.split(":")
         if data[0] == 'hour':
             for idx, session in enumerate(self.bot.active_sessions):
@@ -1167,6 +1168,7 @@ as well.\nFor a list of the available commands type /help.', )
                                           text=f"So you're going to lab at {data[1]}:00 of "
                                                f"{self.bot.active_sessions[idx][2]}. See you inlab!")
                     del self.bot.active_sessions[idx]
+                    return
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
