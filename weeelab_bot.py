@@ -670,16 +670,10 @@ as well.\nFor a list of the available commands type /help.', )
     def tolabGui(self):
         calendar = Tolab_Calendar().make()
         idx = 0
-        for session in self.bot.active_sessions:
-            if self.__last_chat_id == session:
-                break
-            idx += 1
-        if (idx+1) != len(self.bot.active_sessions):
-            self.bot.active_sessions.append(self.__last_chat_id)
         self.__send_inline_keyboard(message=f"Select a date",
                                     markup=calendar)
 
-    def get_tolab_chat_ids(self):
+    def get_tolab_user_ids(self):
         return self.bot.active_sessions
 
     @staticmethod
@@ -1164,11 +1158,15 @@ as well.\nFor a list of the available commands type /help.', )
         else:
             self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
 
-    def tolab_callback(self, query: str, message_id: int):
+    def tolab_callback(self, query: str, message_id: int, user_id: int):
         data = query.split(":")
         if data[1] == 'hour':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Time set to {data[2]}:00. See you inlab!")
+            for idx, session in enumerate(self.bot.active_sessions):
+                if session == user_id:
+                    del self.bot.active_sessions[idx]
+                    print(f"Deleted user_id {session} from active_sessions.")
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
@@ -1186,7 +1184,14 @@ as well.\nFor a list of the available commands type /help.', )
         elif data[1] != ' ' and data[1] != 'None':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Now, send a message with the hour you're going to lab 🕐")
-
+        idx = 0
+        for session in self.bot.active_sessions:
+            if user_id == session:
+                break
+            idx += 1
+        if (idx+1) != len(self.bot.active_sessions):
+            self.bot.active_sessions.append(user_id)
+            print(f"Saved user id for tolab: {user_id}")
 
     def logout(self, words):
         if not self.user.isadmin:
@@ -1832,9 +1837,9 @@ def main():
                 elif query.startswith('game_'):
                     handler.game_callback(query, message_id)
                 elif query.startswith('tolab:'):
-                    handler.tolab_callback(query, message_id)
-                #elif tolab_chat_id in handler.get_tolab_chat_ids():
-                    #handler.tolab_callback(query, message_id)
+                    handler.tolab_callback(query, message_id, user_id)
+                elif user_id in handler.get_tolab_user_ids():
+                    handler.tolab_callback(query, message_id, user_id)
                 else:
                     handler.unknown()
             else:
