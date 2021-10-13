@@ -1164,7 +1164,7 @@ as well.\nFor a list of the available commands type /help.', )
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
                     self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                          text=f"Time set to {data[1]}:00. See you inlab!\n"
+                                          text=f"Time set to {data[1]}:00. See you inlab! "
                                                f"{self.bot.active_sessions[idx][2]}")
                     del self.bot.active_sessions[idx]
         elif data[1] == 'forward_month':
