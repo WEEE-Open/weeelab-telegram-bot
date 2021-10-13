@@ -1813,7 +1813,11 @@ def main():
 
                 else:
                     print(f"{handler.get_tolab_user_ids()}")
-                    handler.unknown()
+                    user_id = last_update['callback_query']['from']['id']
+                    if user_id in handler.get_tolab_user_ids():
+                        handler.tolab_callback(query, message_id, user_id)
+                    else:
+                        handler.unknown()
 
             elif 'callback_query' in last_update:
                 authorized = handler.read_user_from_callback(last_update)
@@ -1823,7 +1827,7 @@ def main():
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
                 message_id = last_update['callback_query']['message']['message_id']
-                user_id = last_update['callback_query']['from']['id']
+
 
                 print(f"last_update: {user_id}")
 
@@ -1838,8 +1842,6 @@ def main():
                 elif query.startswith('game_'):
                     handler.game_callback(query, message_id)
                 elif query.startswith('tolab:'):
-                    handler.tolab_callback(query, message_id, user_id)
-                elif user_id in handler.get_tolab_user_ids():
                     handler.tolab_callback(query, message_id, user_id)
                 else:
                     handler.unknown()
