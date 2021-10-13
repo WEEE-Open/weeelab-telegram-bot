@@ -1190,7 +1190,8 @@ as well.\nFor a list of the available commands type /help.', )
             if (idx+1) == len(self.bot.active_sessions):
                 self.bot.active_sessions.append([user_id, message_id])
                 print(f"Saved user id for tolab: {user_id}")
-
+            print(f"idx: {idx}\nlen: {len(self.bot.active_sessions)}")
+            
     def logout(self, words):
         if not self.user.isadmin:
             self.__send_message("Sorry, this is a feature reserved to admins. You can ask an admin to do your logout.")
