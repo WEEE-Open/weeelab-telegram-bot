@@ -1813,8 +1813,10 @@ def main():
 
                 else:
                     print(f"{handler.get_tolab_user_ids()}")
-                    print(f"user_id: {last_update['message']['from']['id']}")
+                    print(f"user_id: {last_update}")
                     user_id = last_update['message']['from']['id']
+                    message_id = last_update['message']['id']
+
                     if user_id in handler.get_tolab_user_ids():
                         handler.tolab_callback(command[0], message_id, user_id)
                     else:
