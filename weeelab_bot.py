@@ -1820,10 +1820,10 @@ def main():
                     print(f"active_sessions: {active_sessions}")
                     print(f"user_id: {last_update['message']['from']['id']}")
                     for idx, session in enumerate(active_sessions):
+                        print("asd")
                         if user_id in session:
                             handler.tolab_callback(f"hour:{command[0]}", session[1], user_id)
                             return
-                        print("asd")
                     handler.unknown()
 
             elif 'callback_query' in last_update:
