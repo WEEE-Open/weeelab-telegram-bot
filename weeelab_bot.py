@@ -1163,7 +1163,7 @@ as well.\nFor a list of the available commands type /help.', )
         if data[1] == 'hour':
             print("Sono arrivato fino a qui ma mi rompo asd")
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                  text=f"Time set to {data[2]}:00. See you inlab!")
+                                  text=f"Time set to {data[1]}:00. See you inlab!")
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
                     del self.bot.active_sessions[idx]
@@ -1821,7 +1821,7 @@ def main():
                     print(f"user_id: {last_update['message']['from']['id']}")
                     for idx, session in enumerate(active_sessions):
                         if user_id in session:
-                            handler.tolab_callback(command[0], session[1], user_id)
+                            handler.tolab_callback(f"hour:{command[0]}", session[1], user_id)
                     handler.unknown()
 
             elif 'callback_query' in last_update:
