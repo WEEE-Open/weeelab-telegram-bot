@@ -1812,6 +1812,7 @@ def main():
                     handler.next_tests()
 
                 else:
+                    print(f"{handler.get_tolab_user_ids()}")
                     handler.unknown()
 
             elif 'callback_query' in last_update:
@@ -1825,8 +1826,7 @@ def main():
                 user_id = last_update['callback_query']['from']['id']
 
                 print(f"last_update: {user_id}")
-                print(f"{handler.get_tolab_user_ids()}")
-                
+
                 if query.startswith('wol_'):
                     handler.wol_callback(query, message_id)
                 elif query.startswith('lofi_'):
