@@ -673,7 +673,7 @@ as well.\nFor a list of the available commands type /help.', )
         self.__send_inline_keyboard(message=f"Select a date",
                                     markup=calendar)
 
-    def get_tolab_user_ids(self):
+    def get_tolab_active_sessions(self):
         return self.bot.active_sessions
 
     @staticmethod
@@ -1164,7 +1164,7 @@ as well.\nFor a list of the available commands type /help.', )
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Time set to {data[2]}:00. See you inlab!")
             for idx, session in enumerate(self.bot.active_sessions):
-                if session == user_id:
+                if session[0] == user_id:
                     del self.bot.active_sessions[idx]
                     print(f"Deleted user_id {session} from active_sessions.")
         elif data[1] == 'forward_month':
@@ -1184,14 +1184,12 @@ as well.\nFor a list of the available commands type /help.', )
         elif data[1] != ' ' and data[1] != 'None':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Now, send a message with the hour you're going to lab 🕐")
-        idx = 0
-        for session in self.bot.active_sessions:
-            if user_id == session:
+        for idx, session in enumerate(self.bot.active_sessions):
+            if user_id == session[0]:
                 break
-            idx += 1
-        if (idx+1) != len(self.bot.active_sessions):
-            self.bot.active_sessions.append(user_id)
-            print(f"Saved user id for tolab: {user_id}")
+            if (idx+1) == len(self.bot.active_sessions):
+                self.bot.active_sessions.append([user_id, message_id])
+                print(f"Saved user id for tolab: {user_id}")
 
     def logout(self, words):
         if not self.user.isadmin:
@@ -1812,15 +1810,14 @@ def main():
                     handler.next_tests()
 
                 else:
-                    print(f"{handler.get_tolab_user_ids()}")
-                    print(f"user_id: {last_update['message']['from']['id']}")
                     user_id = last_update['message']['from']['id']
-                    message_id = last_update['message']['message_id']
-
-                    if user_id in handler.get_tolab_user_ids():
-                        handler.tolab_callback(command[0], message_id, user_id)
-                    else:
-                        handler.unknown()
+                    active_sessions = handler.get_tolab_active_sessions()
+                    print(f"active_sessions: {active_sessions}")
+                    print(f"user_id: {last_update['message']['from']['id']}")
+                    for idx, session in enumerate(active_sessions):
+                        if user_id in session:
+                            handler.tolab_callback(command[0], session[1], user_id)
+                    handler.unknown()
 
             elif 'callback_query' in last_update:
                 authorized = handler.read_user_from_callback(last_update)
