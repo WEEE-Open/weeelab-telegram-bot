@@ -1185,22 +1185,13 @@ as well.\nFor a list of the available commands type /help.', )
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Now, send a message with the hour you're going to lab 🕐")
             for idx, session in enumerate(self.bot.active_sessions):
-                if session[0] == user_id:
-                    print(f"Saved date in active_session: {data[1]}")
-                    self.bot.active_sessions[idx][2] = data[1]
+                if user_id == session[0]:
                     return
-            print(f"Saved date in active_session: {data[1]}")
-            self.bot.active_sessions[0].append('asd')
-            print(f"{self.bot.active_sessions[0][2]}")
-        for idx, session in enumerate(self.bot.active_sessions):
-            if user_id == session[0]:
-                return
-            if (idx+1) == len(self.bot.active_sessions):
-                self.bot.active_sessions.append([user_id, message_id, ''])
-                return
-        # This is horrendous but it werks
-        self.bot.active_sessions.append([user_id, message_id, ''])
-        print(f"Saved user id for tolab: {user_id}")
+                if (idx + 1) == len(self.bot.active_sessions):
+                    self.bot.active_sessions.append([user_id, message_id, data[1]])
+                    return
+            # This is horrendous but it werks
+            self.bot.active_sessions.append([user_id, message_id, data[1]])
 
     def logout(self, words):
         if not self.user.isadmin:
