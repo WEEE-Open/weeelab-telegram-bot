@@ -1160,15 +1160,13 @@ as well.\nFor a list of the available commands type /help.', )
 
     def tolab_callback(self, query: str, message_id: int, user_id: int):
         data = query.split(":")
-        print(f"tolab_callback_data: {data}")
         if data[0] == 'hour':
-            print("Sono arrivato fino a qui ma mi rompo asd")
-            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                  text=f"Time set to {data[1]}:00. See you inlab!")
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
+                    self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                          text=f"Time set to {data[1]}:00. See you inlab!\n"
+                                               f"{self.bot.active_sessions[idx][2]}")
                     del self.bot.active_sessions[idx]
-                    print(f"Deleted user_id {session} from active_sessions.")
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
@@ -1186,12 +1184,14 @@ as well.\nFor a list of the available commands type /help.', )
         elif data[1] != ' ' and data[1] != 'None':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Now, send a message with the hour you're going to lab 🕐")
+            for idx, session in enumerate(self.bot.active_sessions):
+                if session[0] == user_id:
+                    self.bot.active_sessions[idx][2] = data[1]
         for idx, session in enumerate(self.bot.active_sessions):
             if user_id == session[0]:
                 return
             if (idx+1) == len(self.bot.active_sessions):
-                self.bot.active_sessions.append([user_id, message_id])
-                print(f"Saved user id for tolab: {user_id}")
+                self.bot.active_sessions.append([user_id, message_id, ''])
                 return
         # This is horrendous but it werks
         self.bot.active_sessions.append([user_id, message_id])
