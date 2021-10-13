@@ -1828,9 +1828,7 @@ def main():
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
                 message_id = last_update['callback_query']['message']['message_id']
-
-
-                print(f"last_update: {user_id}")
+                user_id = last_update['callback_query']['from']['id']
 
                 if query.startswith('wol_'):
                     handler.wol_callback(query, message_id)
