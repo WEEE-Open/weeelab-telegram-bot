@@ -1186,6 +1186,7 @@ as well.\nFor a list of the available commands type /help.', )
                                   text=f"Now, send a message with the hour you're going to lab 🕐")
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
+                    print(f"Saved date in active_session: {data[1]}")
                     self.bot.active_sessions[idx][2] = data[1]
         for idx, session in enumerate(self.bot.active_sessions):
             if user_id == session[0]:
