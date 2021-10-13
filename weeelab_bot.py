@@ -1184,14 +1184,16 @@ as well.\nFor a list of the available commands type /help.', )
         elif data[1] != ' ' and data[1] != 'None':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                   text=f"Now, send a message with the hour you're going to lab 🕐")
-        print(f"len: {len(self.bot.active_sessions)}")
         for idx, session in enumerate(self.bot.active_sessions):
-            print(idx)
             if user_id == session[0]:
-                break
+                return
             if (idx+1) == len(self.bot.active_sessions):
                 self.bot.active_sessions.append([user_id, message_id])
                 print(f"Saved user id for tolab: {user_id}")
+                return
+        # This is horrendous but it werks
+        self.bot.active_sessions.append([user_id, message_id])
+        print(f"Saved user id for tolab: {user_id}")
 
     def logout(self, words):
         if not self.user.isadmin:
