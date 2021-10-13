@@ -1164,8 +1164,8 @@ as well.\nFor a list of the available commands type /help.', )
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
                     self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                          text=f"Time set to {data[1]}:00. See you inlab! "
-                                               f"{self.bot.active_sessions[idx][2]}")
+                                          text=f"So you're going to lab at {data[1]}:00 of "
+                                               f"{self.bot.active_sessions[idx][2]}. See you inlab!")
                     del self.bot.active_sessions[idx]
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
@@ -1188,10 +1188,10 @@ as well.\nFor a list of the available commands type /help.', )
                 if user_id == session[0]:
                     return
                 if (idx + 1) == len(self.bot.active_sessions):
-                    self.bot.active_sessions.append([user_id, message_id, data[1]])
+                    self.bot.active_sessions.append([user_id, message_id, f"{data[1]} {data[2]}"])
                     return
             # This is horrendous but it werks
-            self.bot.active_sessions.append([user_id, message_id, data[1]])
+            self.bot.active_sessions.append([user_id, message_id, f"{data[1]} {data[2]}"])
 
     def logout(self, words):
         if not self.user.isadmin:
