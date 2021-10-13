@@ -1168,6 +1168,7 @@ as well.\nFor a list of the available commands type /help.', )
                                           text=f"So you're going to lab at {data[1]}:00 of "
                                                f"{self.bot.active_sessions[idx][2]}. See you inlab!")
                     del self.bot.active_sessions[idx]
+                    print(self.bot.active_sessions[idx])
                     return
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
