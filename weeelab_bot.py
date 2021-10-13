@@ -1823,6 +1823,7 @@ def main():
                         if user_id in session:
                             handler.tolab_callback(f"hour:{command[0]}", session[1], user_id)
                             return
+                        print("asd")
                     handler.unknown()
 
             elif 'callback_query' in last_update:
