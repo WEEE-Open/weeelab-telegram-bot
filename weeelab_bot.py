@@ -1185,10 +1185,14 @@ as well.\nFor a list of the available commands type /help.', )
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"You've selected a past date. Please select a valid date.")
                         return
-                    if len(data) > 2:
-                        self.tolab(the_time=f"{data[1]}:{data[2]}", day=f"+{day}", is_gui=True)
+                    if day == 0:
+                        day = None
                     else:
-                        self.tolab(the_time=f"{data[1]}", day=f"{day}", is_gui=True)
+                        day = f"+{day}"
+                    if len(data) > 2:
+                        self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
+                    else:
+                        self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
 
                     self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                           text=f"So you're going to lab at {data[1]}:00 of "
