@@ -171,9 +171,6 @@ class Tolab_Calendar:
         month , days, dates = self.set_calendar()
         month_num = month.split()[0]
         month_num = datetime.strptime(month_num, "%B").month
-        print(self.day)
-        print(f"self.month: {self.month}")
-        print(f"month_num: {month_num}")
         keyboard = []
         col_names = []
         keyboard.append([inline_keyboard_button(label=month, callback_data="tolab:None")])
@@ -182,9 +179,8 @@ class Tolab_Calendar:
         keyboard.append(col_names)
         for row in dates:
             week = []
-            print(row)
             for date in row:
-                if date == self.day:
+                if date == f"{self.day}":
                     week.append(inline_keyboard_button(f"📍 {date}", callback_data=f"tolab:{date}:{month}"))
                 elif month_num == self.month and date <= self.day:
                     week.append(inline_keyboard_button(date, callback_data="tolab:None"))
