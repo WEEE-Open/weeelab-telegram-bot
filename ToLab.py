@@ -170,10 +170,10 @@ class Tolab_Calendar:
     def make(self):
         month , days, dates = self.set_calendar()
         month_num = month.split()[0]
-        print(f"month_num {month_num}")
-        print(f"self.month {self.month}")
         year_num = int(month.split()[1])
         month_num = datetime.strptime(month_num, "%B").month
+        print(f"month_num {month_num}")
+        print(f"self.month {self.month}")
         keyboard = []
         col_names = []
         keyboard.append([inline_keyboard_button(label=month, callback_data="tolab:None")])
