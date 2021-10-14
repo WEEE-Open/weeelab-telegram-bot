@@ -181,8 +181,9 @@ class Tolab_Calendar:
         for row in dates:
             week = []
             for date in row:
-                if date == f"{self.day}":
-                    week.append(inline_keyboard_button(f"📍{date}", callback_data=f"tolab:{date}:{month}"))
+                if date == f"{self.day}" and year_num == self.year and month_num == self.month:
+                    week.append(inline_keyboard_button(f"📍69", callback_data=f"tolab:{date}:{month}"))
+                    #week.append(inline_keyboard_button(f"📍{date}", callback_data=f"tolab:{date}:{month}"))
                 elif date == ' ':
                     week.append(inline_keyboard_button(date, callback_data="tolab:None"))
                 elif year_num <= self.year and month_num <= self.month and int(date) <= self.day:
