@@ -1183,7 +1183,7 @@ as well.\nFor a list of the available commands type /help.', )
                     print(f"day: {day}")
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                              text=f"You've selected a past date. Please select a valid date.")
+                                              text="You've selected a past date. Please select a valid date.")
                         return
                     if day == 0:
                         day = None
