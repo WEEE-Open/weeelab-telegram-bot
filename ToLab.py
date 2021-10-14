@@ -164,7 +164,8 @@ class Tolab_Calendar:
         self.day = time.tm_mday
         self.month = time.tm_mon
         self.year = time.tm_year
-
+        self.td_month = time.tm_mon
+        self.td_year = time.tm_year
         self.month_offset = int(month_offset)
 
     def make(self):
@@ -172,10 +173,6 @@ class Tolab_Calendar:
         month_num = month.split()[0]
         year_num = int(month.split()[1])
         month_num = datetime.strptime(month_num, "%B").month
-        print(f"month_num {month_num}")
-        print(f"self.month {self.month}")
-        print(f"year_num {year_num}")
-        print(f"self.year {self.year}")
         keyboard = []
         col_names = []
         keyboard.append([inline_keyboard_button(label=month, callback_data="tolab:None")])
@@ -185,11 +182,11 @@ class Tolab_Calendar:
         for row in dates:
             week = []
             for date in row:
-                if date == f"{self.day}" and year_num == self.year and month_num == self.month:
+                if date == f"{self.day}" and year_num == self.td_year and month_num == self.td_month:
                     week.append(inline_keyboard_button(f"📍{date}", callback_data=f"tolab:{date}:{month}"))
                 elif date == ' ':
                     week.append(inline_keyboard_button(date, callback_data="tolab:None"))
-                elif year_num <= self.year and month_num <= self.month and int(date) <= self.day:
+                elif year_num <= self.td_year and month_num <= self.td_month and int(date) <= self.day:
                     week.append(inline_keyboard_button(date, callback_data="tolab:None"))
                 else:
                     week.append(inline_keyboard_button(date, callback_data=f"tolab:{date}:{month}"))
