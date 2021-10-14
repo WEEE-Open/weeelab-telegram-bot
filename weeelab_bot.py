@@ -1184,7 +1184,7 @@ as well.\nFor a list of the available commands type /help.', )
                     print(f"data: {data}")
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                              text="You've selected a past date. Please select a valid date.")
+                                              text="❌ You've selected a past date. Please select a valid date.")
                         del self.bot.active_sessions[idx]
                         return
                     if day == 0:
@@ -1193,12 +1193,15 @@ as well.\nFor a list of the available commands type /help.', )
                         day = f"+{day}"
                     if len(data) > 2:
                         self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text=f"✅ So you're going to lab at {data[1]}:{data[2]} of "
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
                     else:
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text=f"✅ So you're going to lab at {data[1]}:00 of "
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
 
-                    self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                          text=f"So you're going to lab at {data[1]}:00 of "
-                                               f"{self.bot.active_sessions[idx][2]}. See you inlab!")
                     del self.bot.active_sessions[idx]
                     return
         elif data[1] == 'forward_month':
@@ -1214,10 +1217,10 @@ as well.\nFor a list of the available commands type /help.', )
                 if session == self.__last_chat_id:
                     del self.bot.active_sessions[idx]
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                  text=f"Tolab canceled.")
+                                  text=f"❌ Tolab canceled.")
         elif data[1] != ' ' and data[1] != 'None':
             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                  text=f"Now, send a message with the hour you're going to lab 🕐")
+                                  text=f"🕐 Now, send a message with the hour you're going to lab")
             for idx, session in enumerate(self.bot.active_sessions):
                 if user_id == session[0]:
                     return
