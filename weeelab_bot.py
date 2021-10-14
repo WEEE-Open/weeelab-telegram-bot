@@ -660,8 +660,8 @@ as well.\nFor a list of the available commands type /help.', )
                         self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use /tolab_no to cancel. "
                                             f"Check if anyone else is coming with /inlab{sir_message}")
                     else:
-                    last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
-                    self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use /tolab_no to "
+                        last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
+                        self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use /tolab_no to "
                                         f"cancel. Check if anyone else is coming with /inlab"
                                         f"{last_message}")
         except Exception as e:
