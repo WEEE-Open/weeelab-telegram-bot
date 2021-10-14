@@ -182,7 +182,7 @@ class Tolab_Calendar:
         for row in dates:
             week = []
             for date in row:
-                if date == self.day:
+                if int(date) == self.day:
                     week.append(inline_keyboard_button(f"📍 {date}", callback_data=f"tolab:{date}:{month}"))
                 elif month_num == self.month and date <= self.day:
                     week.append(inline_keyboard_button(date, callback_data="tolab:None"))
