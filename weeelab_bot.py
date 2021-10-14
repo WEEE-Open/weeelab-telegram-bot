@@ -1185,8 +1185,8 @@ as well.\nFor a list of the available commands type /help.', )
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text="You've selected a past date. Please select a valid date.")
-                        continue
-                    print("sto continuando ma non dovrei")
+                        del self.bot.active_sessions[idx]
+                        return
                     if day == 0:
                         day = None
                     else:
