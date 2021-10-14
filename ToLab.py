@@ -174,6 +174,8 @@ class Tolab_Calendar:
         month_num = datetime.strptime(month_num, "%B").month
         print(f"month_num {month_num}")
         print(f"self.month {self.month}")
+        print(f"year_num {year_num}")
+        print(f"self.year {self.year}")
         keyboard = []
         col_names = []
         keyboard.append([inline_keyboard_button(label=month, callback_data="tolab:None")])
