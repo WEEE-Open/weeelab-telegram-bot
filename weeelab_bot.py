@@ -727,9 +727,11 @@ as well.\nFor a list of the available commands type /help.', )
         day = date.split()
         day[1] = datetime.datetime.strptime(day[1], "%B").month
         day = f'{day[0]} {day[1]} {day[2]}'
+        print(f"day_funct: {day}")
         day = datetime.datetime.strptime(day, "%d %m %Y")
         today = datetime.datetime.now().timetuple()
         today = f"{today.tm_mday} {today.tm_mon} {today.tm_year}"
+        print(f"today: {today}")
         today = datetime.datetime.strptime(today, "%d %m %Y")
         diff = day - today
         return diff.days
@@ -1178,6 +1180,7 @@ as well.\nFor a list of the available commands type /help.', )
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
+                    print(f"day: {day}")
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"You've selected a past date. Please select a valid date.")
