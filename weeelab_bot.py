@@ -1181,10 +1181,12 @@ as well.\nFor a list of the available commands type /help.', )
                 if session[0] == user_id:
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     print(f"day: {day}")
+                    print(f"data: {data}")
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text="You've selected a past date. Please select a valid date.")
-                        return
+                        continue
+                    print("sto continuando ma non dovrei")
                     if day == 0:
                         day = None
                     else:
