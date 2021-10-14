@@ -624,7 +624,7 @@ as well.\nFor a list of the available commands type /help.', )
             msg += "\n\nUse /ring for the bell, if you are at door 3."
         self.__send_message(msg)
 
-    def tolab(self, the_time: str, day: str = None):
+    def tolab(self, the_time: str, day: str = None, is_gui: bool = False):
         try:
             the_time = self._tolab_parse_time(the_time)
         except ValueError:
@@ -650,15 +650,16 @@ as well.\nFor a list of the available commands type /help.', )
                     sir_message = "\nRemember to sign the SIR when you get there!"
 
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, the_time, day)
-                if days <= 0:
-                    self.__send_message(
-                        f"I took note that you'll go to the lab at {the_time}. "
-                        f"Use /tolab_no to cancel. Check if "
-                        f"anybody else is coming with /inlab.{sir_message}")
-                elif days == 1:
-                    self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use /tolab_no to cancel. "
-                                        f"Check if anyone else is coming with /inlab{sir_message}")
-                else:
+                if not is_gui:
+                    if days <= 0:
+                        self.__send_message(
+                            f"I took note that you'll go to the lab at {the_time}. "
+                            f"Use /tolab_no to cancel. Check if "
+                            f"anybody else is coming with /inlab.{sir_message}")
+                    elif days == 1:
+                        self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use /tolab_no to cancel. "
+                                            f"Check if anyone else is coming with /inlab{sir_message}")
+                    else:
                     last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
                     self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use /tolab_no to "
                                         f"cancel. Check if anyone else is coming with /inlab"
@@ -720,6 +721,18 @@ as well.\nFor a list of the available commands type /help.', )
                 if not day == 0:
                     return day
         raise ValueError
+
+    def _get_tolab_gui_days(self, idx: int, date: str):
+        self.bot.active_sessions[idx][2]
+        day = date.split()
+        day[1] = datetime.datetime.strptime(day[1], "%B").month
+        day = f'{day[0]} {day[1]} {day[2]}'
+        day = datetime.datetime.strptime(day, "%d %m %Y")
+        today = datetime.datetime.now().timetuple()
+        today = f"{today.tm_mday} {today.tm_mon} {today.tm_year}"
+        today = datetime.datetime.strptime(today, "%d %m %Y")
+        diff = day - today
+        return diff.days
 
     def ring(self, wave_obj):
         """
@@ -1164,11 +1177,20 @@ as well.\nFor a list of the available commands type /help.', )
         if data[0] == 'hour':
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
+                    day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
+                    if day < 0:
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text=f"You've selected a past date. Please select a valid date.")
+                        return
+                    if len(data) > 2:
+                        self.tolab(the_time=f"{data[1]}:{data[2]}", day=f"+{day}", is_gui=True)
+                    else:
+                        self.tolab(the_time=f"{data[1]}", day=f"{day}", is_gui=True)
+
                     self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                           text=f"So you're going to lab at {data[1]}:00 of "
                                                f"{self.bot.active_sessions[idx][2]}. See you inlab!")
                     del self.bot.active_sessions[idx]
-                    print(self.bot.active_sessions)
                     return
         elif data[1] == 'forward_month':
             calendar = Tolab_Calendar(data[2]).make()
@@ -1817,11 +1839,10 @@ def main():
                 else:
                     flag = True
                     user_id = last_update['message']['from']['id']
-                    active_sessions = handler.get_tolab_active_sessions()
-                    print(f"active_sessions: {active_sessions}")
+                    tolab_active_sessions = handler.get_tolab_active_sessions()
+                    print(f"active_sessions: {tolab_active_sessions}")
                     print(f"user_id: {last_update['message']['from']['id']}")
-                    for idx, session in enumerate(active_sessions):
-                        print("asd")
+                    for idx, session in enumerate(tolab_active_sessions):
                         if user_id in session:
                             handler.tolab_callback(f"hour:{command[0]}", session[1], user_id)
                             flag = False
