@@ -1680,7 +1680,7 @@ def main():
 
     # fah_grapher_t = Thread(target=fah_grapher, args=(BotHandler(TOKEN_BOT), 9, 0))
     # fah_grapher_t.start()
-    fah_ranker_t = Thread(target=fah_ranker, args=(BotHandler(TOKEN_BOT), 9, 0))
+    fah_ranker_t = Thread(target=fah_ranker, args=(bot, 9, 0))
     fah_ranker_t.start()
 
     handler = CommandHandler(bot, tarallo, logs, tolab, users, people, conn, wol, quotes)
