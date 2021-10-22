@@ -1495,7 +1495,7 @@ as well.\nFor a list of the available commands type /help.', )
 
                 test_people = []
                 for p in self.people.get_all(self.conn):
-                    if p.accountlocked and p.dateofsafetytest and p.dateofsafetytest == datetime.date.today():
+                    if p.dateofsafetytest and p.dateofsafetytest == datetime.date.today():
                         if p.tgid:
                             test_people.append(CommandHandler.__get_telegram_link_to_person(p))
                         else:
