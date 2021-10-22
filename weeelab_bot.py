@@ -28,7 +28,7 @@ from pytarallo.Tarallo import Tarallo
 from Wol import Wol
 from LdapWrapper import Users, People, LdapConnection, LdapConnectionError, DuplicateEntryError, AccountLockedError, \
     AccountNotFoundError, User, Person
-from ToLab import ToLab
+from ToLab import ToLab, Tolab_Calendar
 from Quotes import Quotes
 from Weeelablib import WeeelabLogs
 from variables import *  # internal library with the environment variables
@@ -100,6 +100,7 @@ class BotHandler:
             "Do you know this one?",
             "Do you know who said this one?",
         ]
+        self.active_sessions = []
 
     def get_updates(self, timeout=120):
         """
@@ -623,7 +624,7 @@ as well.\nFor a list of the available commands type /help.', )
             msg += "\n\nUse /ring for the bell, if you are at door 3."
         self.__send_message(msg)
 
-    def tolab(self, the_time: str, day: str = None):
+    def tolab(self, the_time: str, day: str = None, is_gui: bool = False):
         try:
             the_time = self._tolab_parse_time(the_time)
         except ValueError:
@@ -649,22 +650,32 @@ as well.\nFor a list of the available commands type /help.', )
                     sir_message = "\nRemember to sign the SIR when you get there!"
 
                 days = self.tolab_db.set_entry(self.user.uid, self.user.tgid, the_time, day)
-                if days <= 0:
-                    self.__send_message(
-                        f"I took note that you'll go to the lab at {the_time}. "
-                        f"Use /tolab_no to cancel. Check if "
-                        f"anybody else is coming with /inlab.{sir_message}")
-                elif days == 1:
-                    self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use /tolab_no to cancel. "
-                                        f"Check if anyone else is coming with /inlab{sir_message}")
-                else:
-                    last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
-                    self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use /tolab_no to "
+                if not is_gui:
+                    if days <= 0:
+                        self.__send_message(
+                            f"I took note that you'll go to the lab at {the_time}. "
+                            f"Use /tolab_no to cancel. Check if "
+                            f"anybody else is coming with /inlab.{sir_message}")
+                    elif days == 1:
+                        self.__send_message(f"So you'll go the lab at {the_time} tomorrow. Use /tolab_no to cancel. "
+                                            f"Check if anyone else is coming with /inlab{sir_message}")
+                    else:
+                        last_message = sir_message if sir_message != "" else "\nMark it down on your calendar!"
+                        self.__send_message(f"So you'll go the lab at {the_time} in {days} days. Use /tolab_no to "
                                         f"cancel. Check if anyone else is coming with /inlab"
                                         f"{last_message}")
         except Exception as e:
             self.__send_message(f"An error occurred: {str(e)}")
             print(traceback.format_exc())
+
+    def tolabGui(self):
+        calendar = Tolab_Calendar().make()
+        idx = 0
+        self.__send_inline_keyboard(message=f"Select a date",
+                                    markup=calendar)
+
+    def get_tolab_active_sessions(self):
+        return self.bot.active_sessions
 
     @staticmethod
     def _tolab_parse_time(the_time: str):
@@ -710,6 +721,18 @@ as well.\nFor a list of the available commands type /help.', )
                 if not day == 0:
                     return day
         raise ValueError
+
+    def _get_tolab_gui_days(self, idx: int, date: str):
+        self.bot.active_sessions[idx][2]
+        day = date.split()
+        day[1] = datetime.datetime.strptime(day[1], "%B").month
+        day = f'{day[0]} {day[1]} {day[2]}'
+        day = datetime.datetime.strptime(day, "%d %m %Y")
+        today = datetime.datetime.now().timetuple()
+        today = f"{today.tm_mday} {today.tm_mon} {today.tm_year}"
+        today = datetime.datetime.strptime(today, "%d %m %Y")
+        diff = day - today
+        return diff.days
 
     def ring(self, wave_obj):
         """
@@ -1147,6 +1170,61 @@ as well.\nFor a list of the available commands type /help.', )
             return
         else:
             self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
+
+    def tolab_callback(self, query: str, message_id: int, user_id: int):
+        # PLEASE, do not touch anything if you're not absolutely sure about what are you doing. Thanks
+        data = query.split(":")
+        if data[0] == 'hour':
+            for idx, session in enumerate(self.bot.active_sessions):
+                if session[0] == user_id:
+                    day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
+                    if day < 0:
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text="❌ You've selected a past date. Please select a valid date.")
+                        del self.bot.active_sessions[idx]
+                        return
+                    if day == 0:
+                        day = None
+                    else:
+                        day = f"+{day}"
+                    if len(data) > 2:
+                        self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text=f"✅ So you're going to lab at {data[1]}:{data[2]} of "
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
+                    else:
+                        self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text=f"✅ So you're going to lab at {data[1]}:00 of "
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
+
+                    del self.bot.active_sessions[idx]
+                    return
+        elif data[1] == 'forward_month':
+            calendar = Tolab_Calendar(data[2]).make()
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Select a date", reply_markup=calendar)
+        elif data[1] == 'backward_month':
+            calendar = Tolab_Calendar(data[2]).make()
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"Select a date", reply_markup=calendar)
+        elif data[1] == 'cancel_tolab':
+            for idx, session in enumerate(self.bot.active_sessions):
+                if session == self.__last_chat_id:
+                    del self.bot.active_sessions[idx]
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"❌ Tolab canceled.")
+        elif data[1] != ' ' and data[1] != 'None':
+            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                  text=f"🕐 Now, send a message with the hour you're going to lab")
+            for idx, session in enumerate(self.bot.active_sessions):
+                if user_id == session[0]:
+                    return
+                if (idx + 1) == len(self.bot.active_sessions):
+                    self.bot.active_sessions.append([user_id, message_id, f"{data[1]} {data[2]}"])
+                    return
+            # This is horrendous but it werks
+            self.bot.active_sessions.append([user_id, message_id, f"{data[1]} {data[2]}"])
 
     def logout(self, words):
         if not self.user.isadmin:
@@ -1691,7 +1769,7 @@ def main():
                     elif len(command) >= 3:
                         handler.tolab(command[1], command[2])
                     else:
-                        handler.tolab_help()
+                        handler.tolabGui()
 
                 elif command[0] == "/tolab_no" or command[0] == "/tolab_no@weeelab_bot":
                     handler.tolab("no")
@@ -1767,7 +1845,16 @@ def main():
                     handler.next_tests()
 
                 else:
-                    handler.unknown()
+                    flag = True
+                    user_id = last_update['message']['from']['id']
+                    tolab_active_sessions = handler.get_tolab_active_sessions()
+                    for idx, session in enumerate(tolab_active_sessions):
+                        if user_id in session:
+                            handler.tolab_callback(f"hour:{command[0]}", session[1], user_id)
+                            flag = False
+                            break
+                    if flag:
+                        handler.unknown()
 
             elif 'callback_query' in last_update:
                 authorized = handler.read_user_from_callback(last_update)
@@ -1777,6 +1864,7 @@ def main():
                 # Handle button callbacks
                 query = last_update['callback_query']['data']
                 message_id = last_update['callback_query']['message']['message_id']
+                user_id = last_update['callback_query']['from']['id']
 
                 if query.startswith('wol_'):
                     handler.wol_callback(query, message_id)
@@ -1788,6 +1876,8 @@ def main():
                     handler.shutdown_callback(query, message_id, SSH_PIALL_USER, SSH_PIALL_HOST_IP, SSH_PIALL_KEY_PATH)
                 elif query.startswith('game_'):
                     handler.game_callback(query, message_id)
+                elif query.startswith('tolab:'):
+                    handler.tolab_callback(query, message_id, user_id)
                 else:
                     handler.unknown()
             else:

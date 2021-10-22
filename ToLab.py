@@ -1,6 +1,12 @@
 from _datetime import datetime, timedelta
 import json
 import pytz
+import calendar
+from datetime import datetime
+
+
+def inline_keyboard_button(label: str, callback_data: str):
+    return {"text": label, "callback_data": callback_data}
 
 
 class ToLab:
@@ -150,3 +156,65 @@ class ToLab:
             # Save it in local timezone format, because who cares
             entry["tolab"] = datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
         self.oc.put_file_contents(self.tolab_path, json.dumps(serializable, indent=2).encode('utf-8'))
+
+
+class Tolab_Calendar:
+    def __init__(self, month_offset=0):
+        time = datetime.now().timetuple()
+        self.day = time.tm_mday
+        self.month = time.tm_mon
+        self.year = time.tm_year
+        self.td_month = time.tm_mon
+        self.td_year = time.tm_year
+        self.month_offset = int(month_offset)
+
+    def make(self):
+        month , days, dates = self.set_calendar()
+        month_num = month.split()[0]
+        year_num = int(month.split()[1])
+        month_num = datetime.strptime(month_num, "%B").month
+        keyboard = []
+        col_names = []
+        keyboard.append([inline_keyboard_button(label=month, callback_data="tolab:None")])
+        for d in days:
+            col_names.append(inline_keyboard_button(label=d, callback_data="tolab:None"))
+        keyboard.append(col_names)
+        for row in dates:
+            week = []
+            for date in row:
+                if date == f"{self.day}" and year_num == self.td_year and month_num == self.td_month:
+                    week.append(inline_keyboard_button(f"📍{date}", callback_data=f"tolab:{date}:{month}"))
+                elif date == ' ':
+                    week.append(inline_keyboard_button(date, callback_data="tolab:None"))
+                elif year_num <= self.td_year and month_num <= self.td_month and int(date) <= self.day:
+                    week.append(inline_keyboard_button(date, callback_data="tolab:None"))
+                else:
+                    week.append(inline_keyboard_button(date, callback_data=f"tolab:{date}:{month}"))
+            keyboard.append(week)
+        keyboard.append([
+            inline_keyboard_button(label="⬅️", callback_data=f"tolab:backward_month:{self.month_offset-1}:"),
+            inline_keyboard_button(label="❌", callback_data="tolab:cancel_tolab"),
+            inline_keyboard_button(label="➡️", callback_data=f"tolab:forward_month:{self.month_offset+1}")
+        ])
+        return keyboard
+
+    def set_calendar(self):
+        self.month = (self.month + self.month_offset)
+        year_offset = int((self.month - 1)/12)
+        self.month = ((self.month - 1) % 12) + 1
+        rows = calendar.month(self.year + year_offset, self.month, 2, 1).splitlines()
+        month = rows[0].strip()
+        days = rows[1].split(" ")
+        dates = rows[2:]
+        for row, d in enumerate(dates):
+            d = d.strip(" ")
+            d = d.split()
+            if len(d) != 7:
+                if d[0] == '1':
+                    for i in range(7 - len(d)):
+                        d.insert(0, " ")
+                else:
+                    for i in range(7 - len(d)):
+                        d.append(" ")
+            dates[row] = d
+        return month, days, dates
