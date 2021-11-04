@@ -2,10 +2,13 @@
 Description=the Telegram bot
 Requires=network.target
 After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=33
 
 [Service]
 Type=simple
 User=bot
+RestartSec=5
 Environment="OC_URL=https://cloud.example.com/"
 Environment="OC_USER=bot"
 Environment="OC_PWD=f00b4r"
@@ -19,8 +22,10 @@ Environment="BOT_USER=bot"
 Environment="BOT_PSW=f00b4r2"
 Environment="TOKEN_BOT=1234:f00f00f00f00f00f00f00f00f00f00f00"
 WorkingDirectory=/home/bot/weeelab-telegram-bot
-ExecStart=/usr/bin/pipenv run bot
+ExecStart=/home/bot/weeelab-telegram-bot/venv/bin/python -m /home/bot/weeelab-telegram-bot/weeelab_bot.py
 Restart=on-failure
+StandardOutput=journal
+StandardError=journal
 IPAccounting=yes
 
 [Install]

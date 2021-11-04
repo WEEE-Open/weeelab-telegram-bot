@@ -6,6 +6,7 @@ import owncloud
 import random
 import json
 
+
 class Quotes:
     def __init__(self, oc: owncloud, quotes_path: str, demotivational_path: str, games_path: str):
         self.oc = oc
