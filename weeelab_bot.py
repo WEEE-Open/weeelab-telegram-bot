@@ -1194,6 +1194,7 @@ as well.\nFor a list of the available commands type /help.', )
                         else:
                             sir_message = "lol non serve il sir asdlol"
                         print(f"self.user.signedsir : {self.user.signedsir}")
+                        print(f"self.user.dateofsafetytest : {self.user.dateofsafetytest}")
                         print(f"sir_message")
                         self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
@@ -1208,7 +1209,7 @@ as well.\nFor a list of the available commands type /help.', )
                         else:
                             sir_message = "lol non serve il sir asdlol"
                         print(f"self.user.signedsir : {self.user.signedsir}")
-                        print(f"sir_message")
+                        print(f"{sir_message}")
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:00 of "
