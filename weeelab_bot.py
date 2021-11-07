@@ -1177,6 +1177,10 @@ as well.\nFor a list of the available commands type /help.', )
         if data[0] == 'hour':
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
+                    sir_message = ""
+                    if not self.user.signedsir and self.user.dateofsafetytest is not None:
+                        sir_message = "\nRemember to sign the SIR when you get there!"
+
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
@@ -1191,12 +1195,16 @@ as well.\nFor a list of the available commands type /help.', )
                         self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:{data[2]} of "
-                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!\nUse /tolab_no "
+                                                   f"to cancel. Check if anybody else is coming with /inlab.\n"
+                                                   f"{sir_message}")
                     else:
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:00 of "
-                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!\nUse /tolab_no "
+                                                   f"to cancel. Check if anybody else is coming with /inlab.\n"
+                                                   f"{sir_message}")
 
                     del self.bot.active_sessions[idx]
                     return
