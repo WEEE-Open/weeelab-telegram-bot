@@ -1198,7 +1198,7 @@ as well.\nFor a list of the available commands type /help.', )
                                               text=f"✅ So you're going to lab at {data[1]}:{data[2]} of "
                                                    f"{self.bot.active_sessions[idx][2]}. See you inlab!\nUse /tolab_no "
                                                    f"to cancel. Check if anybody else is coming with /inlab.\n"
-                                                   f"{sir_message}")
+                                                   f"lollone")
                     else:
                         sir_message = ""
                         if not self.user.signedsir and self.user.dateofsafetytest is not None:
@@ -1210,7 +1210,7 @@ as well.\nFor a list of the available commands type /help.', )
                                               text=f"✅ So you're going to lab at {data[1]}:00 of "
                                                    f"{self.bot.active_sessions[idx][2]}. See you inlab!\nUse /tolab_no "
                                                    f"to cancel. Check if anybody else is coming with /inlab.\n"
-                                                   f"{sir_message}")
+                                                   f"lollone")
 
                     del self.bot.active_sessions[idx]
                     return
