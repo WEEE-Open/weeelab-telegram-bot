@@ -1178,6 +1178,9 @@ as well.\nFor a list of the available commands type /help.', )
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
+                    sir_message = ""
+                    if not self.user.signedsir and self.user.dateofsafetytest is not None:
+                        sir_message = "\nRemember to sign the SIR when you get there!"
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text="❌ You've selected a past date. Please select a valid date.")
@@ -1188,11 +1191,6 @@ as well.\nFor a list of the available commands type /help.', )
                     else:
                         day = f"+{day}"
                     if len(data) > 2:
-                        sir_message = "asd"
-                        if not self.user.signedsir and self.user.dateofsafetytest is not None:
-                            sir_message = "\nRemember to sign the SIR when you get there!"
-                        else:
-                            sir_message = "lol non serve il sir asdlol"
                         print(f"self.user.signedsir : {self.user.signedsir}")
                         print(f"self.user.dateofsafetytest : {self.user.dateofsafetytest}")
                         print(f"sir_message")
@@ -1203,12 +1201,8 @@ as well.\nFor a list of the available commands type /help.', )
                                                    f"to cancel. Check if anybody else is coming with /inlab.\n"
                                                    f"{sir_message}")
                     else:
-                        sir_message = "asdzorz"
-                        if not self.user.signedsir and self.user.dateofsafetytest is not None:
-                            sir_message = "\nRemember to sign the SIR when you get there!"
-                        else:
-                            sir_message = "lol non serve il sir asdlol"
                         print(f"self.user.signedsir : {self.user.signedsir}")
+                        print(f"self.user.dateofsafetytest : {self.user.dateofsafetytest}")
                         print(f"{sir_message}")
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
