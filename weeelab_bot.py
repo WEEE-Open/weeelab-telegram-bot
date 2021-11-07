@@ -1180,7 +1180,8 @@ as well.\nFor a list of the available commands type /help.', )
                     sir_message = ""
                     if not self.user.signedsir and self.user.dateofsafetytest is not None:
                         sir_message = "\nRemember to sign the SIR when you get there!"
-
+                    print(f"self.user.signedsir : {self.user.signedsir}")
+                    print(f"sir_message")
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
