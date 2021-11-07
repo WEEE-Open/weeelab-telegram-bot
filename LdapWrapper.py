@@ -207,8 +207,8 @@ class User:
     cn: str
     givenname: str
     surname: str
-    signedsir: bool
     dateofsafetytest: Optional[date]
+    signedsir: bool
     isadmin: bool
     nickname: Optional[str]
 
