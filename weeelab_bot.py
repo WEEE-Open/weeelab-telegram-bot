@@ -1191,6 +1191,8 @@ as well.\nFor a list of the available commands type /help.', )
                         sir_message = "asd"
                         if not self.user.signedsir and self.user.dateofsafetytest is not None:
                             sir_message = "\nRemember to sign the SIR when you get there!"
+                        else:
+                            sir_message = "lol non serve il sir asdlol"
                         print(f"self.user.signedsir : {self.user.signedsir}")
                         print(f"sir_message")
                         self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
@@ -1203,6 +1205,8 @@ as well.\nFor a list of the available commands type /help.', )
                         sir_message = "asdzorz"
                         if not self.user.signedsir and self.user.dateofsafetytest is not None:
                             sir_message = "\nRemember to sign the SIR when you get there!"
+                        else:
+                            sir_message = "lol non serve il sir asdlol"
                         print(f"self.user.signedsir : {self.user.signedsir}")
                         print(f"sir_message")
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
