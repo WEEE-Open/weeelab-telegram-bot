@@ -1180,7 +1180,7 @@ as well.\nFor a list of the available commands type /help.', )
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     sir_message = ""
                     if not self.user.signedsir and self.user.dateofsafetytest is not None:
-                        sir_message = "\nRemember to sign the SIR when you get there!"
+                        sir_message = "\nRemember to sign the SIR when you get there! 📝"
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text="❌ You've selected a past date. Please select a valid date.")
@@ -1191,9 +1191,6 @@ as well.\nFor a list of the available commands type /help.', )
                     else:
                         day = f"+{day}"
                     if len(data) > 2:
-                        print(f"self.user.signedsir : {self.user.signedsir}")
-                        print(f"self.user.dateofsafetytest : {self.user.dateofsafetytest}")
-                        print(f"sir_message")
                         self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:{data[2]} of "
@@ -1201,9 +1198,6 @@ as well.\nFor a list of the available commands type /help.', )
                                                    f"to cancel. Check if anybody else is coming with /inlab.\n"
                                                    f"{sir_message}")
                     else:
-                        print(f"self.user.signedsir : {self.user.signedsir}")
-                        print(f"self.user.dateofsafetytest : {self.user.dateofsafetytest}")
-                        print(f"{sir_message}")
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:00 of "
