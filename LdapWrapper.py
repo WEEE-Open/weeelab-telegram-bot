@@ -190,6 +190,7 @@ class People:
                 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true",
                 'nsaccountlock' in attributes,
             )
+            print(f"attributes = {attributes}")
             self.__people[person.uid.lower()] = person
 
         self.last_update = time()
