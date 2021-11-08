@@ -177,7 +177,7 @@ class People:
         for dn, attributes in result:
             dob = self.schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
             dost = self.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-
+            print(f"attributes_people = {attributes}")
             person = Person(
                 attributes['uid'][0].decode(),
                 attributes['cn'][0].decode(),
