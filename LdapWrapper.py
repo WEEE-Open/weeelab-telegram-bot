@@ -177,7 +177,6 @@ class People:
         for dn, attributes in result:
             dob = self.schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
             dost = self.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-            print(f"attributes_people = {attributes}")
             person = Person(
                 attributes['uid'][0].decode(),
                 attributes['cn'][0].decode(),
@@ -265,7 +264,7 @@ class User:
         self.givenname = attributes['givenname'][0].decode()
         self.surname = attributes['surname'][0].decode()
         self.dateofsafetytest = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-        self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "True"
+        self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true"
         self.isadmin = User.is_in_groups(admin_groups, attributes)
         if also_nickname:
             if User.__get_stored_nickname(attributes) != nickname:
@@ -339,7 +338,7 @@ class User:
             'memberof',
             'telegramnickname',
             'safetytestdate',
-            'signedsir'
+            'signedsir',
             'telegramid',
             'nsaccountlock'
         ))
