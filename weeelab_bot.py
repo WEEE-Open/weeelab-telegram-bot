@@ -1180,6 +1180,7 @@ as well.\nFor a list of the available commands type /help.', )
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     sir_message = ""
                     print(f"sir_message = {sir_message}")
+                    print(f"self.user.signedsir = {self.user.signedsir}")
                     print(f"not self.user.signedsir = {not self.user.signedsir}")
                     print(f"self.user.dateofsafetytest is not None = {self.user.dateofsafetytest is not None}")
                     if (not self.user.signedsir) and (self.user.dateofsafetytest is not None):
