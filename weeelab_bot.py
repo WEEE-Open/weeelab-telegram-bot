@@ -1174,7 +1174,9 @@ as well.\nFor a list of the available commands type /help.', )
     def tolab_callback(self, query: str, message_id: int, user_id: int):
         # ---------------- READMEEEEEEEEEEEEEE --------------------
         # PLEASE, do not touch anything if you're not absolutely sure about what are you doing. Thanks
+        query.replace(".", ":")
         data = query.split(":")
+
         if data[0] == 'hour':
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:

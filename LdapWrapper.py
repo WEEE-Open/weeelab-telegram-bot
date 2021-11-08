@@ -307,7 +307,6 @@ class User:
         if nickname != tgnick:
             User.__update_nickname(dn, tgnick, conn)
         # self.__set_update_time() done in __post_init___
-        print(f"attributes = {attributes}")
         return User(
             dn,
             tgid,
