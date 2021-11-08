@@ -260,14 +260,12 @@ class User:
             raise AccountLockedError()
 
         # self.tgid = int(attributes['tgid'][0].decode())
+        self.attributes = attributes
         self.uid = attributes['uid'][0].decode()
         self.cn = attributes['cn'][0].decode()
         self.givenname = attributes['givenname'][0].decode()
         self.surname = attributes['surname'][0].decode()
         self.dateofsafetytest = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-        print(f"attributes = {attributes}")
-        print(f"attributes['signedsir'][0] = {attributes['signedsir'][0]}")
-        print(f"attributes['signedsir'][0].decode() = {attributes['signedsir'][0].decode()}")
         self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true"
         self.isadmin = User.is_in_groups(admin_groups, attributes)
         if also_nickname:

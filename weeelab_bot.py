@@ -1183,6 +1183,11 @@ as well.\nFor a list of the available commands type /help.', )
                     print(f"self.user.signedsir = {self.user.signedsir}")
                     print(f"not self.user.signedsir = {not self.user.signedsir}")
                     print(f"self.user.dateofsafetytest is not None = {self.user.dateofsafetytest is not None}")
+                    print("---------------------------------------")
+                    print(f"attributes = {self.user.attributes}")
+                    print(f"attributes['signedsir'][0] = {self.user.attributes['signedsir'][0]}")
+                    print(f"attributes['signedsir'][0].decode() = {self.user.attributes['signedsir'][0].decode()}")
+                    print("---------------------------------------")
                     if (not self.user.signedsir) and (self.user.dateofsafetytest is not None):
                         print("entering the sir IF")
                         sir_message = "\nRemember to sign the SIR when you get there! 📝"
