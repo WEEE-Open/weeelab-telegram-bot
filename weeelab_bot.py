@@ -1179,15 +1179,10 @@ as well.\nFor a list of the available commands type /help.', )
                 if session[0] == user_id:
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     sir_message = ""
-                    # print(f"sir_message = {sir_message}")
-                    # print(f"self.user.signedsir = {self.user.signedsir}")
-                    # print(f"not self.user.signedsir = {not self.user.signedsir}")
-                    # print(f"self.user.dateofsafetytest is not None = {self.user.dateofsafetytest is not None}")
-                    print("---------------------------------------")
-                    print(f"attributes = {self.user.signedsir}")
-                    print(f"attributes['signedsir'][0] = {self.user.signedsir['signedsir'][0]}")
-                    print(f"attributes['signedsir'][0].decode() = {self.user.signedsir['signedsir'][0].decode()}")
-                    print("---------------------------------------")
+                    print(f"sir_message = {sir_message}")
+                    print(f"self.user.signedsir = {self.user.signedsir}")
+                    print(f"not self.user.signedsir = {not self.user.signedsir}")
+                    print(f"self.user.dateofsafetytest is not None = {self.user.dateofsafetytest is not None}")
                     if (not self.user.signedsir) and (self.user.dateofsafetytest is not None):
                         print("entering the sir IF")
                         sir_message = "\nRemember to sign the SIR when you get there! 📝"
