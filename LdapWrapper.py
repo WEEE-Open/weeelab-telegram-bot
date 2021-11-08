@@ -211,6 +211,7 @@ class User:
     signedsir: bool
     isadmin: bool
     nickname: Optional[str]
+    attributes: Optional[list]
 
     def __post_init__(self):
         self.__set_update_time()
