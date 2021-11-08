@@ -177,7 +177,6 @@ class People:
         for dn, attributes in result:
             dob = self.schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
             dost = self.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-
             person = Person(
                 attributes['uid'][0].decode(),
                 attributes['cn'][0].decode(),
@@ -207,8 +206,8 @@ class User:
     cn: str
     givenname: str
     surname: str
-    signedsir: bool
     dateofsafetytest: Optional[date]
+    signedsir: bool
     isadmin: bool
     nickname: Optional[str]
 
@@ -338,7 +337,7 @@ class User:
             'memberof',
             'telegramnickname',
             'safetytestdate',
-            'signedsir'
+            'signedsir',
             'telegramid',
             'nsaccountlock'
         ))

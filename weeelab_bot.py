@@ -1172,12 +1172,26 @@ as well.\nFor a list of the available commands type /help.', )
             self.__send_message(f"Nope, that quote was from {result}\nAnother one? /game")
 
     def tolab_callback(self, query: str, message_id: int, user_id: int):
+        # ---------------- READMEEEEEEEEEEEEEE --------------------
         # PLEASE, do not touch anything if you're not absolutely sure about what are you doing. Thanks
+        query = query.replace(".", ":")
         data = query.split(":")
+
         if data[0] == 'hour':
             for idx, session in enumerate(self.bot.active_sessions):
                 if session[0] == user_id:
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
+                    sir_message = ""
+                    if len(data[-1]) > 2 or len(data[-1]) < 2 or len(data[-2]) > 2 or len(data[-2]) < 2:
+                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                              text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
+                        del self.bot.active_sessions[idx]
+                        return
+                    if (not self.user.signedsir) and (self.user.dateofsafetytest is not None):
+                        sir_message = "\nRemember to sign the SIR when you get there! 📝"
+                        # if people do tolab for a day that is after tomorrow then send also the "mark it down" message
+                        if day > 1:
+                            sir_message += "\nMark it down on your calendar!"
                     if day < 0:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text="❌ You've selected a past date. Please select a valid date.")
@@ -1191,12 +1205,16 @@ as well.\nFor a list of the available commands type /help.', )
                         self.tolab(the_time=f"{data[1]}:{data[2]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:{data[2]} of "
-                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!\nUse /tolab_no "
+                                                   f"to cancel. Check if anybody else is coming with /inlab.\n"
+                                                   f"{sir_message}")
                     else:
                         self.tolab(the_time=f"{data[1]}", day=day, is_gui=True)
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text=f"✅ So you're going to lab at {data[1]}:00 of "
-                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!")
+                                                   f"{self.bot.active_sessions[idx][2]}. See you inlab!\nUse /tolab_no "
+                                                   f"to cancel. Check if anybody else is coming with /inlab.\n"
+                                                   f"{sir_message}")
 
                     del self.bot.active_sessions[idx]
                     return
