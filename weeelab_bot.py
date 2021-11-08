@@ -1175,7 +1175,7 @@ as well.\nFor a list of the available commands type /help.', )
         # ---------------- READMEEEEEEEEEEEEEE --------------------
         # PLEASE, do not touch anything if you're not absolutely sure about what are you doing. Thanks
         print(f"query_before = {query}")
-        query.replace(".", ":")
+        query = query.replace(".", ":")
         print(f"query_after = {query}")
         data = query.split(":")
 
