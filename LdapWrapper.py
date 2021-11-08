@@ -190,7 +190,6 @@ class People:
                 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true",
                 'nsaccountlock' in attributes,
             )
-            print(f"attributes = {attributes}")
             self.__people[person.uid.lower()] = person
 
         self.last_update = time()
@@ -245,6 +244,7 @@ class User:
             'signedsir',
             'nsaccountlock'
         ))
+        print(f"result = {result}")
         if len(result) == 0:
             raise AccountNotFoundError()
         if len(result) > 1:
