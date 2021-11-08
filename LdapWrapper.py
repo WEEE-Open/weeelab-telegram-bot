@@ -265,7 +265,8 @@ class User:
         self.givenname = attributes['givenname'][0].decode()
         self.surname = attributes['surname'][0].decode()
         self.dateofsafetytest = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-        self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "True"
+        raise Exception("cctf")
+        self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true"
         self.isadmin = User.is_in_groups(admin_groups, attributes)
         if also_nickname:
             if User.__get_stored_nickname(attributes) != nickname:
