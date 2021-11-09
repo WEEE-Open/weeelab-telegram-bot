@@ -1185,6 +1185,8 @@ as well.\nFor a list of the available commands type /help.', )
                     if len(data[-1]) > 2 or len(data[-1]) < 2 or len(data[-2]) > 2 or len(data[-2]) < 2:
                         self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                               text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
+                        print(f"data[-1] = {data[-1]}")
+                        print(f"data[-2] = {data[-2]}")
                         del self.bot.active_sessions[idx]
                         return
                     if (not self.user.signedsir) and (self.user.dateofsafetytest is not None):
