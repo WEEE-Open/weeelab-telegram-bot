@@ -1189,7 +1189,7 @@ as well.\nFor a list of the available commands type /help.', )
                             del self.bot.active_sessions[idx]
                             return
                     else:
-                        if len(data[-1]) > 2 or len(data[-1]):
+                        if len(data[-1]) > 2 or len(data[-1]) < 2:
                             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                                   text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
                             del self.bot.active_sessions[idx]
