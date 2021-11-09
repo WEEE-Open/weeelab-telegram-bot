@@ -1182,13 +1182,14 @@ as well.\nFor a list of the available commands type /help.', )
                 if session[0] == user_id:
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     sir_message = ""
-                    if len(data[-1]) > 2 or len(data[-1]) < 2 or len(data[-2]) > 2 or len(data[-2]) < 2:
-                        self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
-                                              text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
-                        print(f"data[-1] = {data[-1]}")
-                        print(f"data[-2] = {data[-2]}")
-                        del self.bot.active_sessions[idx]
-                        return
+                    if len(data[-1]) > 2 or len(data[-1]) < 2 and data[-2] != 'hour':
+                        if len(data[-2]) > 2 or len(data[-2]) < 2:
+                            self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
+                                                  text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
+                            print(f"data[-1] = {data[-1]}")
+                            print(f"data[-2] = {data[-2]}")
+                            del self.bot.active_sessions[idx]
+                            return
                     if (not self.user.signedsir) and (self.user.dateofsafetytest is not None):
                         sir_message = "\nRemember to sign the SIR when you get there! 📝"
                         # if people do tolab for a day that is after tomorrow then send also the "mark it down" message
