@@ -1,7 +1,7 @@
 # weeelab-telegram-bot
 [![License](http://img.shields.io/:license-GPL3.0-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
-WEEE-Open Telegram bot.
+WEEE Open Telegram bot.
 
 The goal of this bot is to obtain information about who is currently in the lab,  
 who has done what, compute some stats and, in general, simplify the life of our members...  
