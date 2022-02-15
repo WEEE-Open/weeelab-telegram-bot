@@ -389,7 +389,7 @@ def fah_ranker(bot: BotHandler, hour: int, minute: int):
             top_3_daily = ""
             if not new_file:
                 top_3_daily = f"Daily MVPs:\n{top_3}\n\n" if top_3\
-                    else "No MVPs today since the score has not increased."
+                    else "No MVPs today since the score has not increased.\n\n"
 
             text = f"Total Team Score: <b>{human_readable_number(total_credit)}</b>\n" \
                    f"Total Team Work Units: <b>{human_readable_number(total_wus)}</b>\n" \
