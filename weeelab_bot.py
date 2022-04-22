@@ -1183,13 +1183,18 @@ as well.\nFor a list of the available commands type /help.', )
                     day = self._get_tolab_gui_days(idx, self.bot.active_sessions[idx][2])
                     sir_message = ''
                     if data[-2] != 'hour':
-                        if len(data[-1]) > 2 or len(data[-1]) < 2 or len(data[-2]) > 2 or len(data[-2]) < 2:
+                        hour_str = data[-2]
+                        minute_str = data[-1]
+                        # hour_str could be only one character, but minute_str should always be 2 characters long
+                        # e.g. 9.27 or 8:30
+                        if not hour_str or not minute_str or len(hour_str) > 2 or len(minute_str) != 2:
                             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                                   text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
                             del self.bot.active_sessions[idx]
                             return
                     else:
-                        if len(data[-1]) > 2 or len(data[-1]) < 2:
+                        hour_str = data[-1]
+                        if not hour_str or len(hour_str) > 2:
                             self.bot.edit_message(chat_id=self.__last_chat_id, message_id=message_id,
                                                   text="❌ Use correct time format, e.g. 10:30. Please, retry /tolab")
                             del self.bot.active_sessions[idx]
