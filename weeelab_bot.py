@@ -588,7 +588,9 @@ as well.\nFor a list of the available commands type /help.', )
             people_inlab.add(username)
 
         user_themself_inlab = self.user.uid in people_inlab
-        number_of_people_going = self.tolab_db.check_tolab(people_inlab)
+        self.tolab_db.check_tolab(people_inlab)
+        people_going = self.tolab_db.filter_tolab(people_inlab)
+        number_of_people_going = len(people_going)
         right_now = datetime.datetime.now(self.tolab_db.local_tz)
 
         if number_of_people_going > 0:
@@ -599,7 +601,7 @@ as well.\nFor a list of the available commands type /help.', )
                 msg += f'\n\nThere are {str(number_of_people_going)} students that are going to lab:'
 
             user_themself_tolab = False
-            for user in self.tolab_db.tolab_file:
+            for user in people_going:
                 username = user["username"]
                 going_day = user["tolab"].date()
                 hh = str(user["tolab"].hour).zfill(2)

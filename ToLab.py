@@ -118,7 +118,7 @@ class ToLab:
     def check_tolab(self, people_inlab: set):
         """
         Check who's going to lab.
-        Also, remove /tolab entries older than 30 minutes or for people that are in lab.
+        Also, remove old /tolab entries, leaving 30 min of grace time
 
         :param people_inlab: set of usernames of people /inlab
         :return:
@@ -130,7 +130,7 @@ class ToLab:
         keep = []
         for entry in self.tolab_file:
             if entry["tolab"] < expires:
-                # Older than 30 minutes, remove
+                # Entry time is past by more than 30 minutes
                 changed = True
             elif entry["tolab"] <= now and entry["username"] in people_inlab:
                 # Was in /tolab list for some time ago and is in lab right now, remove
@@ -146,7 +146,26 @@ class ToLab:
             self.tolab_file = keep
             self.save(keep)
 
-        return len(keep)
+    def filter_tolab(self, people_inlab: set):
+        """
+        Return a filtered list, removing people that are going to lab in less than 60 mins and are
+        there right now already.
+
+        :param people_inlab: set of usernames of people /inlab
+        :return:
+        """
+        now = datetime.now(self.local_tz)
+        hide_older_than = now + timedelta(minutes=60)
+
+        result = []
+        for entry in self.tolab_file:
+            if entry["tolab"] <= hide_older_than and entry["username"] in people_inlab:
+                # Entry time is less than 30 minutes in the future, filter out
+                pass
+            else:
+                result.append(entry)
+
+        return result
 
     def save(self, entries: list):
         serializable = []
