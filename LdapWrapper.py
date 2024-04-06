@@ -16,9 +16,10 @@ class LdapConnection:
 
     def __enter__(self):
         # print("Connecting to LDAP")
-        self.conn = ldap.initialize(f"ldap://{self.server}:389")
+        self.conn = ldap.initialize(self.server)
         self.conn.protocol_version = ldap.VERSION3
-        self.conn.start_tls_s()
+        if not self.server.startswith('ldaps://'):
+            self.conn.start_tls_s()
         self.conn.simple_bind_s(self.bind_dn, self.password)
         if self.conn is None:
             raise LdapConnectionError

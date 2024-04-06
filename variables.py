@@ -28,7 +28,7 @@ TOKEN_BOT = os.environ.get('TOKEN_BOT')  # Telegram token for the bot API
 TARALLO = os.environ.get('TARALLO')  # tarallo URL
 TARALLO_TOKEN = os.environ.get('TARALLO_TOKEN')  # tarallo token
 
-LDAP_SERVER = os.environ.get('LDAP_SERVER')  # ldap.example.com
+LDAP_SERVER = os.environ.get('LDAP_SERVER')  # ldap://ldap.example.com:389
 LDAP_USER = os.environ.get('LDAP_USER')  # cn=whatever,ou=whatever
 LDAP_PASS = os.environ.get('LDAP_PASS')  # foo
 LDAP_SUFFIX = os.environ.get('LDAP_SUFFIX')  # dc=weeeopen,dc=it
