@@ -510,7 +510,8 @@ Your user ID is: <b>{self.__last_user_id}</b>"""
         return False
 
     def __send_message(self, message):
-        self.bot.send_message(self.__last_chat_id, message)
+        for i in range(0, len(message), 4096):
+            self.bot.send_message(self.__last_chat_id, message[i : i + 4096])
 
     def __send_inline_keyboard(self, message, markup):
         self.bot.send_message(self.__last_chat_id, message, reply_markup=markup)
@@ -1846,7 +1847,7 @@ def main():
                         logout.start()
                     else:
                         handler.logout_help()
-                
+
                 elif command[0] == "/login" or command[0] == "/login@weeelab_bot":
                     if len(command) == 2:
                         login = Thread(target=handler.login, args=(command[1:],))
