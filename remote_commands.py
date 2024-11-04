@@ -1,8 +1,11 @@
 ssh_weeelab_command = {
-    "logout": ["weeelab -o ", " -m "],
-    "login": [
-        "weeelab -i ",
+    'logout': [
+        "weeelab -o ",
+        " -m "
     ],
+    'login': [
+        "weeelab -i ",
+    ]
 }
 
 ssh_i_am_door_command = "telefono/sonoporta"

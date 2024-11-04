@@ -20,16 +20,14 @@ class LofiVlcPlayer:
     def get_player(self):
         if self.player is None:
             self.__create_new_player()
-        elif (
-            not self.player.is_playing() and int(time()) > self.last_player_time + 3600
-        ):
+        elif not self.player.is_playing() and int(time()) > self.last_player_time + 3600:
             self.player.release()  # TODO: how do we close this thing?
             self.__create_new_player()
         return self.player
 
     def __create_new_player(self):
         playurl = self.__get_playurl()
-        instance = vlc.Instance("-q")
+        instance = vlc.Instance('-q')
         player = instance.media_player_new()
         media = instance.media_new(playurl)
         media.get_mrl()  # TODO: what does this do?
@@ -51,16 +49,16 @@ class LofiVlcPlayer:
         url = "https://www.youtube.com/watch?v=5qap5aO4i9A"
         # https://stackoverflow.com/a/49249893
         ydl_opts = {
-            "format": "bestaudio/best",
+            'format': 'bestaudio/best',
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-            playurl = info["formats"][0]["url"]
+            playurl = info['formats'][0]['url']
         self.playurl = playurl
         self.last_player_time = time()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # to test if streaming works
     # player = LofiVlcPlayer().get_player()
     # player.play()

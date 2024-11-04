@@ -14,9 +14,7 @@ class ToLab:
         self.oc = oc
         self.local_tz = pytz.timezone("Europe/Rome")
         self.tolab_path = tolab_path
-        self.tolab_file = json.loads(
-            oc.get_file_contents(self.tolab_path).decode("utf-8")
-        )
+        self.tolab_file = json.loads(oc.get_file_contents(self.tolab_path).decode('utf-8'))
         for entry in self.tolab_file:
             entry["tolab"] = self.string_to_datetime(entry["tolab"])
 
@@ -70,8 +68,7 @@ class ToLab:
             hour=the_real_date.hour,
             minute=the_real_date.minute,
             second=0,
-            microsecond=0,
-        )
+            microsecond=0)
 
     def __delete_user(self, telegram_id):
         keep = []
@@ -87,14 +84,12 @@ class ToLab:
         now = datetime.now(self.local_tz)
         # Assume that the time refers to today
         theday = now + timedelta(days=day)
-        theday = theday.strftime("%Y-%m-%d")
+        theday = theday.strftime('%Y-%m-%d')
         going = self.string_to_datetime(f"{theday} {time}")
 
         # If it already passed, user probably meant "tomorrow"
         if now > going:
-            going += timedelta(
-                days=1
-            )  # I wonder if this does "exactly 24 hours" or it's smarter...
+            going += timedelta(days=1)  # I wonder if this does "exactly 24 hours" or it's smarter...
 
         entry["tolab"] = going
         days = (going.date() - now.date()).days
@@ -179,9 +174,7 @@ class ToLab:
         for entry in serializable:
             # Save it in local timezone format, because who cares
             entry["tolab"] = datetime.strftime(entry["tolab"], "%Y-%m-%d %H:%M")
-        self.oc.put_file_contents(
-            self.tolab_path, json.dumps(serializable, indent=2).encode("utf-8")
-        )
+        self.oc.put_file_contents(self.tolab_path, json.dumps(serializable, indent=2).encode('utf-8'))
 
 
 class Tolab_Calendar:
@@ -195,70 +188,38 @@ class Tolab_Calendar:
         self.month_offset = int(month_offset)
 
     def make(self):
-        month, days, dates = self.set_calendar()
+        month , days, dates = self.set_calendar()
         month_num = month.split()[0]
         year_num = int(month.split()[1])
         month_num = datetime.strptime(month_num, "%B").month
         keyboard = []
         col_names = []
-        keyboard.append(
-            [inline_keyboard_button(label=month, callback_data="tolab:None")]
-        )
+        keyboard.append([inline_keyboard_button(label=month, callback_data="tolab:None")])
         for d in days:
-            col_names.append(
-                inline_keyboard_button(label=d, callback_data="tolab:None")
-            )
+            col_names.append(inline_keyboard_button(label=d, callback_data="tolab:None"))
         keyboard.append(col_names)
         for row in dates:
             week = []
             for date in row:
-                if (
-                    date == f"{self.day}"
-                    and year_num == self.td_year
-                    and month_num == self.td_month
-                ):
-                    week.append(
-                        inline_keyboard_button(
-                            f"📍{date}", callback_data=f"tolab:{date}:{month}"
-                        )
-                    )
-                elif date == " ":
-                    week.append(
-                        inline_keyboard_button(date, callback_data="tolab:None")
-                    )
-                elif (
-                    year_num <= self.td_year
-                    and month_num <= self.td_month
-                    and int(date) <= self.day
-                ):
-                    week.append(
-                        inline_keyboard_button(date, callback_data="tolab:None")
-                    )
+                if date == f"{self.day}" and year_num == self.td_year and month_num == self.td_month:
+                    week.append(inline_keyboard_button(f"📍{date}", callback_data=f"tolab:{date}:{month}"))
+                elif date == ' ':
+                    week.append(inline_keyboard_button(date, callback_data="tolab:None"))
+                elif year_num <= self.td_year and month_num <= self.td_month and int(date) <= self.day:
+                    week.append(inline_keyboard_button(date, callback_data="tolab:None"))
                 else:
-                    week.append(
-                        inline_keyboard_button(
-                            date, callback_data=f"tolab:{date}:{month}"
-                        )
-                    )
+                    week.append(inline_keyboard_button(date, callback_data=f"tolab:{date}:{month}"))
             keyboard.append(week)
-        keyboard.append(
-            [
-                inline_keyboard_button(
-                    label="⬅️",
-                    callback_data=f"tolab:backward_month:{self.month_offset-1}:",
-                ),
-                inline_keyboard_button(label="❌", callback_data="tolab:cancel_tolab"),
-                inline_keyboard_button(
-                    label="➡️",
-                    callback_data=f"tolab:forward_month:{self.month_offset+1}",
-                ),
-            ]
-        )
+        keyboard.append([
+            inline_keyboard_button(label="⬅️", callback_data=f"tolab:backward_month:{self.month_offset-1}:"),
+            inline_keyboard_button(label="❌", callback_data="tolab:cancel_tolab"),
+            inline_keyboard_button(label="➡️", callback_data=f"tolab:forward_month:{self.month_offset+1}")
+        ])
         return keyboard
 
     def set_calendar(self):
-        self.month = self.month + self.month_offset
-        year_offset = int((self.month - 1) / 12)
+        self.month = (self.month + self.month_offset)
+        year_offset = int((self.month - 1)/12)
         self.month = ((self.month - 1) % 12) + 1
         rows = calendar.month(self.year + year_offset, self.month, 2, 1).splitlines()
         month = rows[0].strip()
@@ -268,7 +229,7 @@ class Tolab_Calendar:
             d = d.strip(" ")
             d = d.split()
             if len(d) != 7:
-                if d[0] == "1":
+                if d[0] == '1':
                     for i in range(7 - len(d)):
                         d.insert(0, " ")
                 else:
