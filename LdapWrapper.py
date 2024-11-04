@@ -1,6 +1,7 @@
 from datetime import date
 from threading import Lock
 from time import time
+
 # noinspection PyUnresolvedReferences
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Tuple
@@ -18,7 +19,7 @@ class LdapConnection:
         # print("Connecting to LDAP")
         self.conn = ldap.initialize(self.server)
         self.conn.protocol_version = ldap.VERSION3
-        if not self.server.startswith('ldaps://'):
+        if not self.server.startswith("ldaps://"):
             self.conn.start_tls_s()
         self.conn.simple_bind_s(self.bind_dn, self.password)
         if self.conn is None:
@@ -101,11 +102,11 @@ class Users:
             dn = result[0][0]
             del result
 
-            modlist = [(ldap.MOD_REPLACE, 'telegramid', str(tgid).encode('UTF-8'))]
+            modlist = [(ldap.MOD_REPLACE, "telegramid", str(tgid).encode("UTF-8"))]
             if nickname is None:
-                modlist.append((ldap.MOD_DELETE, 'telegramnickname', None))
+                modlist.append((ldap.MOD_DELETE, "telegramnickname", None))
             else:
-                modlist.append((ldap.MOD_REPLACE, 'telegramnickname', nickname.encode('UTF-8')))
+                modlist.append((ldap.MOD_REPLACE, "telegramnickname", nickname.encode("UTF-8")))
             c.modify_s(dn, modlist)
 
     def delete_cache(self) -> int:
@@ -162,33 +163,38 @@ class People:
         return busted
 
     def __sync(self, conn):
-        result = conn.search_s(self.tree, ldap.SCOPE_SUBTREE, f"(objectClass=weeeOpenPerson)", (
-            'uid',
-            'cn',
-            'memberof',
-            'telegramnickname',
-            'telegramid',
-            'schacdateofbirth',
-            'safetytestdate',
-            'haskey',
-            'signedsir',
-            'nsaccountlock',
-        ))
+        result = conn.search_s(
+            self.tree,
+            ldap.SCOPE_SUBTREE,
+            f"(objectClass=weeeOpenPerson)",
+            (
+                "uid",
+                "cn",
+                "memberof",
+                "telegramnickname",
+                "telegramid",
+                "schacdateofbirth",
+                "safetytestdate",
+                "haskey",
+                "signedsir",
+                "nsaccountlock",
+            ),
+        )
 
         for dn, attributes in result:
-            dob = self.schac_to_date(attributes['schacdateofbirth'][0].decode()) if 'schacdateofbirth' in attributes else None
-            dost = self.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
+            dob = self.schac_to_date(attributes["schacdateofbirth"][0].decode()) if "schacdateofbirth" in attributes else None
+            dost = self.schac_to_date(attributes["safetytestdate"][0].decode()) if "safetytestdate" in attributes else None
             person = Person(
-                attributes['uid'][0].decode(),
-                attributes['cn'][0].decode(),
+                attributes["uid"][0].decode(),
+                attributes["cn"][0].decode(),
                 dob,
                 dost,
                 User.is_in_groups(self.admin_groups, attributes),
-                attributes['telegramnickname'][0].decode() if 'telegramnickname' in attributes else None,
-                int(attributes['telegramid'][0].decode()) if 'telegramid' in attributes else None,
-                'haskey' in attributes and attributes['haskey'][0].decode() == "true",
-                'signedsir' in attributes and attributes['signedsir'][0].decode() == "true",
-                'nsaccountlock' in attributes,
+                attributes["telegramnickname"][0].decode() if "telegramnickname" in attributes else None,
+                int(attributes["telegramid"][0].decode()) if "telegramid" in attributes else None,
+                "haskey" in attributes and attributes["haskey"][0].decode() == "true",
+                "signedsir" in attributes and attributes["signedsir"][0].decode() == "true",
+                "nsaccountlock" in attributes,
             )
             self.__people[person.uid.lower()] = person
 
@@ -197,6 +203,7 @@ class People:
     @staticmethod
     def schac_to_date(schac_date):
         return date(year=int(schac_date[:4]), month=int(schac_date[4:6]), day=int(schac_date[6:8]))
+
 
 # noinspection PyAttributeOutsideInit
 @dataclass
@@ -233,17 +240,7 @@ class User:
         :return: attributes, dn
         """
         print(f"Update {self.tgid} ({self.dn})")
-        result = conn.read_s(self.dn, None, (
-            'uid',
-            'cn',
-            'givenname',
-            'sn',
-            'memberof',
-            'telegramnickname',
-            'telegramid',
-            'signedsir',
-            'nsaccountlock'
-        ))
+        result = conn.read_s(self.dn, None, ("uid", "cn", "givenname", "sn", "memberof", "telegramnickname", "telegramid", "signedsir", "nsaccountlock"))
         if len(result) == 0:
             raise AccountNotFoundError()
         if len(result) > 1:
@@ -256,16 +253,16 @@ class User:
         if isnotallowed:
             raise AccountNotFoundError()
 
-        if 'nsaccountlock' in attributes:
+        if "nsaccountlock" in attributes:
             raise AccountLockedError()
 
         # self.tgid = int(attributes['tgid'][0].decode())
-        self.uid = attributes['uid'][0].decode()
-        self.cn = attributes['cn'][0].decode()
-        self.givenname = attributes['givenname'][0].decode()
-        self.surname = attributes['surname'][0].decode()
-        self.dateofsafetytest = self._schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None
-        self.signedsir = 'signedsir' in attributes and attributes['signedsir'][0].decode() == "true"
+        self.uid = attributes["uid"][0].decode()
+        self.cn = attributes["cn"][0].decode()
+        self.givenname = attributes["givenname"][0].decode()
+        self.surname = attributes["surname"][0].decode()
+        self.dateofsafetytest = self._schac_to_date(attributes["safetytestdate"][0].decode()) if "safetytestdate" in attributes else None
+        self.signedsir = "signedsir" in attributes and attributes["signedsir"][0].decode() == "true"
         self.isadmin = User.is_in_groups(admin_groups, attributes)
         if also_nickname:
             if User.__get_stored_nickname(attributes) != nickname:
@@ -299,7 +296,7 @@ class User:
         if isnotallowed:
             raise AccountNotFoundError()
 
-        if 'nsaccountlock' in attributes:
+        if "nsaccountlock" in attributes:
             raise AccountLockedError()
 
         isadmin = User.is_in_groups(admin_groups, attributes)
@@ -311,14 +308,15 @@ class User:
         return User(
             dn,
             tgid,
-            attributes['uid'][0].decode(),
-            attributes['cn'][0].decode(),
-            attributes['givenname'][0].decode(),
-            attributes['sn'][0].decode(),
-            People.schac_to_date(attributes['safetytestdate'][0].decode()) if 'safetytestdate' in attributes else None,
-            'signedsir' in attributes and attributes['signedsir'][0].decode() == "true",
+            attributes["uid"][0].decode(),
+            attributes["cn"][0].decode(),
+            attributes["givenname"][0].decode(),
+            attributes["sn"][0].decode(),
+            People.schac_to_date(attributes["safetytestdate"][0].decode()) if "safetytestdate" in attributes else None,
+            "signedsir" in attributes and attributes["signedsir"][0].decode() == "true",
             isadmin,
-            tgnick)
+            tgnick,
+        )
 
     @staticmethod
     def __search_by_tgid(conn, tgid, tree) -> Tuple[Dict, str]:
@@ -330,18 +328,12 @@ class User:
         :param tree: Users tree DN
         :return: attributes, dn
         """
-        result = conn.search_s(tree, ldap.SCOPE_SUBTREE, f"(&(objectClass=weeeOpenPerson)(telegramId={tgid}))", (
-            'uid',
-            'cn',
-            'givenname',
-            'sn',
-            'memberof',
-            'telegramnickname',
-            'safetytestdate',
-            'signedsir',
-            'telegramid',
-            'nsaccountlock'
-        ))
+        result = conn.search_s(
+            tree,
+            ldap.SCOPE_SUBTREE,
+            f"(&(objectClass=weeeOpenPerson)(telegramId={tgid}))",
+            ("uid", "cn", "givenname", "sn", "memberof", "telegramnickname", "safetytestdate", "signedsir", "telegramid", "nsaccountlock"),
+        )
         if len(result) == 0:
             raise AccountNotFoundError()
         if len(result) > 1:
@@ -377,17 +369,17 @@ class User:
 
     @staticmethod
     def __get_stored_nickname(attributes):
-        if 'telegramnickname' in attributes:
-            nickname = attributes['telegramnickname'][0].decode()
+        if "telegramnickname" in attributes:
+            nickname = attributes["telegramnickname"][0].decode()
         else:
             nickname = None
         return nickname
 
     @staticmethod
     def is_in_groups(groups_list: List[str], attributes):
-        if 'memberof' not in attributes:
+        if "memberof" not in attributes:
             return False
-        for group in attributes['memberof']:
+        for group in attributes["memberof"]:
             if group.decode() in groups_list:
                 return True
         return False
@@ -402,16 +394,10 @@ class User:
     @staticmethod
     def __update_nickname(dn: str, new_nickname: Optional[str], conn):
         if new_nickname is None:
-            conn.modify_s(dn, [
-                (ldap.MOD_DELETE, 'telegramNickname', None)
-            ])
+            conn.modify_s(dn, [(ldap.MOD_DELETE, "telegramNickname", None)])
         else:
-            conn.modify_s(dn, [
-                (ldap.MOD_REPLACE, 'telegramNickname', new_nickname.encode('UTF-8'))
-            ])
+            conn.modify_s(dn, [(ldap.MOD_REPLACE, "telegramNickname", new_nickname.encode("UTF-8"))])
 
     @staticmethod
     def __update_id(dn: str, new_id: int, conn):
-        conn.modify_s(dn, [
-            (ldap.MOD_REPLACE, 'telegramId', str(new_id).encode('UTF-8'))
-        ])
+        conn.modify_s(dn, [(ldap.MOD_REPLACE, "telegramId", str(new_id).encode("UTF-8"))])

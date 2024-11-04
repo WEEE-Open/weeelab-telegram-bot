@@ -1,6 +1,7 @@
 import datetime
 import re
 from time import time
+
 # noinspection PyUnresolvedReferences
 import owncloud
 import pytz
@@ -31,7 +32,7 @@ class WeeelabLogs:
             return self
 
         self.log = []
-        log_file = self.oc.get_file_contents(self.log_path).decode('utf-8')
+        log_file = self.oc.get_file_contents(self.log_path).decode("utf-8")
         log_lines = log_file.splitlines()
 
         for line in log_lines:
@@ -99,7 +100,7 @@ class WeeelabLogs:
             filename = self.log_base + "log" + str(year) + str(month).zfill(2) + ".txt"
             print(f"Downloading {filename}")
             try:
-                log_file = self.oc.get_file_contents(filename).decode('utf-8')
+                log_file = self.oc.get_file_contents(filename).decode("utf-8")
                 log_lines = log_file.splitlines()
 
                 for line in log_lines:
@@ -206,7 +207,7 @@ class WeeelabLogs:
 
     def store_new_user(self, tid, name: str, surname: str, username: str):
         new_users_file = self.oc.get_file_contents(self.user_bot_path)
-        new_users = new_users_file.decode('utf-8')
+        new_users = new_users_file.decode("utf-8")
 
         if str(tid) in new_users:
             return
@@ -214,14 +215,14 @@ class WeeelabLogs:
             # Store a new user name and id in a file on owncloud server,
             # encoding in utf.8
             try:
-                if surname != '':
+                if surname != "":
                     surname = f" {surname}"
-                if username == '':
+                if username == "":
                     username = " (no username)"
                 else:
                     username = f" (@{username})"
                 new_users = new_users + "{}{}{}: {}\n".format(name, surname, username, tid)
-                self.oc.put_file_contents(self.user_bot_path, new_users.encode('utf-8'))
+                self.oc.put_file_contents(self.user_bot_path, new_users.encode("utf-8"))
             except (AttributeError, UnicodeEncodeError):
                 print("ERROR writing " + self.user_bot_path)
                 pass
@@ -255,7 +256,7 @@ class WeeelabLogs:
 
 
 class WeeelabLine:
-    regex = re.compile('\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)')
+    regex = re.compile("\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)")
 
     def __init__(self, line: str):
         res = self.regex.match(line)
@@ -279,5 +280,5 @@ class WeeelabLine:
         if self.inlab:
             return 0
 
-        parts = self.duration.split(':')
+        parts = self.duration.split(":")
         return int(parts[0]) * 60 + int(parts[1])

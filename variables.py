@@ -35,15 +35,11 @@ LDAP_SUFFIX = os.environ.get("LDAP_SUFFIX")  # dc=weeeopen,dc=it
 LDAP_TREE_GROUPS = os.environ.get("LDAP_TREE_GROUPS")  # ou=Groups,dc=weeeopen,dc=it
 LDAP_TREE_PEOPLE = os.environ.get("LDAP_TREE_PEOPLE")  # ou=People,dc=weeeopen,dc=it
 LDAP_TREE_INVITES = os.environ.get("LDAP_TREE_INVITES")  # ou=Invites,dc=weeeopen,dc=it
-LDAP_ADMIN_GROUPS = os.environ.get(
-    "LDAP_ADMIN_GROUPS"
-)  # ou=Group,dc=weeeopen,dc=it|ou=OtherGroup,dc=weeeopen,dc=it
+LDAP_ADMIN_GROUPS = os.environ.get("LDAP_ADMIN_GROUPS")  # ou=Group,dc=weeeopen,dc=it|ou=OtherGroup,dc=weeeopen,dc=it
 if LDAP_ADMIN_GROUPS is not None:
     LDAP_ADMIN_GROUPS = LDAP_ADMIN_GROUPS.split("|")
 
-INVITE_LINK = os.environ.get(
-    "INVITE_LINK"
-)  # https://example.com/register.php?invite= (invite code will be appended, no spaces in invite code)
+INVITE_LINK = os.environ.get("INVITE_LINK")  # https://example.com/register.php?invite= (invite code will be appended, no spaces in invite code)
 
 SSH_SCMA_USER = os.environ.get("SSH_SCMA_USER")  # foo
 SSH_SCMA_HOST_IP = os.environ.get("SSH_SCMA_HOST_IP")  # 10.20.30.40
@@ -53,9 +49,7 @@ SSH_PIALL_USER = os.environ.get("SSH_PIALL_USER")
 SSH_PIALL_HOST_IP = os.environ.get("SSH_PIALL_HOST_IP")
 SSH_PIALL_KEY_PATH = os.environ.get("SSH_PIALL_KEY_PATH")
 
-WOL_MACHINES = os.environ.get(
-    "WOL_MACHINES"
-)  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
+WOL_MACHINES = os.environ.get("WOL_MACHINES")  # machine:00:0a:0b:0c:0d:0e|other:10:2a:3b:4c:5d:6e
 if WOL_MACHINES is not None:
     WOL_MACHINES = __unpack_wol(WOL_MACHINES)
 WOL_WEEELAB = os.environ.get("WOL_WEEELAB")  # 00:0a:0b:0c:0d:0e

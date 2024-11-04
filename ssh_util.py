@@ -13,19 +13,20 @@ from sys import stderr
 class SSHUtil:
     """Class to connect to a remote server"""
 
-    def __init__(self,
-                 host: str = None,
-                 username: str = None,
-                 password: str = None,
-                 timeout: float = 10.,
-                 commands: [str] = None,
-                 private_key_path: str = None,
-                 connection_port: int = 22,
-                 upload_remote_filepath: str = None,
-                 upload_local_filepath: str = None,
-                 download_remote_filepath: str = None,
-                 download_local_filepath: str = None
-                 ):  # come on, constructor, don't be sad :)
+    def __init__(
+        self,
+        host: str = None,
+        username: str = None,
+        password: str = None,
+        timeout: float = 10.0,
+        commands: [str] = None,
+        private_key_path: str = None,
+        connection_port: int = 22,
+        upload_remote_filepath: str = None,
+        upload_local_filepath: str = None,
+        download_remote_filepath: str = None,
+        download_local_filepath: str = None,
+    ):  # come on, constructor, don't be sad :)
         self.ssh_output = None
         self.ssh_error = None
         self.return_code = None
@@ -63,12 +64,26 @@ class SSHUtil:
             if self.password is None:
                 # this needs to be a PEM key (begins with RSA not OPENSSH)
                 # use "ssh-keygen -p -m PEM -f id_rsa_X" to convert OPENSSH to RSA
-                self.client.connect(hostname=self.host, port=self.port, username=self.username, key_filename=self.pkey,
-                                    timeout=self.timeout, allow_agent=False, look_for_keys=False)
+                self.client.connect(
+                    hostname=self.host,
+                    port=self.port,
+                    username=self.username,
+                    key_filename=self.pkey,
+                    timeout=self.timeout,
+                    allow_agent=False,
+                    look_for_keys=False,
+                )
                 print("Connected to the server", self.host)
             else:
-                self.client.connect(hostname=self.host, port=self.port, username=self.username, password=self.password,
-                                    timeout=self.timeout, allow_agent=False, look_for_keys=False)
+                self.client.connect(
+                    hostname=self.host,
+                    port=self.port,
+                    username=self.username,
+                    password=self.password,
+                    timeout=self.timeout,
+                    allow_agent=False,
+                    look_for_keys=False,
+                )
                 print("Connected to the server", self.host)
         except paramiko.AuthenticationException:
             print("Authentication failed, please verify your credentials")
@@ -80,8 +95,8 @@ class SSHUtil:
             print("Connection timed out")
             result_flag = False
         except Exception as e:
-            print('\nException in connecting to the server')
-            print('PYTHON SAYS:', e)
+            print("\nException in connecting to the server")
+            print("PYTHON SAYS:", e)
             result_flag = False
             self.client.close()
         else:
@@ -106,8 +121,7 @@ class SSHUtil:
                     self.ssh_error = stderr.read()
                     self.return_code = stdout.channel.recv_exit_status()
                     if self.ssh_error:
-                        print(
-                            "Problem occurred while running command:" + command + " The error is " + self.ssh_error.decode())
+                        print("Problem occurred while running command:" + command + " The error is " + self.ssh_error.decode())
                         result_flag = False
                     else:
                         print("Command execution completed successfully:", '"' + command + '"')
@@ -140,8 +154,8 @@ class SSHUtil:
                 print("Could not establish SSH connection")
                 result_flag = False
         except Exception as e:
-            print('\nUnable to upload the file to the remote server', uploadremotefilepath)
-            print('PYTHON SAYS:', e)
+            print("\nUnable to upload the file to the remote server", uploadremotefilepath)
+            print("PYTHON SAYS:", e)
             result_flag = False
             ftp_client.close()
             self.client.close()
@@ -161,8 +175,8 @@ class SSHUtil:
                 print("Could not establish SSH connection")
                 result_flag = False
         except Exception as e:
-            print('\nUnable to download the file from the remote server', downloadremotefilepath)
-            print('PYTHON SAYS:', e)
+            print("\nUnable to download the file from the remote server", downloadremotefilepath)
+            print("PYTHON SAYS:", e)
             result_flag = False
             ftp_client.close()
             self.client.close()
@@ -181,7 +195,7 @@ class AuthenticationMethodNotFoundException(Exception):
 
 
 # ---USAGE EXAMPLES
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Start of %s" % __file__)
 
     # Initialize the ssh object

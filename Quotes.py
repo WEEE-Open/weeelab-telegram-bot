@@ -25,16 +25,16 @@ class Quotes:
         self.demotivational_last_download = None
 
     def _download(self):
-        if self.quotes_last_download is not None and self._timestamp_now() - self.quotes_last_download < 60*60*48:
+        if self.quotes_last_download is not None and self._timestamp_now() - self.quotes_last_download < 60 * 60 * 48:
             return self
 
-        self.quotes = json.loads(self.oc.get_file_contents(self.quotes_path).decode('utf-8'))
+        self.quotes = json.loads(self.oc.get_file_contents(self.quotes_path).decode("utf-8"))
         self.quotes_last_download = self._timestamp_now()
 
         authors_count_for_game = {}
         for quote in self.quotes:
             if "author" in quote:
-                parts = quote["author"].split('/')
+                parts = quote["author"].split("/")
                 for author in parts:
                     author: str
                     author_not_normalized = author.strip()
@@ -59,10 +59,10 @@ class Quotes:
         return self
 
     def _download_demotivational(self):
-        if self.demotivational_last_download is not None and self._timestamp_now() - self.demotivational_last_download < 60*60*48:
+        if self.demotivational_last_download is not None and self._timestamp_now() - self.demotivational_last_download < 60 * 60 * 48:
             return self
 
-        self.demotivational = self.oc.get_file_contents(self.demotivational_path).decode('utf-8').split("\n")
+        self.demotivational = self.oc.get_file_contents(self.demotivational_path).decode("utf-8").split("\n")
         self.demotivational_last_download = self._timestamp_now()
 
         return self
@@ -70,10 +70,10 @@ class Quotes:
     def _download_game(self):
         if len(self.game) <= 0:
             try:
-                self.game = json.loads(self.oc.get_file_contents(self.game_path).decode('utf-8'))
+                self.game = json.loads(self.oc.get_file_contents(self.game_path).decode("utf-8"))
             except owncloud.owncloud.HTTPResponseError as e:
                 if e.status_code == 404:
-                    self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=1).encode('utf-8'))
+                    self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=1).encode("utf-8"))
                 else:
                     raise e
 
@@ -83,7 +83,7 @@ class Quotes:
     def _timestamp_now() -> float:
         return datetime.now().timestamp()
 
-    def get_random_quote(self, author: Optional[str]=None):
+    def get_random_quote(self, author: Optional[str] = None):
         self._download()
 
         if author is None:
@@ -125,7 +125,7 @@ class Quotes:
             author_normalized = self._normalize_author(author_printable)
 
         # 3 other possibilites
-        answers = Quotes._random_choices_without_replacement(dict(filter(lambda el : el[0] != author_normalized, self.authors_weights_for_game.items())), 3)
+        answers = Quotes._random_choices_without_replacement(dict(filter(lambda el: el[0] != author_normalized, self.authors_weights_for_game.items())), 3)
         # plus the right one
         answers.append(author_normalized)
 
@@ -138,7 +138,7 @@ class Quotes:
         self._init_game(uid)
 
         self.game[uid]["current_author"] = author_printable
-        #self._save_game()
+        # self._save_game()
 
         # since author_printable = '/', they're bound
         # noinspection PyUnboundLocalVariable
@@ -176,7 +176,7 @@ class Quotes:
 
     @staticmethod
     def _normalize_author(author):
-        author = ''.join(filter(str.isalnum, author.strip().lower()))
+        author = "".join(filter(str.isalnum, author.strip().lower()))
         return author
 
     @staticmethod
@@ -218,4 +218,4 @@ class Quotes:
     def _save_game(self):
         if len(self.game) > 0:
             # indent=0 to at least have some lines, instead of no newline at all
-            self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=0, separators=(',', ':')).encode('utf-8'))
+            self.oc.put_file_contents(self.game_path, json.dumps(self.game, indent=0, separators=(",", ":")).encode("utf-8"))
