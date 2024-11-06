@@ -61,4 +61,4 @@ WEEE_CHAT_ID = int(os.environ.get("WEEE_CHAT_ID"))
 WEEE_FOLD_ID = int(os.environ.get("WEEE_FOLD_ID"))
 WEEE_CHAT2_ID = int(os.environ.get("WEEE_CHAT2_ID"))
 
-LOCAL_WEEELAB = bool(os.environ.get("LOCAL_WEEELAB"), False)  # 1, True
+LOCAL_WEEELAB = bool(os.environ.get("LOCAL_WEEELAB", False))  # 1, True
