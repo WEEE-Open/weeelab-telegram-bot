@@ -1794,6 +1794,9 @@ as well.\nFor a list of the available commands type /help.",
             except Exception as e:
                 print(e)
 
+    def id(self):
+        self.__send_message(f"Your Telegram ID is: {self.user.uid}")
+
     def unknown(self):
         """
         Called when an unknown command is received
@@ -1835,6 +1838,7 @@ Note: the username <b>must</b> be a single word with no spaces in between.\n"""
 /item <i>code</i> - Show info about an item
 /history <i>item</i> - Show history for an item, straight outta T.A.R.A.L.L.O.
 /history <i>item</i> <i>n</i> - Show <i>n</i> history entries
+/id - Show your Telegram ID
 /lofi - Spawns a keyboard with media controls for the lofi YouTube stream"""
 
         if self.user.isadmin:
@@ -2049,6 +2053,9 @@ def main():
 
                 elif command[0] == "/nexttests" or command[0] == "/nexttests@weeelab_bot":
                     handler.next_tests()
+
+                elif command[0] == "/id" or command[0] == "/id@weeelab_bot":
+                    handler.id()
 
                 else:
                     flag = True
