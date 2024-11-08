@@ -62,3 +62,9 @@ WEEE_FOLD_ID = int(os.environ.get("WEEE_FOLD_ID"))
 WEEE_CHAT2_ID = int(os.environ.get("WEEE_CHAT2_ID"))
 
 LOCAL_WEEELAB = bool(os.environ.get("LOCAL_WEEELAB", False))  # 1, True
+USE_GRILLO_DB = bool(os.environ.get("USE_GRILLO_DB", False))  # 1, True
+GRILLO_DB_HOST = os.environ.get("GRILLO_DB_HOST")
+GRILLO_DB_PORT = int(os.environ.get("GRILLO_DB_PORT"))
+GRILLO_DB_NAME = os.environ.get("GRILLO_DB_NAME")
+GRILLO_DB_USER = os.environ.get("GRILLO_DB_USER")
+GRILLO_DB_PASS = os.environ.get("GRILLO_DB_PASS")

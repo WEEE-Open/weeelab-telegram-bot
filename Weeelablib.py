@@ -6,6 +6,9 @@ from time import time
 import owncloud
 import pytz
 
+from variables import USE_GRILLO_DB, GRILLO_DB_USER, GRILLO_DB_PASSWORD, GRILLO_DB_HOST, GRILLO_DB_PORT, GRILLO_DB_NAME
+import psycopg2
+
 
 class WeeelabLogs:
     def __init__(self, oc: owncloud, log_path: str, log_base: str, user_bot_path: str):
@@ -27,24 +30,47 @@ class WeeelabLogs:
         self.old_logs_year = 2017
         self.local_tz = pytz.timezone("Europe/Rome")
 
+    def connect_pg(self):
+        return psycopg2.connect(user=GRILLO_DB_USER, password=GRILLO_DB_PASSWORD, host=GRILLO_DB_HOST, port=GRILLO_DB_PORT, database=GRILLO_DB_NAME)
+
     def get_log(self):
         if self.log_last_download is not None and time() - self.log_last_download < 30:
             return self
-
         self.log = []
-        log_file = self.oc.get_file_contents(self.log_path).decode("utf-8")
-        log_lines = log_file.splitlines()
 
-        for line in log_lines:
-            if len(line.strip()) > 0:
-                self.log.append(WeeelabLine(line))
+        if not USE_GRILLO_DB:
+            log_file = self.oc.get_file_contents(self.log_path).decode("utf-8")
+            log_lines = log_file.splitlines()
 
-        # store the date of the last update of the log file,
-        # the data is in UTC so we convert it to local timezone
-        last_update_utc = self.oc.file_info(self.log_path).get_last_modified()
+            for line in log_lines:
+                if len(line.strip()) > 0:
+                    self.log.append(WeeelabLine(line))
+
+            # store the date of the last update of the log file,
+            # the data is in UTC so we convert it to local timezone
+            last_update_utc = self.oc.file_info(self.log_path).get_last_modified()
+
+        else:
+            with self.connect_pg() as conn:
+                with conn.cursor() as cur:
+                    # Calculate min timestamp in seconds for the current month
+                    now = datetime.datetime.now()
+                    start_month = datetime.datetime(now.year, now.month, 1)
+                    start_month = int(start_month.timestamp())
+
+                    cur.execute("SELECT * FROM audit WHERE startTime >= ?", (start_month,))
+                    rows = cur.fetchall()
+                    for row in rows:
+                        line = WeeelabLine(row)
+                        self.log.append(line)
+
+                    # select the max timestamp in seconds for the current month of both startTime and endTime
+                    cur.execute("SELECT MAX(endTime), MAX(startTime) FROM audit WHERE startTime >= ?", (start_month,))
+                    row = cur.fetchone()
+                    last_update_utc = datetime.datetime.fromtimestamp(max(row[0], row[1]))
+
         self.log_last_update = pytz.utc.localize(last_update_utc, is_dst=None).astimezone(self.local_tz)
         self.log_last_download = time()
-
         return self
 
     def delete_cache(self) -> int:
@@ -83,37 +109,53 @@ class WeeelabLogs:
         year = self.old_logs_year
         month = self.old_logs_month
 
-        while True:
-            month += 1
-            if month >= 13:
-                month = 1
-                year += 1
-            if year >= max_year and month > max_month:
-                # We're past the target year/month, go back by one
-                # when storing this as the last downloaded one
-                month -= 1
-                if month == 0:
-                    month = 12
-                    year -= 1
-                break
+        if not USE_GRILLO_DB:
+            while True:
+                month += 1
+                if month >= 13:
+                    month = 1
+                    year += 1
+                if year >= max_year and month > max_month:
+                    # We're past the target year/month, go back by one
+                    # when storing this as the last downloaded one
+                    month -= 1
+                    if month == 0:
+                        month = 12
+                        year -= 1
+                    break
 
-            filename = self.log_base + "log" + str(year) + str(month).zfill(2) + ".txt"
-            print(f"Downloading {filename}")
-            try:
-                log_file = self.oc.get_file_contents(filename).decode("utf-8")
-                log_lines = log_file.splitlines()
+                filename = self.log_base + "log" + str(year) + str(month).zfill(2) + ".txt"
+                print(f"Downloading {filename}")
+                try:
+                    log_file = self.oc.get_file_contents(filename).decode("utf-8")
+                    log_lines = log_file.splitlines()
 
-                for line in log_lines:
-                    if len(line.strip()) > 0:
-                        self.old_log.append(WeeelabLine(line))
-            except owncloud.owncloud.HTTPResponseError:
-                print(f"Failed downloading {filename}, will try again next time")
-                # Roll back to the previous month, since that's the last we have
-                month -= 1
-                if month == 0:
-                    month = 12
-                    year -= 1
-                break
+                    for line in log_lines:
+                        if len(line.strip()) > 0:
+                            self.old_log.append(WeeelabLine(line))
+                except owncloud.owncloud.HTTPResponseError:
+                    print(f"Failed downloading {filename}, will try again next time")
+                    # Roll back to the previous month, since that's the last we have
+                    month -= 1
+                    if month == 0:
+                        month = 12
+                        year -= 1
+                    break
+        else:
+            with self.connect_pg() as conn:
+                with conn.cursor() as curr:
+                    # Get all the logs from the month next to the last one we have to max_month max_year
+                    starting_timestamp = int(datetime.datetime(year, month, 1).timestamp())
+                    ending_timestamp = int(datetime.datetime(max_year, max_month, 1).timestamp())
+
+                    curr.execute("SELECT * FROM audit WHERE startTime >= ? AND startTime < ?", (starting_timestamp, ending_timestamp))
+                    rows = curr.fetchall()
+                    for row in rows:
+                        line = WeeelabLine(row)
+                        self.old_log.append(line)
+
+                    year = max_year
+                    month = max_month
 
         self.old_logs_month = month
         self.old_logs_year = year
@@ -257,7 +299,10 @@ class WeeelabLogs:
 class WeeelabLine:
     regex = re.compile("\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)")
 
-    def __init__(self, line: str):
+    def __init__(self, line: str | tuple):
+        if isinstance(line, tuple):
+            # TODO line =
+            raise NotImplementedError("Not implemented yet")
         res = self.regex.match(line)
         self.time_in = res.group(1)
         self.time_out = res.group(2)

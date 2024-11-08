@@ -7,3 +7,4 @@ youtube_dl >=2020.3.24
 paramiko >=2.7.1
 pytarallo >=2.3.1
 python-vlc >=3.0.7110
+psycopg2
