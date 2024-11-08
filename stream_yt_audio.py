@@ -1,10 +1,9 @@
 # this script does the same as:
 # cvlc https://www.youtube.com/watch?v=hHW1oY26kxQ (uses dummy interface for video but still outputs many errors)
-from time import time
+from time import sleep, time
 
-import youtube_dl
 import vlc  # python-vlc when installing with pip
-from time import sleep
+import youtube_dl
 
 
 class LofiVlcPlayer:

@@ -4,3 +4,4 @@ ldaptest.py
 weeedong.wav
 fah_history.json
 venv/
+.direnv/

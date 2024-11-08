@@ -16,50 +16,42 @@ Author: WEEE Open Team
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import datetime
 # Modules
 import json
 import os
+import random
+import time
+import traceback  # Print stack traces in logs
+from datetime import timedelta
+from enum import Enum
 from json import JSONDecodeError
-from typing import Optional, List
-
-from pytarallo.AuditEntry import AuditEntry, AuditChanges
-from pytarallo.Errors import ItemNotFoundError, AuthenticationError
-from pytarallo.Tarallo import Tarallo
-
-from Wol import Wol
-from LdapWrapper import (
-    Users,
-    People,
-    LdapConnection,
-    LdapConnectionError,
-    DuplicateEntryError,
-    AccountLockedError,
-    AccountNotFoundError,
-    User,
-    Person,
-)
-from ToLab import ToLab, Tolab_Calendar
-from Quotes import Quotes
-from Weeelablib import WeeelabLogs
-from variables import *  # internal library with the environment variables
-import requests  # send HTTP requests to Telegram server
+from subprocess import PIPE, run
+from threading import Thread
+from time import sleep
+from typing import List, Optional
 
 # from requests_html import HTMLSession
 # noinspection PyUnresolvedReferences
 import owncloud
-import datetime
-import random
-import time
-from datetime import timedelta
-import traceback  # Print stack traces in logs
+import requests  # send HTTP requests to Telegram server
 import simpleaudio
-from stream_yt_audio import LofiVlcPlayer
-from enum import Enum
-from time import sleep
-from remote_commands import ssh_weeelab_command, shutdown_command, ssh_i_am_door_command
+from pytarallo.AuditEntry import AuditChanges, AuditEntry
+from pytarallo.Errors import AuthenticationError, ItemNotFoundError
+from pytarallo.Tarallo import Tarallo
+
+from LdapWrapper import (AccountLockedError, AccountNotFoundError,
+                         DuplicateEntryError, LdapConnection,
+                         LdapConnectionError, People, Person, User, Users)
+from Quotes import Quotes
+from remote_commands import (shutdown_command, ssh_i_am_door_command,
+                             ssh_weeelab_command)
 from ssh_util import SSHUtil
-from threading import Thread
-from subprocess import run, PIPE
+from stream_yt_audio import LofiVlcPlayer
+from ToLab import ToLab, Tolab_Calendar
+from variables import *  # internal library with the environment variables
+from Weeelablib import WeeelabLogs
+from Wol import Wol
 
 
 class BotHandler:

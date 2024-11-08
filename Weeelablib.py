@@ -225,7 +225,6 @@ class WeeelabLogs:
                 self.oc.put_file_contents(self.user_bot_path, new_users.encode("utf-8"))
             except (AttributeError, UnicodeEncodeError):
                 print("ERROR writing " + self.user_bot_path)
-                pass
 
     @staticmethod
     def get_name_and_surname(user_entry: dict):

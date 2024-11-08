@@ -1,10 +1,10 @@
+# noinspection PyUnresolvedReferences
+from dataclasses import dataclass
 from datetime import date
 from threading import Lock
 from time import time
+from typing import Dict, List, Optional, Tuple
 
-# noinspection PyUnresolvedReferences
-from dataclasses import dataclass
-from typing import Optional, List, Dict, Tuple
 import ldap
 from ldap.filter import escape_filter_chars
 

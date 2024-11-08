@@ -1,10 +1,10 @@
 # noinspection PyUnresolvedReferences
+import json
+import random
 from datetime import datetime
 from typing import Optional
 
 import owncloud
-import random
-import json
 
 
 class Quotes:
