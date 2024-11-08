@@ -17,6 +17,7 @@ Author: WEEE Open Team
 """
 
 import datetime
+
 # Modules
 import json
 import os
@@ -40,12 +41,9 @@ from pytarallo.AuditEntry import AuditChanges, AuditEntry
 from pytarallo.Errors import AuthenticationError, ItemNotFoundError
 from pytarallo.Tarallo import Tarallo
 
-from LdapWrapper import (AccountLockedError, AccountNotFoundError,
-                         DuplicateEntryError, LdapConnection,
-                         LdapConnectionError, People, Person, User, Users)
+from LdapWrapper import AccountLockedError, AccountNotFoundError, DuplicateEntryError, LdapConnection, LdapConnectionError, People, Person, User, Users
 from Quotes import Quotes
-from remote_commands import (shutdown_command, ssh_i_am_door_command,
-                             ssh_weeelab_command)
+from remote_commands import shutdown_command, ssh_i_am_door_command, ssh_weeelab_command
 from ssh_util import SSHUtil
 from stream_yt_audio import LofiVlcPlayer
 from ToLab import ToLab, Tolab_Calendar
