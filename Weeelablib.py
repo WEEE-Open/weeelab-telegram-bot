@@ -1,4 +1,5 @@
 import datetime
+import glob
 import re
 from time import time
 
@@ -11,12 +12,12 @@ import psycopg2
 
 
 class WeeelabLogs:
-    def __init__(self, oc: owncloud, log_path: str, log_base: str, user_bot_path: str):
+    def __init__(self, oc: owncloud.Client, log_path: str, log_base: str, user_bot_path: str):
         self.log = []
         self.log_last_download = None
         self.log_last_update = None
         self.error = None
-        self.oc = oc
+        self.oc: owncloud.Client = oc
 
         self.log_path = log_path
         self.log_base = log_base
@@ -110,19 +111,11 @@ class WeeelabLogs:
         month = self.old_logs_month
 
         if not USE_GRILLO_DB:
-            while True:
+            while year < max_year or (year == max_year and month <= max_month):
                 month += 1
                 if month >= 13:
                     month = 1
                     year += 1
-                if year >= max_year and month > max_month:
-                    # We're past the target year/month, go back by one
-                    # when storing this as the last downloaded one
-                    month -= 1
-                    if month == 0:
-                        month = 12
-                        year -= 1
-                    break
 
                 filename = self.log_base + "log" + str(year) + str(month).zfill(2) + ".txt"
                 print(f"Downloading {filename}")
@@ -133,14 +126,11 @@ class WeeelabLogs:
                     for line in log_lines:
                         if len(line.strip()) > 0:
                             self.old_log.append(WeeelabLine(line))
-                except owncloud.owncloud.HTTPResponseError:
+                except owncloud.owncloud.HTTPResponseError as e:
                     print(f"Failed downloading {filename}, will try again next time")
                     # Roll back to the previous month, since that's the last we have
-                    month -= 1
-                    if month == 0:
-                        month = 12
-                        year -= 1
-                    break
+                    if e.status_code == 404:
+                        self.oc.put_file_contents(filename, "".encode("utf-8"))
         else:
             with self.connect_pg() as conn:
                 with conn.cursor() as curr:
@@ -184,7 +174,6 @@ class WeeelabLogs:
         """
         minutes_thismonth = 0
 
-        # noinspection PyUnusedLocal
         line: WeeelabLine
         for line in self.log:
             if line.username == username:
@@ -192,7 +181,6 @@ class WeeelabLogs:
 
         minutes_total = minutes_thismonth
 
-        # noinspection PyUnusedLocal
         line: WeeelabLine
         for line in self.old_log:
             if line.username == username:
@@ -297,7 +285,7 @@ class WeeelabLogs:
 
 
 class WeeelabLine:
-    regex = re.compile("\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)")
+    regex = re.compile(r"\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*<([^>]+)>\s*[:{2}]*\s*(.*)")
 
     def __init__(self, line: str | tuple):
         if isinstance(line, tuple):
